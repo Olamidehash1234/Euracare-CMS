@@ -15,7 +15,7 @@ const Careers = lazy(() => import('./pages/Careers'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Department = lazy(() => import('./pages/Department'));
 const Logs = lazy(() => import('./pages/Logs'));
-const Accreditations = lazy(() => import ('./pages/Accreditations'))
+const Accreditations = lazy(() => import('./pages/Accreditations'))
 
 function App() {
   return (
