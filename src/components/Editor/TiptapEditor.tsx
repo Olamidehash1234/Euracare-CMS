@@ -28,11 +28,12 @@ const fontFamilyOptions = [
   { label: 'Courier New', value: 'Courier New' },
 ];
 
-const TiptapEditor = ({ content, onChange, placeholder }: TiptapEditorProps) => {
+const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      TextStyle.configure({ types: ['textStyle'] }),
+      // Use TextStyle without invalid options (configure types is not supported in this version)
+      TextStyle,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
         alignments: ['left', 'center', 'right', 'justify'],
@@ -62,7 +63,8 @@ const TiptapEditor = ({ content, onChange, placeholder }: TiptapEditorProps) => 
         <CustomDropdown
           options={fontFamilyOptions}
           value=""
-          onChange={(value) => editor.chain().focus().setFontFamily(value).run()}
+          // apply font-family via textStyle mark (cast to any to avoid typings mismatch)
+          onChange={(value) => (editor as any).chain().focus().setMark('textStyle', { fontFamily: value }).run()}
           placeholder="Font Family"
           className="w-36"
         />
@@ -70,7 +72,8 @@ const TiptapEditor = ({ content, onChange, placeholder }: TiptapEditorProps) => 
         <CustomDropdown
           options={fontSizeOptions}
           value=""
-          onChange={(value) => editor.chain().focus().setFontSize(value).run()}
+          // apply font-size via textStyle mark (cast to any to avoid typings mismatch)
+          onChange={(value) => (editor as any).chain().focus().setMark('textStyle', { fontSize: value }).run()}
           placeholder="Font Size"
           className="w-32"
         />

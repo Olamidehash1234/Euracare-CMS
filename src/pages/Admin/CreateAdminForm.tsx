@@ -10,7 +10,7 @@ export type AdminPayload = {
   roleType: string;
   avatar?: string;
   notifyByEmail?: boolean;
-  // countryCode?: string;
+  countryCode?: string;
 };
 
 interface Props {
@@ -48,6 +48,7 @@ export default function CreateAdminForm({ mode = 'create', initialData, onSave, 
     fullName: initialData?.fullName || '',
     email: initialData?.email || '',
     phone: initialData?.phone || '',
+    countryCode: initialData?.countryCode || '+234',
     password: '',
     confirmPassword: '',
     roleType: initialData?.roleType || '',
