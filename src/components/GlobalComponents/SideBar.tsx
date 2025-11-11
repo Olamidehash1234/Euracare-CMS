@@ -7,11 +7,11 @@ import doctorsIcon from "/icon/doctor.svg"
 import ourTeamIcon from "/icon/team.svg"
 import servicesIcon from "/icon/services.svg"
 import blogIcon from "/icon/news.svg"
-import careerIcon from "/icon/careers.svg"
+// import careerIcon from "/icon/careers.svg"
 import adminIcon from "/icon/admin.svg"
 import departmentIcon from "/icon/department.svg"
 import activityIcon from "/icon/activity.svg"
-import accreditationsIcon from "/icon/accreditations.svg"
+// import accreditationsIcon from "/icon/accreditations.svg"
 
 interface NavItem {
   id: string;
@@ -38,13 +38,13 @@ const items: NavSection = {
     { id: "team", label: "Our Team", icon: ourTeamIcon },
     { id: "services", label: "Services", icon: servicesIcon },
     { id: "blogs", label: "Blogs & Articles", icon: blogIcon },
-    { id: "accreditations", label: "Accreditations", icon: accreditationsIcon },
-    { id: "careers", label: "Careers", icon: careerIcon },
+    // { id: "accreditations", label: "Accreditations", icon: accreditationsIcon },
+    // { id: "careers", label: "Careers", icon: careerIcon },
   ],
 
   system: [
     { id: "admin", label: "Admin Management", icon: adminIcon },
-    { id: "department", label: "Department", icon: departmentIcon },
+    { id: "roles&permission", label: "Roles & Permission", icon: departmentIcon },
     { id: "logs", label: "Activity Logs", icon: activityIcon },
   ],
 };
@@ -66,11 +66,12 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
     if (path.startsWith('/team')) return 'team';
     if (path.startsWith('/services')) return 'services';
     if (path.startsWith('/blogs')) return 'blogs';
-    if (path.startsWith('/careers')) return 'careers';
+    // if (path.startsWith('/careers')) return 'careers';
     if (path.startsWith('/admin')) return 'admin';
-    if (path.startsWith('/department')) return 'department';
+    // FIX: match sidebar id for roles&permission
+    if (path.startsWith('/roles&permission')) return 'roles&permission';
     if (path.startsWith('/logs')) return 'logs';
-    if (path.startsWith('/accreditations')) return 'accreditations' // Fixed: changed ./accreditations to /accreditations
+    // if (path.startsWith('/accreditations')) return 'accreditations'
     return initialActiveItem;
   };
 
@@ -218,7 +219,7 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
                 const handleClick = () => {
                   setActive(it.id);
                   if (it.id === "admin") navigate("/admin");
-                  if (it.id === "department") navigate("/department");
+                  if (it.id === "roles&permission") navigate("/roles&permission");
                   if (it.id === "logs") navigate("/logs");
                 };
                 return (

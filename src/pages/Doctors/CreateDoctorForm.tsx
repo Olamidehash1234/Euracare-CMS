@@ -41,7 +41,7 @@ export default function DoctorForm({ mode = 'create', initialData, onClose }: Do
         email: initialData?.email || '',
         countryCode: '+234',
         phone: initialData?.phone || '',
-        languages: initialData?.languages || ['English', 'Yoruba'],
+        languages: initialData?.languages || [],
         languageInput: '',
         regNumber: initialData?.regNumber || '',
         yearsExperience: initialData?.yearsExperience || '',
@@ -53,18 +53,16 @@ export default function DoctorForm({ mode = 'create', initialData, onClose }: Do
 
     // Professional information states
     const [programInput, setProgramInput] = useState<string>('');
-    const [programs, setPrograms] = useState<string[]>(['Advanced Cardiac Imaging','Interventional Cardiology']);
+    const [programs, setPrograms] = useState<string[]>([]);
 
     const [researchInput, setResearchInput] = useState<string>('');
-    const [researchInterests, setResearchInterests] = useState<string[]>(['Hypertension','Congenital heart disease','Pulmonary hypertension']);
+    const [researchInterests, setResearchInterests] = useState<string[]>([]);
 
     const [qualificationInput, setQualificationInput] = useState<string>('');
-    const [qualifications, setQualifications] = useState<string[]>(["BSc (Hons), King's College London","PhD in Biochemistry, University of Southampton","MBBS, St. George's Hospital Medical School, London"]);
+    const [qualifications, setQualifications] = useState<string[]>([]);
 
     const [trainingInput, setTrainingInput] = useState<string>('');
     const [trainings, setTrainings] = useState<string[]>([
-      'Internship and residency in Internal Medicine, London UK',
-      'Cardiology residency in West Midlands, UK',
     ]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {

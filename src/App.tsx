@@ -13,7 +13,7 @@ const Services = lazy(() => import('./pages/Services'));
 const Blogs = lazy(() => import('./pages/Blogs'));
 const Careers = lazy(() => import('./pages/Careers'));
 const Admin = lazy(() => import('./pages/Admin'));
-const Department = lazy(() => import('./pages/Department'));
+const Roles = lazy(() => import('./pages/Roles&permission'));
 // const Logs = lazy(() => import('./pages/logs'));
 const Accreditations = lazy(() => import('./pages/Accreditations'))
 
@@ -33,7 +33,7 @@ function App() {
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/department" element={<Department />} />
+            <Route path="/roles&permission" element={<Roles />} />
             {/* <Route path="/logs" element={<Logs />} /> */}
             <Route path='/accreditations' element={ <Accreditations/>} />
           </Route>
