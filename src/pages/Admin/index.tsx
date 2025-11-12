@@ -7,7 +7,7 @@ import CreateAdminForm from './CreateAdminForm';
 import type { AdminType } from '../../components/Admin/AdminTable';
 import type { AdminPayload } from './CreateAdminForm';
 
-const sampleAdminsInitial: AdminType[] = [
+export const sampleAdminsInitial: AdminType[] = [
   { 
     id: 1, 
     name: 'Dr. Hammed Ninalowo', 
@@ -19,10 +19,98 @@ const sampleAdminsInitial: AdminType[] = [
   { 
     id: 2, 
     name: 'Dr. Tosin Majekodunmi',
-    avatar: '',
+    avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
     role: 'Admin'
+  },
+  { 
+    id: 3, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/image/doctor/test1.png',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Super Admin'
+  },
+  { 
+    id: 4, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Admin'
+  },
+  { 
+    id: 5, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Super Admin'
+  },
+  { 
+    id: 6, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Admin'
+  },
+  { 
+    id: 7, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Super Admin'
+  },
+  { 
+    id: 8, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Admin'
+  },
+  { 
+    id: 9, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Super Admin'
+  },
+  { 
+    id: 10, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Admin'
+  },
+  { 
+    id: 11, 
+    name: 'Dr. Tosin Majekodunmi',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'M.Tosin@euracare.com',
+    role: 'Admin'
+  },
+  {
+    id: 12,
+    name: 'Jane Doe',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'jane.doe@euracare.com',
+    role: 'Support'
+  },
+  {
+    id: 13,
+    name: 'John Smith',
+    avatar: '/svg.svg',
+    dateCreated: new Date().toISOString(),
+    email: 'john.smith@euracare.com',
+    role: 'Support'
   },
 ];
 
