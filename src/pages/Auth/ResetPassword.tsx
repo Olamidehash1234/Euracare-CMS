@@ -13,8 +13,8 @@ export default function ResetPassword(): JSX.Element {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-center bg-cover relative" style={{ backgroundImage: `url('/image/reset-bg.jpg')` }}>
-            <div className="absolute inset-0 bg-black/30" />
+    <div className="min-h-screen w-full flex items-center justify-center bg-cover relative" style={{ backgroundImage: `url('/image/bg-image.png')` }}>
+            <div className="absolute inset-0 bg-black/50" />
 
             <div className="relative z-10 w-full max-w-[520px] mx-4">
                 <div className="bg-white rounded-[30px] shadow-2xl border border-[#ECEFF2] p-6 lg:p-[60px]">

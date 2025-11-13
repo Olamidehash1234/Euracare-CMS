@@ -11,8 +11,8 @@ export default function LoginPage(): JSX.Element {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-center bg-cover relative">
-            <div className="absolute inset-0 bg-black/30" />
+    <div className="min-h-screen w-full flex items-center justify-center bg-cover relative" style={{ backgroundImage: `url('/image/bg-image.png')` }}>
+            <div className="absolute inset-0 bg-black/50" />
 
             <div className="z-10 relative w-full max-w-[520px] mx-4">
                 <div className="bg-white rounded-[30px] shadow-xl border border-[#E8ECEF] p-8 lg:p-[60px]">
