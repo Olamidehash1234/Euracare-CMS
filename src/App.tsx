@@ -15,7 +15,7 @@ const Careers = lazy(() => import('./pages/Careers'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Roles = lazy(() => import('./pages/Roles&permission'));
 const Accreditations = lazy(() => import('./pages/Accreditations'))
-const ActivityLogs = lazy(() => import('./pages/logs'));
+const ActivityLogs = lazy(() => import('./pages/Activitylogs'));
 
 function App() {
   return (
