@@ -6,6 +6,7 @@ export interface AdminType {
   email: string;
   role: string;
   active?: string; // last active / human readable
+  status?: 'Active' | 'Suspended'; // account status
 }
 
 interface AdminTableProps {

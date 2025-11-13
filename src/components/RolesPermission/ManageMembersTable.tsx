@@ -38,7 +38,14 @@ export default function ManageMembersTable({ members, onEdit, onDelete }: Props)
             </tr>
           </thead>
           <tbody>
-            {members.map((m) => (
+            {members.map((m) => {
+              const isSuspended = m.status === 'Suspended';
+              const badgeClass = isSuspended
+                ? 'bg-[#FF95001A] text-[#FF9500]'
+                : (m.role === 'Super Admin' ? 'bg-[#EBF9F0] text-green-800' : 'bg-amber-100 text-amber-800');
+              const badgeText = isSuspended ? 'Suspended' : 'Active';
+
+              return (
               <tr key={m.id} className="border-t border-[#01010133]">
                 <td className="w-[40px] py-[25px] align-middle"><input type="checkbox" /></td>
                 <td className="py-3 px-0 py-[25px] flex items-center gap-3">
@@ -51,8 +58,10 @@ export default function ManageMembersTable({ members, onEdit, onDelete }: Props)
                 <td className="py-3 px-0 py-[25px] text-sm">{m.active ?? '-'}</td>
                 <td className="py-3 px-0 py-[25px]">
                   <div className="flex items-center gap-[10px]">
-                    <span className={`inline-flex items-center gap-[4px] px-3 py-1 lg:px-[20px] lg:py-[8px] lg:leading-[16px] rounded-[4px] text-sm ${m.role === 'Super Admin' ? 'bg-[#EBF9F0] text-green-800' : 'bg-amber-100 text-amber-800'}`}>
-                      <img src="/icon/circle.svg" alt="" />{m.role === 'Super Admin' ? 'Active' : 'Active'}
+                    <span className={`inline-flex items-center gap-[4px] px-3 py-1 lg:px-[20px] lg:py-[8px] lg:leading-[16px] rounded-[4px] text-sm ${badgeClass}`}>
+                      {/* use a different icon for suspended status */}
+                      <img src={isSuspended ? '/icon/circle-yellow.svg' : '/icon/circle.svg'} alt={badgeText} />
+                      {badgeText}
                     </span>
 
                     {/* More button (three-dots) */}
@@ -78,7 +87,8 @@ export default function ManageMembersTable({ members, onEdit, onDelete }: Props)
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
 
             {members.length === 0 && (
               <tr>

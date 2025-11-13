@@ -16,12 +16,22 @@ const Admin = lazy(() => import('./pages/Admin'));
 const Roles = lazy(() => import('./pages/Roles&permission'));
 const Accreditations = lazy(() => import('./pages/Accreditations'))
 const ActivityLogs = lazy(() => import('./pages/Activitylogs'));
+const Login = lazy(() => import('./pages/Auth/Login'));
+const ResetPassword = lazy(() => import('./pages/Auth/ResetPassword'));
+const VerifyCode = lazy(() => import('./pages/Auth/VerifyCode'));
+const UpdatePassword = lazy(() => import('./pages/Auth/UpdatePassword'));
 
 function App() {
   return (
     <BrowserRouter>
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
+          {/* Public / auth routes (no Layout/sidebar) */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-code" element={<VerifyCode />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
+
           <Route path="/" element={<Layout />}>
             <Route index element={<Overview />} />
             <Route path="/overview" element={<Overview />} />

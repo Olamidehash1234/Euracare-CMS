@@ -14,6 +14,8 @@ export type NewDoctorPayload = {
   researchInterests?: string[];
   qualifications?: string[];
   trainings?: string[];
+  associations?: string[]; // professional associations
+  certifications?: string[]; // professional certifications
 };
 
 type FormState = {
@@ -62,8 +64,14 @@ export default function DoctorForm({ mode = 'create', initialData, onClose }: Do
     const [qualifications, setQualifications] = useState<string[]>([]);
 
     const [trainingInput, setTrainingInput] = useState<string>('');
-    const [trainings, setTrainings] = useState<string[]>([
-    ]);
+    const [trainings, setTrainings] = useState<string[]>([]);
+
+    // NEW: Professional associations & certifications
+    const [associationInput, setAssociationInput] = useState<string>('');
+    const [associations, setAssociations] = useState<string[]>(initialData?.programs ?? []);
+
+    const [certificationInput, setCertificationInput] = useState<string>('');
+    const [certifications, setCertifications] = useState<string[]>([]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         const target = e.target as HTMLInputElement;
@@ -102,6 +110,8 @@ export default function DoctorForm({ mode = 'create', initialData, onClose }: Do
             researchInterests,
             qualifications,
             trainings,
+            associations,
+            certifications,
         };
         console.log('payload', payload);
         // replace with real submit logic
@@ -140,6 +150,24 @@ export default function DoctorForm({ mode = 'create', initialData, onClose }: Do
         setTrainingInput('');
     };
     const removeTraining = (t: string): void => setTrainings(prev => prev.filter(x => x !== t));
+
+    // associations handlers
+    const addAssociation = (): void => {
+        const v = associationInput.trim();
+        if (!v) return;
+        if (!associations.includes(v)) setAssociations(prev => [...prev, v]);
+        setAssociationInput('');
+    };
+    const removeAssociation = (a: string): void => setAssociations(prev => prev.filter(x => x !== a));
+
+    // certifications handlers
+    const addCertification = (): void => {
+        const v = certificationInput.trim();
+        if (!v) return;
+        if (!certifications.includes(v)) setCertifications(prev => [...prev, v]);
+        setCertificationInput('');
+    };
+    const removeCertification = (c: string): void => setCertifications(prev => prev.filter(x => x !== c));
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -380,6 +408,46 @@ export default function DoctorForm({ mode = 'create', initialData, onClose }: Do
                                             <span key={t} className="inline-flex items-center gap-2 border border-[#0C2141] rounded-full px-3 py-1 lg:py-[4px] text-[14px] text-[#010101CC]">
                                                 <span>{t}</span>
                                                 <button type="button" onClick={() => removeTraining(t)} className="text-[#01010180]"><img src="/icon/cancel.svg" alt="" /></button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Professional Associations */}
+                                <div className="mb-6">
+                                    <label className="block text-[14px] text-[#010101] mb-2">Professional Associations</label>
+                                    <input
+                                        value={associationInput}
+                                        onChange={(e) => setAssociationInput(e.target.value)}
+                                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addAssociation(); } }}
+                                        placeholder="Type association name"
+                                        className="w-full rounded-md border border-[#01010133] mb-[8px] px-3 py-[8px] text-sm placeholder-[#01010180] lg:leading-[24px]  focus:outline-none"
+                                    />
+                                    <div className="flex gap-2 flex-wrap">
+                                        {associations.map(a => (
+                                            <span key={a} className="inline-flex items-center gap-2 border border-[#0C2141] rounded-full px-3 py-1 lg:py-[4px] text-[14px] text-[#010101CC]">
+                                                <span>{a}</span>
+                                                <button type="button" onClick={() => removeAssociation(a)} className="text-[#01010180]"><img src="/icon/cancel.svg" alt="" /></button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Certifications */}
+                                <div className="mb-6">
+                                    <label className="block text-[14px] text-[#010101] mb-2">Certifications</label>
+                                    <input
+                                        value={certificationInput}
+                                        onChange={(e) => setCertificationInput(e.target.value)}
+                                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCertification(); } }}
+                                        placeholder="Type certification name"
+                                        className="w-full rounded-md border border-[#01010133] mb-[8px] px-3 py-[8px] text-sm placeholder-[#01010180] lg:leading-[24px]  focus:outline-none"
+                                    />
+                                    <div className="flex gap-2 flex-wrap">
+                                        {certifications.map(c => (
+                                            <span key={c} className="inline-flex items-center gap-2 border border-[#0C2141] rounded-full px-3 py-1 lg:py-[4px] text-[14px] text-[#010101CC]">
+                                                <span>{c}</span>
+                                                <button type="button" onClick={() => removeCertification(c)} className="text-[#01010180]"><img src="/icon/cancel.svg" alt="" /></button>
                                             </span>
                                         ))}
                                     </div>

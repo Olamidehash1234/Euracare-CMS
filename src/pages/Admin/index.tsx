@@ -16,6 +16,7 @@ export const sampleAdminsInitial: AdminType[] = [
     email: 'N.Hammed@euracare.com',
     role: 'Super Admin',
     active: '2 mins ago',
+    status: 'Active',
   },
   { 
     id: 2, 
@@ -25,6 +26,7 @@ export const sampleAdminsInitial: AdminType[] = [
     email: 'M.Tosin@euracare.com',
     role: 'Admin',
     active: '30 secs ago',
+    status: 'Active',
   },
   { 
     id: 3, 
@@ -34,6 +36,7 @@ export const sampleAdminsInitial: AdminType[] = [
     email: 'M.Tosin@euracare.com',
     role: 'Super Admin',
     active: '9 hours ago',
+    status: 'Active',
   },
   { 
     id: 4, 
@@ -43,6 +46,7 @@ export const sampleAdminsInitial: AdminType[] = [
     email: 'M.Tosin@euracare.com',
     role: 'Admin',
     active: '1 day ago',
+    status: 'Suspended',
   },
   { 
     id: 5, 
@@ -70,6 +74,7 @@ export const sampleAdminsInitial: AdminType[] = [
     email: 'M.Tosin@euracare.com',
     role: 'Super Admin',
     active: '10 hours ago',
+    status: 'Suspended',
   },
   { 
     id: 8, 
@@ -106,6 +111,7 @@ export const sampleAdminsInitial: AdminType[] = [
     email: 'M.Tosin@euracare.com',
     role: 'Admin',
     active: '30 Nov 2023',
+    status: 'Suspended',
   },
   {
     id: 12,
@@ -115,6 +121,7 @@ export const sampleAdminsInitial: AdminType[] = [
     email: 'jane.doe@euracare.com',
     role: 'Support',
     active: '30 Nov 2023',
+    status: 'Active',
   },
   {
     id: 13,
@@ -124,6 +131,7 @@ export const sampleAdminsInitial: AdminType[] = [
     email: 'john.smith@euracare.com',
     role: 'Support',
     active: '30 Nov 2023',
+    status: 'Active',
   },
 ];
 
