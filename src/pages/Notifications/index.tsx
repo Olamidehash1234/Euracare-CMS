@@ -5,7 +5,7 @@ import NotificationList from '../../components/Notifications/NotificationList';
 import { useState } from 'react';
 
 export default function NotificationsPage() {
-  const [query, setQuery] = useState('');
+  const [query] = useState('');
   const [selectedAll, setSelectedAll] = useState(false);
 
   return (
@@ -17,7 +17,7 @@ export default function NotificationsPage() {
           <div className="p-4 lg:p-6 border-b border-[#F1F3F5]">
             <div className="flex items-center gap-4 justify-between">
               <div className="flex-1 max-w-lg">
-                <SearchBar placeholder="Search Notification" value={query} onChange={(v: string) => setQuery(v)} />
+                <SearchBar placeholder="Search Notification" />
               </div>
 
               <div className="flex items-center gap-2">

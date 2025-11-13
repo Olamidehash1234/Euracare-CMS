@@ -17,7 +17,7 @@ const fmt = (iso?: string) => {
   return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) + ' - ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 };
 
-export default function ManageMembersTable({ members, onEdit, onDelete, onClose }: Props) {
+export default function ManageMembersTable({ members, onEdit, onDelete }: Props) {
   const [openMenuFor, setOpenMenuFor] = useState<string | number | null>(null);
 
   return (
