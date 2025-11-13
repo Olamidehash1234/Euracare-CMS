@@ -5,6 +5,7 @@ export interface AdminType {
   dateCreated: string;
   email: string;
   role: string;
+  active?: string; // last active / human readable
 }
 
 interface AdminTableProps {

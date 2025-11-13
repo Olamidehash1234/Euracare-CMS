@@ -3,10 +3,13 @@ import { useEffect, useRef } from 'react';
 interface MoreMenuProps {
   onManageMembers?: () => void;
   onManagePermission?: () => void;
+  onSuspendUser?: () => void;
+  onViewActivity?: () => void;
   onClose?: () => void;
+  menuClassName?: string; // optional override for menu width / styling
 }
 
-export default function MoreMenu({ onManageMembers, onManagePermission, onClose }: MoreMenuProps) {
+export default function MoreMenu({ onManageMembers, onManagePermission, onSuspendUser, onViewActivity, onClose, menuClassName }: MoreMenuProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   const handleClick = (cb?: () => void) => {
@@ -36,20 +39,44 @@ export default function MoreMenu({ onManageMembers, onManagePermission, onClose 
   }, [onClose]);
 
   return (
-    <div ref={rootRef} className="absolute right-2 mt-2 z-20" role="dialog" aria-modal="false">
-      <div className="max-w-[220px] bg-white border border-gray-200 rounded-[10px] shadow-lg overflow-hidden p-[4px]">
-        <button
-          onClick={() => handleClick(onManageMembers)}
-          className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101]"
-        >
-          Manage Members
-        </button>
-        <button
-          onClick={() => handleClick(onManagePermission)}
-          className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101]"
-        >
-          Manage Permission
-        </button>
+    <div ref={rootRef} className="absolute z-10 right-2 mt-2 z-20" role="dialog" aria-modal="false">
+      <div className={`${menuClassName ?? 'max-w-[220px]'} bg-white border border-[#0C2141] rounded-[10px] shadow-lg overflow-hidden p-[4px]`}>
+        {/* Render items only when a handler is provided so this menu stays flexible */}
+        {onSuspendUser && (
+          <button
+            onClick={() => handleClick(onSuspendUser)}
+            className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101] flex items-center gap-2"
+          >
+            Suspend User
+          </button>
+        )}
+
+        {onManageMembers && (
+          <button
+            onClick={() => handleClick(onManageMembers)}
+            className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101]"
+          >
+            Manage Members
+          </button>
+        )}
+
+        {onManagePermission && (
+          <button
+            onClick={() => handleClick(onManagePermission)}
+            className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101]"
+          >
+            Manage Permission
+          </button>
+        )}
+
+        {onViewActivity && (
+          <button
+            onClick={() => handleClick(onViewActivity)}
+            className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101]"
+          >
+            View Activity Log
+          </button>
+        )}
       </div>
     </div>
   );

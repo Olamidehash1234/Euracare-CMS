@@ -14,7 +14,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/image/doctor/test1.png',
     dateCreated: new Date().toISOString(),
     email: 'N.Hammed@euracare.com',
-    role: 'Super Admin'
+    role: 'Super Admin',
+    active: '2 mins ago',
   },
   { 
     id: 2, 
@@ -22,7 +23,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Admin'
+    role: 'Admin',
+    active: '30 secs ago',
   },
   { 
     id: 3, 
@@ -30,7 +32,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/image/doctor/test1.png',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Super Admin'
+    role: 'Super Admin',
+    active: '9 hours ago',
   },
   { 
     id: 4, 
@@ -38,7 +41,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Admin'
+    role: 'Admin',
+    active: '1 day ago',
   },
   { 
     id: 5, 
@@ -46,7 +50,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Super Admin'
+    role: 'Super Admin',
+    active: '2 days ago',
   },
   { 
     id: 6, 
@@ -54,7 +59,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Admin'
+    role: 'Admin',
+    active: '5 mins ago',
   },
   { 
     id: 7, 
@@ -62,7 +68,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Super Admin'
+    role: 'Super Admin',
+    active: '10 hours ago',
   },
   { 
     id: 8, 
@@ -70,7 +77,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Admin'
+    role: 'Admin',
+    active: '3 days ago',
   },
   { 
     id: 9, 
@@ -78,7 +86,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Super Admin'
+    role: 'Super Admin',
+    active: '15 mins ago',
   },
   { 
     id: 10, 
@@ -86,7 +95,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Admin'
+    role: 'Admin',
+    active: '1 week ago',
   },
   { 
     id: 11, 
@@ -94,7 +104,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'M.Tosin@euracare.com',
-    role: 'Admin'
+    role: 'Admin',
+    active: '30 Nov 2023',
   },
   {
     id: 12,
@@ -102,7 +113,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'jane.doe@euracare.com',
-    role: 'Support'
+    role: 'Support',
+    active: '30 Nov 2023',
   },
   {
     id: 13,
@@ -110,7 +122,8 @@ export const sampleAdminsInitial: AdminType[] = [
     avatar: '/svg.svg',
     dateCreated: new Date().toISOString(),
     email: 'john.smith@euracare.com',
-    role: 'Support'
+    role: 'Support',
+    active: '30 Nov 2023',
   },
 ];
 

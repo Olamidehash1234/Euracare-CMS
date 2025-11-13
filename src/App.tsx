@@ -14,8 +14,8 @@ const Blogs = lazy(() => import('./pages/Blogs'));
 const Careers = lazy(() => import('./pages/Careers'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Roles = lazy(() => import('./pages/Roles&permission'));
-// const Logs = lazy(() => import('./pages/logs'));
 const Accreditations = lazy(() => import('./pages/Accreditations'))
+const ActivityLogs = lazy(() => import('./pages/logs'));
 
 function App() {
   return (
@@ -34,7 +34,7 @@ function App() {
             <Route path="/careers" element={<Careers />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/roles&permission" element={<Roles />} />
-            {/* <Route path="/logs" element={<Logs />} /> */}
+            <Route path='/logs' element={ <ActivityLogs/>} />
             <Route path='/accreditations' element={ <Accreditations/>} />
           </Route>
         </Routes>
