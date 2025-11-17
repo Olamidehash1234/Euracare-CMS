@@ -37,23 +37,23 @@ export default function NotificationsPage() {
         </div>
 
         <div className="mt-[35px] flex items-center justify-between text-sm text-[#202224]">
-            <div>Showing 1-12 of 1,253</div>
+          <div>Showing 1-12 of 1,253</div>
 
-            <div className="text-center">
-              <button className="text-[#005920] text-[14px] font-medium hover:underline" onClick={() => console.log('Mark all as read')}>
-                Mark all as read
-              </button>
-            </div>
-
-            <div className="flex items-center border border-[#E6E8EE] divide-x divide-[#E6E8EE] rounded-[8px]">
-              <button className="px-[20px] py-[13px]">
-                <img src="/icon/arrow-left.svg" alt="" />
-              </button>
-              <button className="px-[20px] py-[13px]">
-                <img src="/icon/arrow-right.svg" alt="" />
-              </button>
-            </div>
+          <div className="text-center">
+            <button className="text-[#005920] text-[14px] font-medium hover:underline" onClick={() => console.log('Mark all as read')}>
+              Mark all as read
+            </button>
           </div>
+
+          <div className="flex items-center border border-[#E6E8EE] divide-x divide-[#E6E8EE] rounded-[8px]">
+            <button className="px-[20px] py-[13px]">
+              <img src="/icon/arrow-left.svg" alt="" />
+            </button>
+            <button className="px-[20px] py-[13px]">
+              <img src="/icon/arrow-right.svg" alt="" />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

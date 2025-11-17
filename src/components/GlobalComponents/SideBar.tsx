@@ -106,7 +106,7 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
 
       {/* Sidebar container (desktop & tablet) */}
       <aside
-        className={`hidden lg:flex flex-col border-r-[1.5px] border-[#01010133] h-screen sticky top-0 px-[20px] pt-[8px] pb-[17px] transition-all duration-200 ${collapsed ? "w-20" : "w-64"}`}
+        className={`hidden z-100 lg:flex flex-col border-r-[1.5px] border-[#01010133] h-screen sticky top-0 px-[20px] pt-[8px] pb-[17px] transition-all duration-200 ${collapsed ? "w-20" : "w-64"}`}
         aria-label="Sidebar"
       >
         {/* top logo + collapse toggle */}
