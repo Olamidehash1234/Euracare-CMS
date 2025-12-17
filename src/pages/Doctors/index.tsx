@@ -84,9 +84,10 @@ const DoctorsPage = () => {
         try {
             console.log('[DoctorsPage] Attempting to fetch full doctor data for ID:', doctor.id);
             
-            // Try to fetch full doctor data by ID
+            // Fetch full doctor data by ID
             const response = await doctorService.getDoctorById(doctor.id.toString());
-            const fullDoctor = response.data?.data;
+            // Extract doctor from nested response structure: response.data.data.doctor
+            const fullDoctor = response.data?.data?.doctor;
             
             if (fullDoctor) {
                 console.log('[DoctorsPage] Full doctor data loaded:', fullDoctor);
@@ -103,42 +104,16 @@ const DoctorsPage = () => {
                     researchInterests: fullDoctor.research_interest || [],
                     qualifications: fullDoctor.qualification || [],
                     trainings: fullDoctor.training_and_education || [],
-                    associations: fullDoctor.professional_association ? 
-                        (Array.isArray(fullDoctor.professional_association) 
-                            ? fullDoctor.professional_association 
-                            : [fullDoctor.professional_association]) 
-                        : [],
+                    associations: Array.isArray(fullDoctor.professional_association) 
+                        ? fullDoctor.professional_association 
+                        : (fullDoctor.professional_association ? [fullDoctor.professional_association] : []),
                     certifications: fullDoctor.certification || [],
                     doctorId: doctor.id.toString()
                 });
             }
         } catch (err) {
             console.error('[DoctorsPage] Error fetching doctor details:', err);
-            console.log('[DoctorsPage] Doctor object:', doctor);
-            console.log('[DoctorsPage] Attempted URL would be:', `/doctors/${doctor.id}`);
-            
-            // Fallback: use available data from list
-            console.log('[DoctorsPage] Using fallback data from list for editing');
-            setEditDoctor({
-                fullName: doctor.name || '',
-                email: doctor.email || '',
-                phone: '',
-                languages: '',
-                regNumber: '',
-                yearsExperience: '',
-                bio: '',
-                avatar: doctor.avatar,
-                programs: doctor.specialties || [],
-                researchInterests: [],
-                qualifications: [],
-                trainings: [],
-                associations: [],
-                certifications: [],
-                doctorId: doctor.id.toString()
-            });
-            
-            // Show warning but don't fail
-            console.warn('[DoctorsPage] Note: Some doctor details may not be fully loaded. ID mismatch detected.');
+            setError('Failed to load doctor details for editing');
         }
     };
 
