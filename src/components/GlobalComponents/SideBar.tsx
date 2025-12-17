@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
+import { useAuth } from "../../context/AuthContext";
 import OverviewIcon from "/icon/overview.svg"
 import notificationIcon from "/icon/notification.svg"
 import doctorsIcon from "/icon/doctor.svg"
@@ -58,6 +59,7 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
   const [open, setOpen] = useState<boolean>(false); // mobile drawer open
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const pathToId = (path: string) => {
     if (!path || path === '/' || path === '/overview') return 'overview';
@@ -299,6 +301,23 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
                     </button>
                   ))}
                 </nav>
+              </div>
+
+              <div className="border-t border-[#01010133]" />
+
+              {/* Mobile Logout Section */}
+              <div className="pt-4">
+                <button
+                  onClick={() => {
+                    logout();
+                    setOpen(false);
+                    navigate('/auth/login', { replace: true });
+                  }}
+                  className="w-full flex items-center gap-3 px-[10px] py-2 rounded-[20px] text-sm hover:bg-red-50 text-red-600 font-medium"
+                >
+                  <span>🚪</span>
+                  <span>Logout</span>
+                </button>
               </div>
             </div>
           </aside>

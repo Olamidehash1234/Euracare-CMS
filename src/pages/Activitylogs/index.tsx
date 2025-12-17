@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import Header from '../../components/commonComponents/Header';
 import SearchBar from '../../components/commonComponents/SearchBar';
 import ActivityTable from '../../components/ActivityLogs/ActivityTable';
+import InlineRoleDropdown from '../../components/commonComponents/InlineRoleDropdown';
 import type { ActivityRow } from '../../components/ActivityLogs/ActivityTable';
 
 const roleOptions = ['Super Admin', 'Admin', 'System', 'marketing'];
@@ -37,31 +38,11 @@ const sampleActivities: ActivityRow[] = [
 ];
 
 const LogsPage = () => {
-  const [openRoleDropdown, setOpenRoleDropdown] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
-  const popRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const onDown = (e: MouseEvent) => {
-      if (!popRef.current) return;
-      if (!popRef.current.contains(e.target as Node)) setOpenRoleDropdown(false);
-    };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, []);
-
-  const toggleRole = (r: string) => {
-    setSelectedRoles(prev => (prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r]));
-  };
-
-  const applyRoles = () => {
-    // selectedRoles is available for filtering; here we just close the dropdown
-    setOpenRoleDropdown(false);
-  };
-
+  // resetFilters clears parent's selection (dropdown reads value prop)
   const resetFilters = () => {
     setSelectedRoles([]);
-    setOpenRoleDropdown(false);
   };
 
   // Footer action handlers (local no-op / logging for now)
@@ -97,56 +78,11 @@ const LogsPage = () => {
             </div>
 
             {/* Role dropdown trigger */}
-            <div className="relative" ref={popRef}>
-              <button
-                onClick={() => setOpenRoleDropdown(prev => !prev)}
-                className="flex items-center gap-2 px-[20px] py-[12px]"
-                aria-expanded={openRoleDropdown}
-              >
-                <span className="text-[#202224] text-[15px]">Role</span>
-                <svg className="w-4 h-4 text-[#0C2141]" viewBox="0 0 20 20" fill="none" aria-hidden>
-                  <path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-
-              {openRoleDropdown && (
-                <div className="absolute right-0 mt-2 z-50 w-[344px] lg:w-[520px] bg-white border border-[#01010133] rounded-[14px] shadow-lg">
-                  <div className='px-5 py-[24px]'>
-                    <div className="text-[16px] font-medium mb-3 lg:mb-[20px] leading-normal">Select Role</div>
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                      {roleOptions.map((r) => {
-                        const active = selectedRoles.includes(r);
-                        return (
-                          <button
-                            key={r}
-                            type="button"
-                            onClick={() => toggleRole(r)}
-                            className={`py-[12px] px-[20px] text-[14px] rounded-full border ${active ? 'bg-[#0C2141] text-white border-transparent' : 'bg-white text-[#111827] border-[#01010133]'}`}
-                          >
-                            {r}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className='w-full h-[0.5px] bg-[#979797]/70'></div>
-                  <div className='px-5 pt-[16px] pb-[24px]'>
-                    <div className="text-[14px] text-[#434343] mb-4 leading-normal">*You can choose multiple roles</div>
-
-                    <div className="flex items-center justify-center">
-                      <button
-                        type="button"
-                        onClick={applyRoles}
-                        className="w-full lg:w-[120px] py-[8px] rounded-md bg-[#0C2141] text-white"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <InlineRoleDropdown
+              options={roleOptions}
+              value={selectedRoles}
+              onChange={(vals) => setSelectedRoles(vals)}
+            />
 
             {/* Reset filter */}
             <button

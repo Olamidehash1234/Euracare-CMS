@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../../components/commonComponents/Header';
 import SearchBar from '../../components/commonComponents/SearchBar';
 import NotFound from '../../components/commonComponents/NotFound';
@@ -6,45 +6,67 @@ import DoctorsTable from '../../components/Doctors/DoctorsTable';
 import type { Doctor } from '../../components/Doctors/DoctorsTable';
 import DoctorForm from './CreateDoctorForm';
 import type { NewDoctorPayload } from './CreateDoctorForm';
-
-const sampleDoctors: Doctor[] = [
-    {
-        id: 1,
-        name: 'Dr. Hammed Ninalowo',
-        avatar: '',
-        createdAt: new Date().toISOString(),
-        email: 'N.Hammed@euracare.com',
-        specialties: ['Interventional Radiology', 'Oncology', 'Vascular Surgery']
-    },
-    {
-        id: 2,
-        name: 'Dr. Tosin Majekodunmi',
-        avatar: '',
-        createdAt: new Date().toISOString(),
-        email: 'M.Tosin@euracare.com',
-        specialties: ['Advanced Cardiac Imaging', 'Interventional Cardiology', 'Adult & Pediatric Cardiology']
-    },
-    {
-        id: 3,
-        name: 'Dr. Owen Woghiren',
-        avatar: '',
-        createdAt: new Date().toISOString(),
-        email: 'W.Owen@euracare.com',
-        specialties: ['Gastroenterology']
-    },
-    {
-        id: 4,
-        name: 'Dr. Olamide Adeola',
-        avatar: '',
-        createdAt: new Date().toISOString(),
-        email: 'olamideadeola2005@gmail.com',
-        specialties: ['Breast surgery']
-    }
-];
+import { doctorService } from '@/services';
 
 const DoctorsPage = () => {
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [showCreate, setShowCreate] = useState(false);
     const [editDoctor, setEditDoctor] = useState<NewDoctorPayload | null>(null);
+
+    // Fetch doctors on mount
+    useEffect(() => {
+        fetchDoctors();
+    }, []);
+
+    const fetchDoctors = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await doctorService.getAllDoctors();
+            console.log('[DoctorsPage] Raw API response:', response);
+            
+            // Handle different response structures
+            let doctorsData = [];
+            
+            // API returns: response.data.data.doctor
+            if (response?.data?.data?.doctor && Array.isArray(response.data.data.doctor)) {
+                doctorsData = response.data.data.doctor;
+            } else if (response?.data?.data && Array.isArray(response.data.data)) {
+                doctorsData = response.data.data;
+            } else if (response?.data && Array.isArray(response.data)) {
+                doctorsData = response.data;
+            } else if (Array.isArray(response)) {
+                doctorsData = response;
+            }
+
+            console.log('[DoctorsPage] Parsed doctors data:', doctorsData);
+            
+            if (!Array.isArray(doctorsData)) {
+                throw new Error('Invalid response format: expected array of doctors');
+            }
+            
+            // Transform API response to match Doctor interface
+            const transformedDoctors: Doctor[] = doctorsData.map((doc: any) => ({
+                id: doc.id,
+                name: doc.full_name,
+                avatar: doc.profile_picture_url,
+                createdAt: doc.createdAt || new Date().toISOString(),
+                email: doc.email,
+                specialties: doc.programs_and_specialty || [],
+            }));
+
+            setDoctors(transformedDoctors);
+            console.log('[DoctorsPage] Doctors loaded:', transformedDoctors);
+        } catch (err) {
+            console.error('[DoctorsPage] Error fetching doctors:', err);
+            const errorMessage = err instanceof Error ? err.message : 'Failed to load doctors';
+            setError(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // const handleSearch = (q: string) => {
     //     console.log('search:', q);
@@ -58,7 +80,69 @@ const DoctorsPage = () => {
         console.log('view doctor', d);
     };
 
-    const hasDoctors = sampleDoctors.length > 0;
+    const handleEditDoctor = async (doctor: Doctor) => {
+        try {
+            console.log('[DoctorsPage] Attempting to fetch full doctor data for ID:', doctor.id);
+            
+            // Try to fetch full doctor data by ID
+            const response = await doctorService.getDoctorById(doctor.id.toString());
+            const fullDoctor = response.data?.data;
+            
+            if (fullDoctor) {
+                console.log('[DoctorsPage] Full doctor data loaded:', fullDoctor);
+                setEditDoctor({
+                    fullName: fullDoctor.full_name,
+                    email: fullDoctor.email || '',
+                    phone: fullDoctor.phone || '',
+                    languages: fullDoctor.language || '',
+                    regNumber: fullDoctor.reg_number || '',
+                    yearsExperience: fullDoctor.years_of_experince || '',
+                    bio: fullDoctor.bio || '',
+                    avatar: fullDoctor.profile_picture_url,
+                    programs: fullDoctor.programs_and_specialty || [],
+                    researchInterests: fullDoctor.research_interest || [],
+                    qualifications: fullDoctor.qualification || [],
+                    trainings: fullDoctor.training_and_education || [],
+                    associations: fullDoctor.professional_association ? 
+                        (Array.isArray(fullDoctor.professional_association) 
+                            ? fullDoctor.professional_association 
+                            : [fullDoctor.professional_association]) 
+                        : [],
+                    certifications: fullDoctor.certification || [],
+                    doctorId: doctor.id.toString()
+                });
+            }
+        } catch (err) {
+            console.error('[DoctorsPage] Error fetching doctor details:', err);
+            console.log('[DoctorsPage] Doctor object:', doctor);
+            console.log('[DoctorsPage] Attempted URL would be:', `/doctors/${doctor.id}`);
+            
+            // Fallback: use available data from list
+            console.log('[DoctorsPage] Using fallback data from list for editing');
+            setEditDoctor({
+                fullName: doctor.name || '',
+                email: doctor.email || '',
+                phone: '',
+                languages: '',
+                regNumber: '',
+                yearsExperience: '',
+                bio: '',
+                avatar: doctor.avatar,
+                programs: doctor.specialties || [],
+                researchInterests: [],
+                qualifications: [],
+                trainings: [],
+                associations: [],
+                certifications: [],
+                doctorId: doctor.id.toString()
+            });
+            
+            // Show warning but don't fail
+            console.warn('[DoctorsPage] Note: Some doctor details may not be fully loaded. ID mismatch detected.');
+        }
+    };
+
+    const hasDoctors = doctors.length > 0;
 
     if (showCreate || editDoctor) {
         return (
@@ -72,6 +156,8 @@ const DoctorsPage = () => {
                             console.log(editDoctor ? 'update' : 'save', payload);
                             setShowCreate(false);
                             setEditDoctor(null);
+                            // Refetch doctors after save
+                            fetchDoctors();
                         }}
                         onClose={() => {
                             setShowCreate(false);
@@ -100,29 +186,33 @@ const DoctorsPage = () => {
 
                     {hasDoctors ? (
                         <DoctorsTable 
-                            doctors={sampleDoctors} 
+                            doctors={doctors} 
                             onView={handleView}
-                            onEdit={(doctor) => {
-                                setEditDoctor({
-                                    fullName: doctor.name,
-                                    email: doctor.email || '',
-                                    countryCode: '+234',
-                                    phone: '',
-                                    languages: ['English'],
-                                    bio: '',
-                                    avatar: doctor.avatar,
-                                    programs: doctor.specialties
-                                });
-                            }}
+                            onEdit={handleEditDoctor}
                             onDelete={(doctor) => {
                                 console.log('delete doctor', doctor);
                                 // Implement delete logic here
                             }}
                         />
+                    ) : isLoading ? (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="text-center">
+                                <div className="w-12 h-12 border-4 border-[#0C2141] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                <p className="text-[#666]">Loading doctors...</p>
+                            </div>
+                        </div>
+                    ) : error ? (
+                        <NotFound
+                            title="Error Loading Doctors"
+                            description={error}
+                            imageSrc="/not-found.png"
+                            ctaText="Try Again"
+                            onCta={fetchDoctors}
+                        />
                     ) : (
                         <NotFound
                             title="No Doctors Yet"
-                            description={`It looks like you haven't defined any roles and permission yet. Once Added, they'll appear here for you to manage.`}
+                            description={`It looks like you haven't added any doctors yet. Once Added, they'll appear here for you to manage.`}
                             imageSrc="/not-found.png"
                             ctaText="Add New Doctor"
                             onCta={handleAdd}

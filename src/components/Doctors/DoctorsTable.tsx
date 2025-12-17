@@ -37,9 +37,9 @@ const DoctorsTable: React.FC<DoctorsTableProps> = ({ doctors, onEdit, onDelete }
         <thead>
           <tr className="text-[14px] text-[#0C2141]">
             <th className="pt-[22px] pb-[22px] text-[14px] font-medium leading-[20px] px-0 align-middle"><span className="sr-only">Select rows</span></th>
-            <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Doctor's Name</th>
-            <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Date Created</th>
-            <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Email Address</th>
+            <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[230px]">Doctor's Name</th>
+            <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[190px]">Date Created</th>
+            <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[270px]">Email Address</th>
             <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Specialties</th>
             <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Action</th>
           </tr>
@@ -50,7 +50,7 @@ const DoctorsTable: React.FC<DoctorsTableProps> = ({ doctors, onEdit, onDelete }
               <td className="py-[29px] align-middle"><input type="checkbox" /></td>
               <td className="py-[29px] pl-4 pr-0 align-middle">
                 <div className="flex items-center gap-3">
-                  <img src={d.avatar ? d.avatar : '/placeholder-image.png'} alt={d.name} className="w-10 h-10 lg:w-[36px] lg:h-[36px] rounded-full object-cover" />
+                  <img src={d.avatar ? d.avatar : '/placeholder-image.png'} alt={d.name} className="w-10 h-10 lg:w-[46px] lg:h-[46px] rounded-full object-cover" />
                   <div>
                     <div className="font-normal text-[13px]">{d.name}</div>
                   </div>
