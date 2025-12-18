@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doctorService, getErrorMessage } from '@/services';
 import Toast from '@/components/GlobalComponents/Toast';
+import LoadingSpinner from '@/components/commonComponents/LoadingSpinner';
 import AvatarUpload from '@/components/Doctors/AvatarUpload';
 import BasicInformation from '@/components/Doctors/BasicInformation';
 import ProfessionalInformation from '@/components/Doctors/ProfessionalInformation';
@@ -32,12 +33,14 @@ interface DoctorFormProps {
   initialData?: NewDoctorPayload;
   onSave?: (payload: NewDoctorPayload) => void;
   onClose?: () => void;
+  isLoadingData?: boolean;
 }
 
 export default function DoctorForm({
   mode = 'create',
   initialData,
   onClose,
+  isLoadingData = false,
 }: DoctorFormProps): React.ReactElement {
   const navigate = useNavigate();
   const { form, handleChange, setForm } = useDoctorForm(initialData);
@@ -137,6 +140,8 @@ export default function DoctorForm({
         console.log('[DoctorForm] Doctor updated successfully:', response);
         setToastType('success');
         setToastMessage('Doctor profile updated successfully! ✅');
+        // Reset form after successful update
+        // resetForm();
       } else {
         // Create doctor
         response = await doctorService.createDoctor(payload as any);
@@ -147,17 +152,17 @@ export default function DoctorForm({
         resetForm();
       }
 
-      setShowToast(true);
-
-      setTimeout(() => {
-        navigate('/doctors', { replace: true });
-      }, 1500);
+      // Keep toast visible during timeout
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Then navigate
+      navigate('/doctors', { replace: true });
     } catch (err) {
       console.error('[DoctorForm] Error:', err);
       const errorMessage = getErrorMessage(err);
       setToastType('error');
       setToastMessage(errorMessage);
-      setShowToast(true);
+      // Toast stays visible for errors, user can dismiss manually
     } finally {
       setIsSubmitting(false);
     }
@@ -169,10 +174,17 @@ export default function DoctorForm({
         message={toastMessage}
         type={toastType}
         show={showToast}
-        onHide={() => setShowToast(false)}
+        onHide={() => {
+          // Only hide toast if not loading
+          if (toastType !== 'loading') {
+            setShowToast(false);
+          }
+        }}
       />
 
-      <div className="">
+      {isLoadingData && <LoadingSpinner />}
+
+      <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
         <a
           href="/doctors"
           className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 lg:mb-[30px] lg:leading-[140%] gap-[4px]"

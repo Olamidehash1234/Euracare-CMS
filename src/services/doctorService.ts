@@ -52,8 +52,19 @@ const doctorService = {
     apiClient.post<{ data: DoctorResponse }>('/doctors/', payload),
 
   // Update doctor
-  updateDoctor: (id: string, payload: Partial<CreateDoctorPayload>) =>
-    apiClient.put<{ data: DoctorResponse }>(`/doctors/${id}`, payload),
+  updateDoctor: async (id: string, payload: Partial<CreateDoctorPayload>) => {
+    try {
+      console.log('[DoctorService] Updating doctor with payload:', payload);
+      const response = await apiClient.put<{ data: DoctorResponse }>(`/doctors/${id}`, payload);
+      console.log('[DoctorService] Update successful:', response.data);
+      return response;
+    } catch (error: any) {
+      console.error('[DoctorService] Update error status:', error.response?.status);
+      console.error('[DoctorService] Update error message:', error.response?.data?.message || error.message);
+      console.error('[DoctorService] Update error details:', error.response?.data);
+      throw error;
+    }
+  },
 
   // Delete doctor
   deleteDoctor: (id: string) =>

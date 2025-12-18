@@ -14,6 +14,7 @@ const DoctorsPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [showCreate, setShowCreate] = useState(false);
     const [editDoctor, setEditDoctor] = useState<NewDoctorPayload | null>(null);
+    const [isFetchingDoctorData, setIsFetchingDoctorData] = useState(false);
 
     // Fetch doctors on mount
     useEffect(() => {
@@ -82,6 +83,7 @@ const DoctorsPage = () => {
 
     const handleEditDoctor = async (doctor: Doctor) => {
         try {
+            setIsFetchingDoctorData(true);
             console.log('[DoctorsPage] Attempting to fetch full doctor data for ID:', doctor.id);
             
             // Fetch full doctor data by ID
@@ -114,6 +116,8 @@ const DoctorsPage = () => {
         } catch (err) {
             console.error('[DoctorsPage] Error fetching doctor details:', err);
             setError('Failed to load doctor details for editing');
+        } finally {
+            setIsFetchingDoctorData(false);
         }
     };
 
@@ -127,6 +131,7 @@ const DoctorsPage = () => {
                     <DoctorForm
                         mode={editDoctor ? 'edit' : 'create'}
                         initialData={editDoctor || undefined}
+                        isLoadingData={isFetchingDoctorData}
                         onSave={(payload) => {
                             console.log(editDoctor ? 'update' : 'save', payload);
                             setShowCreate(false);

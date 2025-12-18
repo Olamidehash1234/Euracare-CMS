@@ -32,7 +32,10 @@ export const handleApiError = (error: unknown): ApiError => {
 
 export const getErrorMessage = (error: unknown): string => {
   const apiError = handleApiError(error);
-  console.log('[ErrorHandler] API Error:', { message: apiError.message, status: apiError.status, data: apiError.data });
+  console.log('[ErrorHandler] API Error:', { message: apiError.message, status: apiError.status });
+  if (apiError.data) {
+    console.log('[ErrorHandler] Backend response data:', JSON.stringify(apiError.data, null, 2));
+  }
   
   const status = apiError.status;
   
