@@ -46,7 +46,7 @@ const validateFile = (file: File): { valid: boolean; error?: string } => {
  */
 export const uploadToCloudinary = async (
   file: File,
-  folder: string = 'euracare/doctors'
+  folder: string = 'euracare'
 ): Promise<CloudinaryUploadResponse> => {
   // Validate file
   const validation = validateFile(file);

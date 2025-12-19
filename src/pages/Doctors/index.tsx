@@ -6,7 +6,9 @@ import DoctorsTable from '../../components/Doctors/DoctorsTable';
 import type { Doctor } from '../../components/Doctors/DoctorsTable';
 import DoctorForm from './CreateDoctorForm';
 import type { NewDoctorPayload } from './CreateDoctorForm';
+import Toast from '../../components/GlobalComponents/Toast';
 import { doctorService } from '@/services';
+import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
 
 const DoctorsPage = () => {
     const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -15,6 +17,9 @@ const DoctorsPage = () => {
     const [showCreate, setShowCreate] = useState(false);
     const [editDoctor, setEditDoctor] = useState<NewDoctorPayload | null>(null);
     const [isFetchingDoctorData, setIsFetchingDoctorData] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('success');
+    const [showToast, setShowToast] = useState(false);
 
     // Fetch doctors on mount
     useEffect(() => {
@@ -121,6 +126,28 @@ const DoctorsPage = () => {
         }
     };
 
+    const handleDeleteDoctor = async (doctor: Doctor) => {
+        try {
+            console.log('[DoctorsPage] Deleting doctor with ID:', doctor.id);
+            await doctorService.deleteDoctor(doctor.id.toString());
+            console.log('[DoctorsPage] Doctor deleted successfully');
+            
+            // Remove the deleted doctor from the list
+            setDoctors(doctors.filter(d => d.id !== doctor.id));
+            
+            // Show success toast
+            setToastMessage('Doctor deleted successfully! ✅');
+            setToastType('success');
+            setShowToast(true);
+        } catch (err) {
+            console.error('[DoctorsPage] Error deleting doctor:', err);
+            const errorMessage = err instanceof Error ? err.message : 'Failed to delete doctor';
+            setToastMessage(errorMessage);
+            setToastType('error');
+            setShowToast(true);
+        }
+    };
+
     const hasDoctors = doctors.length > 0;
 
     if (showCreate || editDoctor) {
@@ -151,6 +178,12 @@ const DoctorsPage = () => {
 
     return (
         <section>
+            <Toast
+                message={toastMessage}
+                type={toastType}
+                show={showToast}
+                onHide={() => setShowToast(false)}
+            />
             <Header title="Doctors" />
             <div className="p-[16px] lg:p-[40px]">
                 <div className="bg-white rounded-[14px] p-6 lg:px-[20px] lg:py-[23px] shadow-sm border border-gray-200">
@@ -169,18 +202,10 @@ const DoctorsPage = () => {
                             doctors={doctors} 
                             onView={handleView}
                             onEdit={handleEditDoctor}
-                            onDelete={(doctor) => {
-                                console.log('delete doctor', doctor);
-                                // Implement delete logic here
-                            }}
+                            onDelete={handleDeleteDoctor}
                         />
                     ) : isLoading ? (
-                        <div className="flex items-center justify-center py-12">
-                            <div className="text-center">
-                                <div className="w-12 h-12 border-4 border-[#0C2141] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                                <p className="text-[#666]">Loading doctors...</p>
-                            </div>
-                        </div>
+                        <LoadingSpinner heightClass="py-[200px]" />
                     ) : error ? (
                         <NotFound
                             title="Error Loading Doctors"

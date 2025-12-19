@@ -1,7 +1,12 @@
 import React, { useRef, useState } from 'react';
 import CustomDropdown from '../../components/commonComponents/CustomDropdown';
+import Toast from '../../components/GlobalComponents/Toast';
+import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
+import { adminService } from '@/services';
+import { getErrorMessage } from '@/services';
 
 export type AdminPayload = {
+  id?: string | number;
   fullName: string;
   email: string;
   phone: string;
@@ -16,6 +21,7 @@ export type AdminPayload = {
 interface Props {
   mode?: 'create' | 'edit';
   initialData?: AdminPayload;
+  isLoadingData?: boolean;
   onSave: (data: AdminPayload) => void;
   onClose: () => void;
 }
@@ -28,20 +34,53 @@ const countryOptions = [
 
 const roleOptions = [
   { label: 'Choose a role type', value: '' },
-  { label: 'Admin', value: 'admin' },
-  { label: 'Super Admin', value: 'super_admin' },
+  { label: 'Admin', value: '6940060fc2a3695489abc933' },
+  { label: 'Super Admin', value: '6940060fc2a3695489abc932' },
 ];
 
-export default function CreateAdminForm({ mode = 'create', initialData, onSave, onClose }: Props) {
+export default function CreateAdminForm({ mode = 'create', initialData, isLoadingData = false, onSave, onClose }: Props) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(initialData?.avatar || null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('loading');
+  const [showToast, setShowToast] = useState(false);
 
-  // handle avatar file selection
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setAvatarPreview(url);
+
+    try {
+      setIsUploadingAvatar(true);
+      setToastMessage('Uploading image...');
+      setToastType('loading');
+      setShowToast(true);
+
+      // Show local preview immediately
+      const localUrl = URL.createObjectURL(file);
+      setAvatarPreview(localUrl);
+
+      // Upload to Cloudinary
+      const imageUrl = await adminService.uploadAdminAvatar(file);
+      console.log('[CreateAdminForm] Image uploaded successfully:', imageUrl);
+
+      // Update preview with Cloudinary URL
+      setAvatarPreview(imageUrl);
+
+      setToastMessage('Image uploaded successfully! ✅');
+      setToastType('success');
+      setShowToast(true);
+    } catch (err) {
+      console.error('[CreateAdminForm] Error uploading avatar:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload image';
+      setToastMessage(errorMessage);
+      setToastType('error');
+      setShowToast(true);
+      setAvatarPreview(null);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   const [form, setForm] = useState({
@@ -55,17 +94,124 @@ export default function CreateAdminForm({ mode = 'create', initialData, onSave, 
     notifyByEmail: initialData?.notifyByEmail ?? true,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = (): boolean => {
+    if (!form.fullName || !form.email || !form.phone || !form.roleType) {
+      setToastMessage('Please fill in all required fields');
+      setToastType('error');
+      setShowToast(true);
+      return false;
+    }
+
+    // Only require password in create mode
+    if (mode === 'create' && (!form.password || !form.confirmPassword)) {
+      setToastMessage('Password and confirm password are required');
+      setToastType('error');
+      setShowToast(true);
+      return false;
+    }
+
+    // If password is being updated, both password and confirmPassword must match
+    if ((form.password || form.confirmPassword) && form.password !== form.confirmPassword) {
+      setToastMessage('Passwords do not match');
+      setToastType('error');
+      setShowToast(true);
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setToastMessage('Please enter a valid email address');
+      setToastType('error');
+      setShowToast(true);
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      ...form,
-      avatar: avatarPreview || undefined,
-    });
+
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    setToastType('loading');
+    setToastMessage(mode === 'create' ? 'Creating admin profile...' : 'Updating admin profile...');
+    setShowToast(true);
+
+    try {
+      const fullPhone = `${form.countryCode}${form.phone}`;
+      
+      const payload: any = {
+        profile_picture_url: avatarPreview || '',
+        full_name: form.fullName,
+        email: form.email,
+        phone: fullPhone,
+        role: form.roleType,
+        notify_user: form.notifyByEmail,
+      };
+
+      // Only include password fields if they have actual values (not empty)
+      // In create mode, password is always required
+      // In edit mode, password is optional (only include if user provided new password)
+      if (form.password || mode === 'create') {
+        payload.password = form.password;
+        payload.confirm_password = form.confirmPassword;
+      }
+
+      console.log('[CreateAdminForm] Submitting payload:', payload);
+      
+      let response;
+      if (mode === 'create') {
+        response = await adminService.createUser(payload);
+        console.log('[CreateAdminForm] Admin created successfully:', response);
+        setToastMessage('Admin profile created successfully! ✅');
+      } else {
+        // For edit mode, use updateAdmin which should be able to handle optional password
+        response = await adminService.updateAdmin(initialData?.id || '', payload);
+        console.log('[CreateAdminForm] Admin updated successfully:', response);
+        setToastMessage('Admin profile updated successfully! ✅');
+      }
+
+      setToastType('success');
+
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      onSave({
+        fullName: form.fullName,
+        email: form.email,
+        phone: form.phone,
+        roleType: form.roleType,
+        avatar: avatarPreview || undefined,
+        notifyByEmail: form.notifyByEmail,
+        countryCode: form.countryCode,
+      });
+    } catch (err) {
+      console.error('[CreateAdminForm] Error:', err);
+      const errorMessage = getErrorMessage(err);
+      setToastType('error');
+      setToastMessage(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="">
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        show={showToast}
+        onHide={() => {
+          if (toastType !== 'loading') {
+            setShowToast(false);
+          }
+        }}
+      />
+
+      {isSubmitting && toastType === 'loading' && <LoadingSpinner heightClass="fixed inset-0 h-screen" />}
+
+      <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
         <a href="/admin" className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px]">
           <img src="/icon/right.svg" alt="" /> Back to Admin Management
         </a>
@@ -83,6 +229,11 @@ export default function CreateAdminForm({ mode = 'create', initialData, onSave, 
                 {/* Avatar */}
                 <div className="flex-shrink-0 justify-center flex flex-col items-center">
                   <div className="w-24 h-24 z-30 lg:w-[150px] lg:h-[150px] rounded-full bg-slate-100 flex items-center justify-center overflow-hidden relative">
+                    {isUploadingAvatar && (
+                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-full z-40">
+                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    )}
                     {avatarPreview ? (
                       // eslint-disable-next-line
                       <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover" />
@@ -93,17 +244,20 @@ export default function CreateAdminForm({ mode = 'create', initialData, onSave, 
 
                   <label
                     htmlFor="avatar"
-                    className="mt-[-1px] z-10 inline-block text-[12px] lg:text-[12px] bg-[#0C2141] text-[#F8F8F8] px-3 lg:px-[17px] py-[5px] rounded-full cursor-pointer text-center shadow-sm"
+                    className={`mt-[-1px] z-10 inline-block text-[12px] bg-[#0C2141] text-[#F8F8F8] px-3 lg:px-[17px] py-[5px] rounded-full cursor-pointer text-center shadow-sm ${
+                      isUploadingAvatar ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
-                    Tap to change image
+                    {isUploadingAvatar ? 'Uploading...' : 'Tap to change image'}
                   </label>
                   <input
                     id="avatar"
                     ref={fileRef}
                     onChange={handleAvatarChange}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     className="hidden"
+                    disabled={isUploadingAvatar}
                   />
                 </div>
 
@@ -163,31 +317,31 @@ export default function CreateAdminForm({ mode = 'create', initialData, onSave, 
                     />
                   </div>
 
-                  {mode === 'create' && (
-                    <>
-                      <div>
-                        <label className="block text-sm text-[#010101] mb-2">Password</label>
-                        <input
-                          type="password"
-                          value={form.password}
-                          onChange={(e) => setForm(prev => ({ ...prev, password: e.target.value }))}
-                          placeholder="XXXXXXXXXX"
-                          className="w-full rounded-md border border-[#01010133] leading-[24px] px-3 py-[8px] text-sm focus:outline-none"
-                        />
-                      </div>
+                  <div>
+                    <label className="block text-sm text-[#010101] mb-2">
+                      Password {mode === 'edit' && <span className="text-[#999]">(optional)</span>}
+                    </label>
+                    <input
+                      type="password"
+                      value={form.password}
+                      onChange={(e) => setForm(prev => ({ ...prev, password: e.target.value }))}
+                      placeholder={mode === 'create' ? 'XXXXXXXXXX' : 'Leave empty to keep current password'}
+                      className="w-full rounded-md border border-[#01010133] leading-[24px] px-3 py-[8px] text-sm focus:outline-none"
+                    />
+                  </div>
 
-                      <div>
-                        <label className="block text-sm text-[#010101] mb-2">Confirm Password</label>
-                        <input
-                          type="password"
-                          value={form.confirmPassword}
-                          onChange={(e) => setForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                          placeholder="XXXXXXXXXX"
-                          className="w-full rounded-md border border-[#01010133] leading-[24px] px-3 py-[8px] text-sm focus:outline-none"
-                        />
-                      </div>
-                    </>
-                  )}
+                  <div>
+                    <label className="block text-sm text-[#010101] mb-2">
+                      Confirm Password {mode === 'edit' && <span className="text-[#999]">(optional)</span>}
+                    </label>
+                    <input
+                      type="password"
+                      value={form.confirmPassword}
+                      onChange={(e) => setForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      placeholder={mode === 'create' ? 'XXXXXXXXXX' : 'Leave empty to keep current password'}
+                      className="w-full rounded-md border border-[#01010133] leading-[24px] px-3 py-[8px] text-sm focus:outline-none"
+                    />
+                  </div>
                 </div>
                 <div className="mt-6">
                   <div className="flex items-center gap-6">
@@ -218,11 +372,11 @@ export default function CreateAdminForm({ mode = 'create', initialData, onSave, 
               </div>
 
               <div className="flex justify-end gap-3">
-                <button type="button" onClick={onClose} className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm">
+                <button type="button" onClick={onClose} disabled={isSubmitting} className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                   Cancel
                 </button>
-                <button type="submit" className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm">
-                  {mode === 'create' ? 'Create Profile' : 'Update changes'}
+                <button type="submit" disabled={isSubmitting} className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                  {isSubmitting ? 'Creating...' : (mode === 'create' ? 'Create Profile' : 'Update changes')}
                 </button>
               </div>
             </div>

@@ -1,12 +1,15 @@
 import apiClient from './apiClient';
+import { uploadToCloudinary } from './cloudinaryService';
 
-export interface AdminPayload {
-  name: string;
+export interface CreateUserPayload {
+  profile_picture_url?: string;
+  full_name: string;
   email: string;
-  password?: string;
-  role?: string;
-  permissions?: string[];
-  [key: string]: any;
+  phone: string;
+  role: string;
+  password: string;
+  confirm_password: string;
+  notify_user: boolean;
 }
 
 export interface AdminResponse {
@@ -22,31 +25,42 @@ export interface AdminResponse {
 const adminService = {
   // Get all admins
   getAllAdmins: (params?: { page?: number; limit?: number; search?: string }) =>
-    apiClient.get<{ data: AdminResponse[]; total: number }>('/admins', { params }),
+    apiClient.get<{ data: AdminResponse[]; total: number }>('/users/', { params }),
 
   // Get single admin
   getAdminById: (id: string) =>
-    apiClient.get<{ data: AdminResponse }>(`/admins/${id}`),
+    apiClient.get<{ data: AdminResponse }>(`/users/${id}`),
 
-  // Create admin
-  createAdmin: (payload: AdminPayload) =>
-    apiClient.post<{ data: AdminResponse }>('/admins', payload),
+  // Create user (admin)
+  createUser: (payload: CreateUserPayload) =>
+    apiClient.post<{ data: AdminResponse }>('/users/', payload),
 
   // Update admin
-  updateAdmin: (id: string, payload: Partial<AdminPayload>) =>
-    apiClient.put<{ data: AdminResponse }>(`/admins/${id}`, payload),
+  updateAdmin: (id: string, payload: Partial<CreateUserPayload>) =>
+    apiClient.put<{ data: AdminResponse }>(`/users/${id}`, payload),
 
   // Delete admin
   deleteAdmin: (id: string) =>
-    apiClient.delete(`/admins/${id}`),
+    apiClient.delete(`/users/${id}`),
 
   // Update admin password
   updatePassword: (id: string, password: string) =>
-    apiClient.patch(`/admins/${id}/password`, { password }),
+    apiClient.patch(`/users/${id}/password`, { password }),
 
   // Bulk delete admins
   bulkDeleteAdmins: (ids: string[]) =>
-    apiClient.post('/admins/bulk-delete', { ids }),
+    apiClient.post('/users/bulk-delete', { ids }),
+
+  // Upload admin avatar to Cloudinary
+  uploadAdminAvatar: async (file: File): Promise<string> => {
+    try {
+      const response = await uploadToCloudinary(file, 'euracare/admins');
+      return response.secure_url;
+    } catch (error) {
+      console.error('[AdminService] Avatar upload error:', error);
+      throw error;
+    }
+  },
 };
 
 export default adminService;
