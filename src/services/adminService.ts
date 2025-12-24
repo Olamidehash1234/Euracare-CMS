@@ -14,7 +14,7 @@ export interface CreateUserPayload {
 
 export interface AdminResponse {
   id: string;
-  name: string;
+  full_name: string;
   email: string;
   role?: string;
   permissions?: string[];
@@ -25,7 +25,7 @@ export interface AdminResponse {
 const adminService = {
   // Get all admins
   getAllAdmins: (params?: { page?: number; limit?: number; search?: string }) =>
-    apiClient.get<{ data: AdminResponse[]; total: number }>('/users/', { params }),
+    apiClient.get<{ data: { users: AdminResponse[]; meta?: any } }>('/users/', { params }),
 
   // Get single admin
   getAdminById: (id: string) =>
@@ -37,7 +37,7 @@ const adminService = {
 
   // Update admin
   updateAdmin: (id: string, payload: Partial<CreateUserPayload>) =>
-    apiClient.put<{ data: AdminResponse }>(`/users/${id}`, payload),
+    apiClient.patch<{ data: AdminResponse }>(`/users/${id}`, payload),
 
   // Delete admin
   deleteAdmin: (id: string) =>

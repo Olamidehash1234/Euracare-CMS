@@ -24,6 +24,12 @@ const AdminPage = () => {
   const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('success');
   const [showToast, setShowToast] = useState(false);
 
+  const showToastMessage = (message: string, type: 'success' | 'error' | 'loading') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+  };
+
   // Fetch admins on mount
   useEffect(() => {
     fetchAdmins();
@@ -37,19 +43,8 @@ const AdminPage = () => {
       const response = await adminService.getAllAdmins();
       console.log('[AdminPage] Raw API response:', response);
 
-      // Handle different response structures
-      let adminsData = [];
-
-      // API returns: response.data.data.users
-      if (response?.data?.data?.users && Array.isArray(response.data.data.users)) {
-        adminsData = response.data.data.users;
-      } else if (response?.data?.data && Array.isArray(response.data.data)) {
-        adminsData = response.data.data;
-      } else if (response?.data && Array.isArray(response.data)) {
-        adminsData = response.data;
-      } else if (Array.isArray(response)) {
-        adminsData = response;
-      }
+      // API returns: response.data.data.users as AdminResponse[]
+      const adminsData = response?.data?.data?.users || [];
 
       console.log('[AdminPage] Parsed admins data:', adminsData);
 
@@ -94,10 +89,20 @@ const AdminPage = () => {
 
       setAdmins(transformedAdmins);
       console.log('[AdminPage] Admins loaded:', transformedAdmins);
-    } catch (err) {
+    } catch (err: any) {
       console.error('[AdminPage] Error fetching admins:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load admins';
+      let errorMessage = 'Failed to load admins';
+
+      if (err.response?.status === 403) {
+        errorMessage = 'You do not have permission to perform this action';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
       setError(errorMessage);
+      showToastMessage(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -129,17 +134,26 @@ const AdminPage = () => {
           id: admin.id,
           fullName: fullAdmin.full_name || '',
           email: fullAdmin.email || '',
-          phone: fullAdmin.phone || '',
+          phone: '',
           roleType: getRoleId(fullAdmin.role),
-          avatar: fullAdmin.profile_picture_url,
+          avatar: '',
           notifyByEmail: false,
           countryCode: '+234',
         });
         setShowCreate(true);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('[AdminPage] Error fetching admin details:', err);
-      setError('Failed to load admin details for editing');
+      let errorMessage = 'Failed to load admin details for editing';
+
+      if (err.response?.status === 403) {
+        errorMessage = 'You do not have permission to perform this action';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      }
+
+      setError(errorMessage);
+      showToastMessage(errorMessage, 'error');
     } finally {
       setIsFetchingAdminData(false);
     }
@@ -158,9 +172,18 @@ const AdminPage = () => {
       setToastMessage('Admin deleted successfully! ✅');
       setToastType('success');
       setShowToast(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('[AdminPage] Error deleting admin:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to delete admin';
+      let errorMessage = 'Failed to delete admin';
+
+      if (err.response?.status === 403) {
+        errorMessage = 'You do not have permission to perform this action';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
       setToastMessage(errorMessage);
       setToastType('error');
       setShowToast(true);

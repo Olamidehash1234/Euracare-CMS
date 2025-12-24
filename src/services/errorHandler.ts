@@ -8,8 +8,11 @@ export interface ApiError {
 
 export const handleApiError = (error: unknown): ApiError => {
   if (error instanceof AxiosError) {
-    // First try to get message from backend response
-    const backendMessage = error.response?.data?.message || error.response?.data?.error?.message;
+    // First try to get message from backend response (check multiple paths)
+    const backendMessage = 
+      error.response?.data?.message || 
+      error.response?.data?.error?.message ||
+      error.response?.data?.detail?.message;
     const message = backendMessage || error.message || 'An error occurred';
     
     return {
@@ -39,8 +42,11 @@ export const getErrorMessage = (error: unknown): string => {
   
   const status = apiError.status;
   
-  // Try to get backend message first
-  const backendMsg = apiError.data?.message || apiError.data?.error?.message;
+  // Try to get backend message first (check multiple paths for different API response formats)
+  const backendMsg = 
+    apiError.data?.message || 
+    apiError.data?.error?.message ||
+    apiError.data?.detail?.message;
   if (backendMsg && typeof backendMsg === 'string' && !backendMsg.includes('Request failed')) {
     return backendMsg;
   }
@@ -49,7 +55,7 @@ export const getErrorMessage = (error: unknown): string => {
   const statusCodeMessages: Record<number, string> = {
     400: 'Invalid request. Please check the information you entered and try again.',
     401: 'Your session has expired. Please log in again.',
-    403: 'You are not allowed to perform this action.',
+    403: 'You do not have permission to perform this action.',
     404: 'The resource you are looking for does not exist.',
     409: 'This record already exists. Please check if the data is already in the system.',
     422: 'Some of the information you provided is invalid. Please review and try again.',

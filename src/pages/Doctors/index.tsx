@@ -33,19 +33,8 @@ const DoctorsPage = () => {
             const response = await doctorService.getAllDoctors();
             console.log('[DoctorsPage] Raw API response:', response);
             
-            // Handle different response structures
-            let doctorsData = [];
-            
-            // API returns: response.data.data.doctor
-            if (response?.data?.data?.doctor && Array.isArray(response.data.data.doctor)) {
-                doctorsData = response.data.data.doctor;
-            } else if (response?.data?.data && Array.isArray(response.data.data)) {
-                doctorsData = response.data.data;
-            } else if (response?.data && Array.isArray(response.data)) {
-                doctorsData = response.data;
-            } else if (Array.isArray(response)) {
-                doctorsData = response;
-            }
+            // API returns: response.data.data.doctor as DoctorResponse[]
+            const doctorsData = response?.data?.data?.doctor || [];
 
             console.log('[DoctorsPage] Parsed doctors data:', doctorsData);
             
@@ -65,9 +54,18 @@ const DoctorsPage = () => {
 
             setDoctors(transformedDoctors);
             console.log('[DoctorsPage] Doctors loaded:', transformedDoctors);
-        } catch (err) {
+        } catch (err: any) {
             console.error('[DoctorsPage] Error fetching doctors:', err);
-            const errorMessage = err instanceof Error ? err.message : 'Failed to load doctors';
+            let errorMessage = 'Failed to load doctors';
+
+            if (err.response?.status === 403) {
+                errorMessage = 'You do not have permission to perform this action';
+            } else if (err.response?.status === 401) {
+                errorMessage = 'Your session has expired. Please log in again.';
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+
             setError(errorMessage);
         } finally {
             setIsLoading(false);
@@ -93,8 +91,8 @@ const DoctorsPage = () => {
             
             // Fetch full doctor data by ID
             const response = await doctorService.getDoctorById(doctor.id.toString());
-            // Extract doctor from nested response structure: response.data.data.doctor
-            const fullDoctor = response.data?.data?.doctor;
+            // Extract doctor from nested response structure or direct data
+            const fullDoctor = (response.data?.data as any)?.doctor || response.data?.data;
             
             if (fullDoctor) {
                 console.log('[DoctorsPage] Full doctor data loaded:', fullDoctor);
@@ -118,9 +116,17 @@ const DoctorsPage = () => {
                     doctorId: doctor.id.toString()
                 });
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error('[DoctorsPage] Error fetching doctor details:', err);
-            setError('Failed to load doctor details for editing');
+            let errorMessage = 'Failed to load doctor details for editing';
+
+            if (err.response?.status === 403) {
+                errorMessage = 'You do not have permission to perform this action';
+            } else if (err.response?.status === 401) {
+                errorMessage = 'Your session has expired. Please log in again.';
+            }
+
+            setError(errorMessage);
         } finally {
             setIsFetchingDoctorData(false);
         }
@@ -139,9 +145,18 @@ const DoctorsPage = () => {
             setToastMessage('Doctor deleted successfully! ✅');
             setToastType('success');
             setShowToast(true);
-        } catch (err) {
+        } catch (err: any) {
             console.error('[DoctorsPage] Error deleting doctor:', err);
-            const errorMessage = err instanceof Error ? err.message : 'Failed to delete doctor';
+            let errorMessage = 'Failed to delete doctor';
+
+            if (err.response?.status === 403) {
+                errorMessage = 'You do not have permission to perform this action';
+            } else if (err.response?.status === 401) {
+                errorMessage = 'Your session has expired. Please log in again.';
+            } else if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+
             setToastMessage(errorMessage);
             setToastType('error');
             setShowToast(true);

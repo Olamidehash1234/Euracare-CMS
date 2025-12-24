@@ -41,11 +41,11 @@ export interface DoctorResponse {
 const doctorService = {
   // Get all doctors
   getAllDoctors: (params?: { page?: number; limit?: number; search?: string }) =>
-    apiClient.get<{ data: DoctorResponse[]; total: number }>('/doctors', { params }),
+    apiClient.get<{ data: { doctor: DoctorResponse[]; meta?: any } }>('/doctors/', { params }),
 
   // Get single doctor
   getDoctorById: (id: string) =>
-    apiClient.get<{ data: DoctorResponse }>(`/doctors/${id}`),
+    apiClient.get<{ data: { doctor: DoctorResponse } | DoctorResponse }>(`/doctors/${id}`),
 
   // Create doctor
   createDoctor: (payload: CreateDoctorPayload) =>

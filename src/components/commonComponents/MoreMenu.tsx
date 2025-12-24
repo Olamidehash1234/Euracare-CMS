@@ -4,12 +4,13 @@ interface MoreMenuProps {
   onManageMembers?: () => void;
   onManagePermission?: () => void;
   onSuspendUser?: () => void;
+  onDeleteRole?: () => void;
   onViewActivity?: () => void;
   onClose?: () => void;
   menuClassName?: string; // optional override for menu width / styling
 }
 
-export default function MoreMenu({ onManageMembers, onManagePermission, onSuspendUser, onViewActivity, onClose, menuClassName }: MoreMenuProps) {
+export default function MoreMenu({ onManageMembers, onManagePermission, onSuspendUser, onDeleteRole, onViewActivity, onClose, menuClassName }: MoreMenuProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   const handleClick = (cb?: () => void) => {
@@ -66,6 +67,15 @@ export default function MoreMenu({ onManageMembers, onManagePermission, onSuspen
             className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101]"
           >
             Manage Permission
+          </button>
+        )}
+
+        {onDeleteRole && (
+          <button
+            onClick={() => handleClick(onDeleteRole)}
+            className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-red-50 text-[14px] text-red-500 font-medium"
+          >
+            Delete Role
           </button>
         )}
 

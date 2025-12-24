@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import CustomDropdown from '../../components/commonComponents/CustomDropdown';
 import Toast from '../../components/GlobalComponents/Toast';
 import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
-import { adminService } from '@/services';
+import { adminService, roleService } from '@/services';
 import { getErrorMessage } from '@/services';
 
 export type AdminPayload = {
@@ -32,12 +32,6 @@ const countryOptions = [
   { label: '+1 (United States)', value: '+1' },
 ];
 
-const roleOptions = [
-  { label: 'Choose a role type', value: '' },
-  { label: 'Admin', value: '6940060fc2a3695489abc933' },
-  { label: 'Super Admin', value: '6940060fc2a3695489abc932' },
-];
-
 export default function CreateAdminForm({ mode = 'create', initialData, isLoadingData = false, onSave, onClose }: Props) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(initialData?.avatar || null);
@@ -46,6 +40,9 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('loading');
   const [showToast, setShowToast] = useState(false);
+  const [roleOptions, setRoleOptions] = useState<Array<{ label: string; value: string }>>([
+    { label: 'Loading roles...', value: '' },
+  ]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -71,9 +68,18 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
       setToastMessage('Image uploaded successfully! ✅');
       setToastType('success');
       setShowToast(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('[CreateAdminForm] Error uploading avatar:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to upload image';
+      let errorMessage = 'Failed to upload image';
+
+      if (err.response?.status === 403) {
+        errorMessage = 'You do not have permission to perform this action';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
       setToastMessage(errorMessage);
       setToastType('error');
       setShowToast(true);
@@ -82,6 +88,43 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
       setIsUploadingAvatar(false);
     }
   };
+
+  // Fetch roles on component mount
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await roleService.getAllRoles();
+        const rolesData = response?.data?.data?.roles || [];
+
+        if (Array.isArray(rolesData) && rolesData.length > 0) {
+          const formattedRoles = rolesData.map((role: any) => ({
+            label: role.name,
+            value: role.id,
+          }));
+          setRoleOptions([
+            { label: 'Choose a role type', value: '' },
+            ...formattedRoles,
+          ]);
+        } else {
+          setRoleOptions([{ label: 'No roles available', value: '' }]);
+        }
+      } catch (err: any) {
+        console.error('[CreateAdminForm] Error fetching roles:', err);
+        
+        let fallbackLabel = 'Failed to load roles';
+        if (err.response?.status === 403) {
+          fallbackLabel = 'You do not have permission to view roles';
+        } else if (err.response?.status === 401) {
+          fallbackLabel = 'Session expired, please log in again';
+        }
+
+        setRoleOptions([{ label: fallbackLabel, value: '' }]);
+      } finally {
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const [form, setForm] = useState({
     fullName: initialData?.fullName || '',
@@ -168,7 +211,7 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
         setToastMessage('Admin profile created successfully! ✅');
       } else {
         // For edit mode, use updateAdmin which should be able to handle optional password
-        response = await adminService.updateAdmin(initialData?.id || '', payload);
+        response = await adminService.updateAdmin(String(initialData?.id || ''), payload);
         console.log('[CreateAdminForm] Admin updated successfully:', response);
         setToastMessage('Admin profile updated successfully! ✅');
       }

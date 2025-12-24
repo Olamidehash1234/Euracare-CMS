@@ -35,7 +35,7 @@ const DoctorProfile = () => {
             try {
                 console.log('[DoctorProfile] Fetching doctor profile for id:', id);
                 const response = await doctorService.getDoctorById(id);
-                const doctorData = response.data?.data?.doctor;
+                const doctorData = (response.data?.data as any)?.doctor || response.data?.data;
 
                 if (!doctorData) {
                     throw new Error('Doctor data not found');
@@ -68,9 +68,18 @@ const DoctorProfile = () => {
                 };
 
                 setDoctor(transformedDoctor);
-            } catch (err) {
+            } catch (err: any) {
                 console.error('[DoctorProfile] Error fetching doctor:', err);
-                const errorMessage = err instanceof Error ? err.message : 'Failed to load doctor profile';
+                let errorMessage = 'Failed to load doctor profile';
+
+                if (err.response?.status === 403) {
+                    errorMessage = 'You do not have permission to perform this action';
+                } else if (err.response?.status === 401) {
+                    errorMessage = 'Your session has expired. Please log in again.';
+                } else if (err instanceof Error) {
+                    errorMessage = err.message;
+                }
+
                 setError(errorMessage);
             } finally {
                 setIsLoading(false);
