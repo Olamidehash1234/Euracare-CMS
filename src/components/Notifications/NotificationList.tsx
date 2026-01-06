@@ -10,14 +10,7 @@ export type NotificationRow = {
   read?: boolean;
 };
 
-const sampleData: NotificationRow[] = Array.from({ length: 12 }).map((_, i) => ({
-  id: i + 1,
-  title: 'Action heading',
-  role: ['Role','Role','Role','Role'][i % 4],
-  message: 'Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor',
-  time: ['8:38 AM','8:13 AM','7:52 PM','7:52 PM','4:13 PM','3:52 PM','2:30 PM','8:38 AM','8:13 AM','7:52 PM','4:13 PM','7:52 PM'][i],
-  read: i % 3 === 0,
-}));
+const sampleData: NotificationRow[] = [];
 
 interface Props {
   search?: string;

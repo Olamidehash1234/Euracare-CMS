@@ -9,6 +9,7 @@ import ManageMembersTable from '../../components/RolesPermission/ManageMembersTa
 import ManagePermissionModal from '../../components/RolesPermission/ManagePermissionModal';
 import Toast from '../../components/GlobalComponents/Toast';
 import roleService from '../../services/roleService';
+import adminService from '../../services/adminService';
 
 const roleMeta: Record<string, { description: string; icon: string }> = {
   'SUPER_ADMIN': {
@@ -122,6 +123,8 @@ const DepartmentPage = () => {
 
   const [openMenuFor, setOpenMenuFor] = useState<string | null>(null);
   const [openMembersFor, setOpenMembersFor] = useState<string | null>(null); // which role id to show members for
+  const [membersData, setMembersData] = useState<any[]>([]); // Stores fetched members for the selected role
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [permissionModalOpen, setPermissionModalOpen] = useState(false);
   const [permissionModalMode, setPermissionModalMode] = useState<'create' | 'edit'>('create');
   const [selectedRoleForPermission, setSelectedRoleForPermission] = useState<string | null>(null);
@@ -132,10 +135,76 @@ const DepartmentPage = () => {
     show: false,
   });
 
-  const handleManageMembers = (roleId: string) => {
+  const handleManageMembers = async (roleId: string) => {
     // close the small MoreMenu and open inline members table
     setOpenMenuFor(null);
-    setOpenMembersFor(roleId);
+    setIsLoadingMembers(true);
+
+    try {
+      // Fetch users filtered by roleId using the list users endpoint
+      const params = { 
+        roleId: roleId,
+        limit: 100 // Get all users for this role
+      };
+      
+      console.log('[RolesPage] Fetching members with params:', params);
+      
+      const response = await adminService.getAllAdmins(params);
+      
+      console.log('[RolesPage] Full response from backend:', response);
+      console.log('[RolesPage] Response data:', response?.data);
+      
+      const usersData = response?.data?.data?.users || [];
+      
+      console.log('[RolesPage] Parsed users data:', usersData);
+      console.log('[RolesPage] Users count:', usersData.length);
+
+      if (Array.isArray(usersData) && usersData.length > 0) {
+        // Get the role name from the mockRoles
+        const role = mockRoles.find(r => r.id === roleId);
+        const roleName = role?.name || 'Unknown';
+
+        // Transform the users data to AdminType format
+        const transformedMembers = usersData.map((user: any) => {
+          console.log('[RolesPage] Transforming user:', {
+            id: user.id || user._id,
+            name: user.full_name,
+            status: user.status,
+          });
+
+          return {
+            id: user.id || user._id,
+            name: user.full_name || user.fullName || '',
+            avatar: user.profile_picture_url || user.profilePictureUrl,
+            dateCreated: user.created_at || user.createdAt || new Date().toISOString(),
+            email: user.email || '',
+            role: roleName,
+            active: user.lastLogin ? 'Active' : 'Inactive',
+            status: user.status === 'Active' ? 'Active' : 'Suspended',
+          };
+        });
+
+        console.log('[RolesPage] Transformed members:', transformedMembers);
+        setMembersData(transformedMembers);
+        setOpenMembersFor(roleId);
+      } else {
+        console.warn('[RolesPage] No users data found or empty array');
+        showToast('No members found for this role', 'error');
+      }
+    } catch (error: any) {
+      console.error('[RolesPage] Error fetching role members:', error);
+      let errorMessage = 'Failed to load members for this role';
+
+      if (error.response?.status === 401) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'You do not have permission to view members.';
+      }
+
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsLoadingMembers(false);
+    }
   };
 
   const handleManagePermission = (roleId: string) => {
@@ -344,17 +413,23 @@ const DepartmentPage = () => {
             {openMembersFor ? (
               (() => {
                 const role = mockRoles.find(r => r.id === openMembersFor);
-                const members = sampleAdminsInitial.filter(a => a.role === (role?.name ?? ''));
                 return (
                   <div className="mt-0">
-                    <ManageMembersTable
-                      isOpen={true}
-                      roleName={role?.name ?? 'Members'}
-                      members={members}
-                      onClose={() => setOpenMembersFor(null)}
-                      onEdit={(admin) => console.log('edit admin from members table', admin)}
-                      onDelete={(admin) => console.log('delete admin from members table', admin)}
-                    />
+                    {isLoadingMembers ? (
+                      <LoadingSpinner heightClass="py-[100px]" />
+                    ) : (
+                      <ManageMembersTable
+                        isOpen={true}
+                        roleName={role?.name ?? 'Members'}
+                        members={membersData}
+                        onClose={() => {
+                          setOpenMembersFor(null);
+                          setMembersData([]);
+                        }}
+                        onEdit={(admin) => console.log('edit admin from members table', admin)}
+                        onDelete={(admin) => console.log('delete admin from members table', admin)}
+                      />
+                    )}
                   </div>
                 );
               })()

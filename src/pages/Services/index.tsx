@@ -8,24 +8,6 @@ import CreateServiceForm from './CreateServiceForm';
 import type { ServicePayload } from './CreateServiceForm';
 
 const sampleServicesInitial: ServiceType[] = [
-  {
-    id: 1,
-    title: 'Interventional Cardiology',
-    image: '/image/services/doctor.jpg',
-    publishedAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    title: 'Interventional Radiology',
-    image: '/image/services/doctor.jpg',
-    publishedAt: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    title: 'General Surgery',
-    image: '/image/services/doctor.jpg',
-    publishedAt: new Date().toISOString(),
-  },
 ];
 
 const ServicesPage = () => {

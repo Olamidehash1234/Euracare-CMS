@@ -1,14 +1,20 @@
 import React, { useRef, useState } from 'react';
 import TiptapEditor from '../../components/Editor/TiptapEditor';
+import { blogService } from '@/services';
 
 export type BlogPayload = {
-  title: string;
-  shortDescription?: string;
-  image?: string; // cover image
-  bannerImage?: string;
-  content?: string;
-  videoLink?: string;
-  publishedAt?: string;
+  snippet?: {
+    title: string;
+    cover_image_url?: string;
+  };
+  page?: {
+    content?: {
+      [key: string]: any;
+    };
+    video_link_url?: string;
+  };
+  video_link_url?: string;
+  blogId?: string;
 };
 
 interface Props {
@@ -16,47 +22,101 @@ interface Props {
   initialData?: BlogPayload;
   onSave: (data: BlogPayload) => void;
   onClose: () => void;
+  isLoading?: boolean;
+  isLoadingData?: boolean;
+  blogId?: string;
 }
 
-export default function CreateBlogForm({ mode = 'create', initialData, onSave, onClose }: Props) {
+export default function CreateBlogForm({ mode = 'create', initialData, onSave, onClose, isLoading = false, isLoadingData = false, blogId }: Props) {
   const coverRef = useRef<HTMLInputElement | null>(null);
 
-  const [coverPreview, setCoverPreview] = useState<string | null>(initialData?.image || null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(initialData?.snippet?.cover_image_url || null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
-    title: initialData?.title || '',
-    shortDescription: initialData?.shortDescription || '',
-    content: initialData?.content || '',
-    videoLink: initialData?.videoLink || '',
+    title: initialData?.snippet?.title || '',
+    content: initialData?.page?.content?.additionalProp1 || '',
+    videoLink: initialData?.page?.video_link_url || initialData?.video_link_url || '',
   });
 
-  const handleFile = (file?: File, setter?: (v: string | null) => void) => {
-    if (!file || !setter) return;
-    const url = URL.createObjectURL(file);
-    setter(url);
+  const handleFile = async (file?: File) => {
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    setUploadError(null);
+
+    try {
+      // Show local preview immediately
+      const url = URL.createObjectURL(file);
+      setCoverPreview(url);
+      console.log('[CreateBlogForm] Local preview set');
+
+      // Upload to Cloudinary
+      console.log('[CreateBlogForm] Uploading image to Cloudinary...');
+      const imageUrl = await blogService.uploadBlogCoverImage(file);
+      console.log('[CreateBlogForm] Image uploaded successfully:', imageUrl);
+
+      // Update preview with Cloudinary URL
+      setCoverPreview(imageUrl);
+    } catch (error: any) {
+      console.error('[CreateBlogForm] Error uploading image:', error);
+      const errorMessage = error?.message || 'Failed to upload image';
+      console.error('[CreateBlogForm] Upload error details:', errorMessage);
+      setUploadError(errorMessage);
+      setCoverPreview(null);
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
-  const handleDrop = (e: React.DragEvent, setter: (v: string | null) => void) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    handleFile(file, setter);
+    handleFile(file);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      title: form.title.trim(),
-      shortDescription: form.shortDescription.trim(),
-      image: coverPreview || undefined,
-      content: form.content.trim(),
-      videoLink: form.videoLink.trim() || undefined,
-      publishedAt: new Date().toISOString(),
-    });
+
+    console.log('[CreateBlogForm] Form submission initiated');
+
+    if (!form.title.trim()) {
+      console.warn('[CreateBlogForm] Validation failed: missing title');
+      setUploadError('Please enter a blog title');
+      return;
+    }
+
+    if (!form.content.trim()) {
+      console.warn('[CreateBlogForm] Validation failed: missing content');
+      setUploadError('Please add blog content');
+      return;
+    }
+
+    const payload: BlogPayload = {
+      snippet: {
+        title: form.title.trim(),
+        cover_image_url: coverPreview || undefined,
+      },
+      page: {
+        content: {
+          additionalProp1: form.content.trim(),
+        },
+        video_link_url: form.videoLink.trim() || undefined,
+      },
+      video_link_url: form.videoLink.trim() || undefined,
+    };
+
+    console.log('[CreateBlogForm] Validation passed');
+    console.log('[CreateBlogForm] Submitting payload:', JSON.stringify(payload, null, 2));
+    console.log('[CreateBlogForm] Mode:', mode);
+    console.log('[CreateBlogForm] Blog ID:', blogId);
+    onSave(payload);
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="">
+    <div className="min-h-screen bg-slate-50">
+      <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
         <a href="/blogs" className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px]">
           <img src="/icon/right.svg" alt="" /> Back to Blogs & Articles Page
         </a>
@@ -90,12 +150,14 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
                 <label className="block text-sm text-[#010101] mb-2">Add Cover Image</label>
 
                 <div
-                  onDrop={(e) => handleDrop(e, setCoverPreview)}
+                  onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
-                  onClick={() => coverRef.current?.click()}
+                  onClick={() => !isUploadingImage && coverRef.current?.click()}
                   className="w-full h-[150px] lg:h-[200px] rounded-md border border-[#01010133] bg-[#F2F2F2] flex items-center justify-center text-center p-4 cursor-pointer"
                 >
-                  {coverPreview ? (
+                  {isUploadingImage ? (
+                    <div className="text-sm text-[#010101CC]">Uploading...</div>
+                  ) : coverPreview ? (
                     <img src={coverPreview} alt="cover" className="h-full w-full object-cover" />
                   ) : (
                     <div>
@@ -111,10 +173,15 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
                     ref={coverRef}
                     type="file"
                     accept="image/*"
+                    disabled={isUploadingImage}
                     className="hidden"
-                    onChange={(e) => handleFile(e.target.files?.[0], setCoverPreview)}
+                    onChange={(e) => handleFile(e.target.files?.[0])}
                   />
                 </div>
+
+                {uploadError && (
+                  <div className="mt-2 text-sm text-red-600">{uploadError}</div>
+                )}
               </div>
             </div>
 
@@ -142,11 +209,11 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
-              <button type="button" onClick={onClose} className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm">
+              <button type="button" onClick={onClose} disabled={isLoading} className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm disabled:opacity-50">
                 Cancel
               </button>
-              <button type="submit" className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm">
-                {mode === 'create' ? 'Create Blog' : 'Update changes'}
+              <button type="submit" disabled={isLoading || isUploadingImage} className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm disabled:opacity-50">
+                {isLoading ? (mode === 'create' ? 'Creating...' : 'Updating...') : (mode === 'create' ? 'Create Blog' : 'Update changes')}
               </button>
             </div>
           </form>

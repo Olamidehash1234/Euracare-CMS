@@ -130,15 +130,30 @@ const AdminPage = () => {
           return roleObj;
         };
 
+        // Parse phone number and country code from fullAdmin.phone
+        let countryCode = '+234';
+        let phoneNumber = '';
+        const phone = (fullAdmin as any).phone;
+        if (phone) {
+          const countryCodePatterns = ['+234', '+233', '+1'];
+          const matchedCode = countryCodePatterns.find(code => phone.startsWith(code));
+          if (matchedCode) {
+            countryCode = matchedCode;
+            phoneNumber = phone.substring(matchedCode.length);
+          } else {
+            phoneNumber = phone;
+          }
+        }
+
         setEditAdmin({
           id: admin.id,
           fullName: fullAdmin.full_name || '',
           email: fullAdmin.email || '',
-          phone: '',
+          phone: phoneNumber,
           roleType: getRoleId(fullAdmin.role),
-          avatar: '',
+          avatar: (fullAdmin as any).profile_picture_url || '',
           notifyByEmail: false,
-          countryCode: '+234',
+          countryCode: countryCode,
         });
         setShowCreate(true);
       }

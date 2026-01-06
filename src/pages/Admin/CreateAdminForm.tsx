@@ -99,12 +99,20 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
         if (Array.isArray(rolesData) && rolesData.length > 0) {
           const formattedRoles = rolesData.map((role: any) => ({
             label: role.name,
-            value: role.id,
+            value: role._id || role.id,
           }));
           setRoleOptions([
             { label: 'Choose a role type', value: '' },
             ...formattedRoles,
           ]);
+
+          // If in edit mode and role is set, ensure it matches one of the API roles
+          if (mode === 'edit' && initialData?.roleType) {
+            const matchingRole = formattedRoles.find(r => r.value === initialData.roleType);
+            if (matchingRole && form.roleType !== initialData.roleType) {
+              setForm(prev => ({ ...prev, roleType: initialData.roleType || '' }));
+            }
+          }
         } else {
           setRoleOptions([{ label: 'No roles available', value: '' }]);
         }
@@ -119,12 +127,11 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
         }
 
         setRoleOptions([{ label: fallbackLabel, value: '' }]);
-      } finally {
       }
     };
 
     fetchRoles();
-  }, []);
+  }, [mode, initialData?.roleType]);
 
   const [form, setForm] = useState({
     fullName: initialData?.fullName || '',

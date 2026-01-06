@@ -73,28 +73,4 @@ export default function TeamTable({ members, onView, onEdit, onDelete }: TeamTab
 }
 
 export const sampleTeamMembers: TeamMember[] = [
-  {
-    id: 1,
-    name: 'Dr. Hammed Ninalowo',
-    avatar: '/image/doctor/test.png',
-    createdAt: new Date().toISOString(),
-    role: 'Managing Director',
-    category: 'Board of Directors',
-  },
-  {
-    id: 2,
-    name: 'Dr. Tosin Majekodunmi',
-    avatar: '/image/doctor/test.png',
-    createdAt: new Date().toISOString(),
-    role: 'Cardiology Lead',
-    category: 'Our Team',
-  },
-  {
-    id: 3,
-    name: 'Dr. Owen Woghiren',
-    avatar: '/image/doctor/test.png',
-    createdAt: new Date().toISOString(),
-    role: 'Head of Research',
-    category: 'Board of Directors',
-  },
 ];

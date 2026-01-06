@@ -1,12 +1,8 @@
+import NotFound from '../commonComponents/NotFound';
+
 type ServiceItem = { id: number; title: string; image?: string };
 
-const sample: ServiceItem[] = [
-    { id: 1, title: 'Interventional Cardiology', image: '/image/services/doctor.jpg' },
-    { id: 2, title: 'Adult & Pediatric Cardiology', image: '/image/services/doctor.jpg' },
-    { id: 3, title: 'General Surgery', image: '/image/services/doctor.jpg' },
-    { id: 4, title: 'Bariatric & Weight Loss Surgery', image: '/image/services/doctor.jpg' },
-    { id: 5, title: 'Orthopedic Surgery', image: '/image/services/doctor.jpg' },
-];
+const sample: ServiceItem[] = [];
 
 export default function ServicesCard() {
     return (
@@ -18,30 +14,40 @@ export default function ServicesCard() {
       </div>
 
       <div className="divide-y p-5 lg:px-[20px] lg:pb-[10px] lg:pt-0">
-                {sample.map(s => (
-                    <div key={s.id} className="flex items-center py-[12px] justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-md overflow-hidden bg-slate-100">
-                                <img src={s.image} alt={s.title} className="w-full h-full object-cover" />
+                {sample.length > 0 ? (
+                    sample.map(s => (
+                        <div key={s.id} className="flex items-center py-[12px] justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-md overflow-hidden bg-slate-100">
+                                    <img src={s.image} alt={s.title} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="text-sm">{s.title}</div>
                             </div>
-                            <div className="text-sm">{s.title}</div>
+
+                            <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
+                                <button className="px-[12px] py-[10px] text-[#0C2141]" title="View">
+                                    <img src="/icon/eye.svg" alt="View" />
+                                </button>
+
+                                <button className="px-[12px] py-[10px] text-[#0C2141]" title="Edit">
+                                    <img src="/icon/edit.svg" alt="Edit" />
+                                </button>
+
+                                <button className="px-[12px] py-[10px] text-[#EF4444]" title="Delete">
+                                    <img src="/icon/delete.svg" alt="Delete" />
+                                </button>
+                            </div>
                         </div>
-
-                        <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
-                            <button className="px-[12px] py-[10px] text-[#0C2141]" title="View">
-                                <img src="/icon/eye.svg" alt="View" />
-                            </button>
-
-                            <button className="px-[12px] py-[10px] text-[#0C2141]" title="Edit">
-                                <img src="/icon/edit.svg" alt="Edit" />
-                            </button>
-
-                            <button className="px-[12px] py-[10px] text-[#EF4444]" title="Delete">
-                                <img src="/icon/delete.svg" alt="Delete" />
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    <NotFound
+                        title="No Services Yet"
+                        description="No services available at the moment."
+                        imageSrc="/not-found.png"
+                        ctaText="Add New Service"
+                        onCta={() => window.location.href = '/services'}
+                    />
+                )}
             </div>
         </div>
     );

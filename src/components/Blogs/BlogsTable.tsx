@@ -31,7 +31,7 @@ export default function BlogsTable({ blogs, onView, onEdit, onDelete }: BlogsTab
             <th className="w-[100px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Image</th>
             <th className="w-[300px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Title</th>
             <th className="w-[200px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Category</th>
-            <th className="w-[200px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Date Published</th>
+            <th className="w-[300px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Date Published</th>
             <th className="w-[150px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">Action</th>
           </tr>
         </thead>

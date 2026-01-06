@@ -24,7 +24,7 @@ export interface AdminResponse {
 
 const adminService = {
   // Get all admins
-  getAllAdmins: (params?: { page?: number; limit?: number; search?: string }) =>
+  getAllAdmins: (params?: { page?: number; limit?: number; search?: string; roleId?: string }) =>
     apiClient.get<{ data: { users: AdminResponse[]; meta?: any } }>('/users/', { params }),
 
   // Get single admin

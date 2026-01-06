@@ -20,14 +20,6 @@ const fontSizeOptions = [
   { label: '30px', value: '30px' },
 ];
 
-const fontFamilyOptions = [
-  { label: 'Arial', value: 'Arial' },
-  { label: 'Times New Roman', value: 'Times New Roman' },
-  { label: 'Helvetica', value: 'Helvetica' },
-  { label: 'Georgia', value: 'Georgia' },
-  { label: 'Courier New', value: 'Courier New' },
-];
-
 const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   const editor = useEditor({
     extensions: [
@@ -42,7 +34,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
     content,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
+        class: 'focus:outline-none text-base',
       },
     },
     onUpdate: ({ editor }) => {
@@ -60,14 +52,6 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   return (
     <div className="border rounded-md border-[#01010133]">
       <div className="flex flex-wrap gap-2 p-2 border-b border-[#01010133] bg-gray-50">
-        <CustomDropdown
-          options={fontFamilyOptions}
-          value=""
-          // apply font-family via textStyle mark (cast to any to avoid typings mismatch)
-          onChange={(value) => (editor as any).chain().focus().setMark('textStyle', { fontFamily: value }).run()}
-          placeholder="Font Family"
-          className="w-36"
-        />
 
         <CustomDropdown
           options={fontSizeOptions}
@@ -159,7 +143,8 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
 
       <EditorContent 
         editor={editor} 
-        className="p-3 min-h-[200px] prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none" 
+        onClick={() => editor?.chain().focus().run()}
+        className="p-3 min-h-[200px] focus:outline-none text-base leading-relaxed cursor-text" 
       />
     </div>
   );
