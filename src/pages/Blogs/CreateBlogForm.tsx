@@ -50,19 +50,19 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
       // Show local preview immediately
       const url = URL.createObjectURL(file);
       setCoverPreview(url);
-      console.log('[CreateBlogForm] Local preview set');
+      // console.log('[CreateBlogForm] Local preview set');
 
       // Upload to Cloudinary
-      console.log('[CreateBlogForm] Uploading image to Cloudinary...');
+      // console.log('[CreateBlogForm] Uploading image to Cloudinary...');
       const imageUrl = await blogService.uploadBlogCoverImage(file);
-      console.log('[CreateBlogForm] Image uploaded successfully:', imageUrl);
+      // console.log('[CreateBlogForm] Image uploaded successfully:', imageUrl);
 
       // Update preview with Cloudinary URL
       setCoverPreview(imageUrl);
     } catch (error: any) {
-      console.error('[CreateBlogForm] Error uploading image:', error);
+      // console.error('[CreateBlogForm] Error uploading image:', error);
       const errorMessage = error?.message || 'Failed to upload image';
-      console.error('[CreateBlogForm] Upload error details:', errorMessage);
+      // console.error('[CreateBlogForm] Upload error details:', errorMessage);
       setUploadError(errorMessage);
       setCoverPreview(null);
     } finally {
@@ -79,16 +79,16 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('[CreateBlogForm] Form submission initiated');
+    // console.log('[CreateBlogForm] Form submission initiated');
 
     if (!form.title.trim()) {
-      console.warn('[CreateBlogForm] Validation failed: missing title');
+      // console.warn('[CreateBlogForm] Validation failed: missing title');
       setUploadError('Please enter a blog title');
       return;
     }
 
     if (!form.content.trim()) {
-      console.warn('[CreateBlogForm] Validation failed: missing content');
+      // console.warn('[CreateBlogForm] Validation failed: missing content');
       setUploadError('Please add blog content');
       return;
     }
@@ -107,10 +107,10 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
       video_link_url: form.videoLink.trim() || undefined,
     };
 
-    console.log('[CreateBlogForm] Validation passed');
-    console.log('[CreateBlogForm] Submitting payload:', JSON.stringify(payload, null, 2));
-    console.log('[CreateBlogForm] Mode:', mode);
-    console.log('[CreateBlogForm] Blog ID:', blogId);
+    // console.log('[CreateBlogForm] Validation passed');
+    // console.log('[CreateBlogForm] Submitting payload:', JSON.stringify(payload, null, 2));
+    // console.log('[CreateBlogForm] Mode:', mode);
+    // console.log('[CreateBlogForm] Blog ID:', blogId);
     onSave(payload);
   };
 

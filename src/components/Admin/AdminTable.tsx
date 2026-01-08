@@ -43,8 +43,8 @@ export default function AdminTable({ admins, onView, onEdit, onDelete }: AdminTa
             <tr key={admin.id} className="border-t border-[#01010133]">
               <td className="w-[40px] py-[19px] align-middle"><input type="checkbox" /></td>
               <td className="w-[250px] py-[19px] pl-4 pr-0 align-middle">
-                <div className="w-[280px] flex items-center gap-3">
-                  <img src={admin.avatar ? admin.avatar : '/placeholder-image.png'} alt="" className="w-10 h-10 lg:w-[42px] lg:h-[42px] rounded-full" />
+                <div className="w-[280px] flex items-center gap-3"> 
+                  <img src={admin.avatar ? admin.avatar : '/placeholder-image.png'} alt="" className="w-10 h-10 lg:w-[44px] lg:h-[44px] rounded-full" />
                   <span className="font-normal text-[14px]">{admin.name}</span>
                 </div>
               </td>
@@ -70,9 +70,9 @@ export default function AdminTable({ admins, onView, onEdit, onDelete }: AdminTa
                       <img src="/icon/delete.svg" alt="Delete" />
                     </button>
                   </div>
-                  <button className="p-2">
+                  {/* <button className="p-2">
                     <img src="/icon/more.svg" alt="More options" />
-                  </button>
+                  </button> */}
                 </div>
               </td>
             </tr>

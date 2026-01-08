@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         navigate('/auth/login', { replace: true });
       }, 1000);
     } catch (err) {
-      console.error('Logout error:', err);
+      // console.error('Logout error:', err);
       setToastType('error');
       setToastMessage('Failed to logout');
       setShowToast(true);

@@ -60,7 +60,7 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
 
       // Upload to Cloudinary
       const imageUrl = await adminService.uploadAdminAvatar(file);
-      console.log('[CreateAdminForm] Image uploaded successfully:', imageUrl);
+      // console.log('[CreateAdminForm] Image uploaded successfully:', imageUrl);
 
       // Update preview with Cloudinary URL
       setAvatarPreview(imageUrl);
@@ -69,7 +69,7 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
       setToastType('success');
       setShowToast(true);
     } catch (err: any) {
-      console.error('[CreateAdminForm] Error uploading avatar:', err);
+      // console.error('[CreateAdminForm] Error uploading avatar:', err);
       let errorMessage = 'Failed to upload image';
 
       if (err.response?.status === 403) {
@@ -117,7 +117,7 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
           setRoleOptions([{ label: 'No roles available', value: '' }]);
         }
       } catch (err: any) {
-        console.error('[CreateAdminForm] Error fetching roles:', err);
+        // console.error('[CreateAdminForm] Error fetching roles:', err);
         
         let fallbackLabel = 'Failed to load roles';
         if (err.response?.status === 403) {
@@ -209,17 +209,17 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
         payload.confirm_password = form.confirmPassword;
       }
 
-      console.log('[CreateAdminForm] Submitting payload:', payload);
+      // console.log('[CreateAdminForm] Submitting payload:', payload);
       
       let response;
       if (mode === 'create') {
         response = await adminService.createUser(payload);
-        console.log('[CreateAdminForm] Admin created successfully:', response);
+        // console.log('[CreateAdminForm] Admin created successfully:', response);
         setToastMessage('Admin profile created successfully! ✅');
       } else {
         // For edit mode, use updateAdmin which should be able to handle optional password
         response = await adminService.updateAdmin(String(initialData?.id || ''), payload);
-        console.log('[CreateAdminForm] Admin updated successfully:', response);
+        // console.log('[CreateAdminForm] Admin updated successfully:', response);
         setToastMessage('Admin profile updated successfully! ✅');
       }
 
@@ -237,7 +237,7 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
         countryCode: form.countryCode,
       });
     } catch (err) {
-      console.error('[CreateAdminForm] Error:', err);
+      // console.error('[CreateAdminForm] Error:', err);
       const errorMessage = getErrorMessage(err);
       setToastType('error');
       setToastMessage(errorMessage);

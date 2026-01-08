@@ -11,7 +11,7 @@ const TeamPage = () => {
   const [members, setMembers] = useState<TeamMember[]>(sampleTeamMembers);
   const [editMember, setEditMember] = useState<TeamMember | null>(null);
 
-  const handleView = (m: TeamMember) => console.log('view', m);
+  const handleView = (m: TeamMember) => { /* console.log('view', m); */ };
   
   const handleEdit = (m: TeamMember) => {
     setEditMember(m);

@@ -39,14 +39,14 @@ const AdminPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      console.log('[AdminPage] Fetching admins...');
+      // console.log('[AdminPage] Fetching admins...');
       const response = await adminService.getAllAdmins();
-      console.log('[AdminPage] Raw API response:', response);
+      // console.log('[AdminPage] Raw API response:', response);
 
       // API returns: response.data.data.users as AdminResponse[]
       const adminsData = response?.data?.data?.users || [];
 
-      console.log('[AdminPage] Parsed admins data:', adminsData);
+      // console.log('[AdminPage] Parsed admins data:', adminsData);
 
       if (!Array.isArray(adminsData)) {
         throw new Error('Invalid response format: expected array of admins');
@@ -88,9 +88,9 @@ const AdminPage = () => {
       }));
 
       setAdmins(transformedAdmins);
-      console.log('[AdminPage] Admins loaded:', transformedAdmins);
+      // console.log('[AdminPage] Admins loaded:', transformedAdmins);
     } catch (err: any) {
-      console.error('[AdminPage] Error fetching admins:', err);
+      // console.error('[AdminPage] Error fetching admins:', err);
       let errorMessage = 'Failed to load admins';
 
       if (err.response?.status === 403) {
@@ -108,19 +108,19 @@ const AdminPage = () => {
     }
   };
 
-  const handleView = (admin: AdminType) => console.log('view admin', admin);
+  const handleView = (admin: AdminType) => { /* console.log('view admin', admin); */ };
 
   const handleEdit = async (admin: AdminType) => {
     try {
       setIsFetchingAdminData(true);
-      console.log('[AdminPage] Attempting to fetch full admin data for ID:', admin.id);
+      // console.log('[AdminPage] Attempting to fetch full admin data for ID:', admin.id);
 
       // Fetch full admin data by ID
       const response = await adminService.getAdminById(admin.id.toString());
       const fullAdmin = response.data?.data;
 
       if (fullAdmin) {
-        console.log('[AdminPage] Full admin data loaded:', fullAdmin);
+        // console.log('[AdminPage] Full admin data loaded:', fullAdmin);
 
         // Map role ID to display name
         const getRoleId = (roleObj: any) => {
@@ -158,7 +158,7 @@ const AdminPage = () => {
         setShowCreate(true);
       }
     } catch (err: any) {
-      console.error('[AdminPage] Error fetching admin details:', err);
+      // console.error('[AdminPage] Error fetching admin details:', err);
       let errorMessage = 'Failed to load admin details for editing';
 
       if (err.response?.status === 403) {
@@ -176,9 +176,9 @@ const AdminPage = () => {
 
   const handleDelete = async (admin: AdminType) => {
     try {
-      console.log('[AdminPage] Deleting admin with ID:', admin.id);
+      // console.log('[AdminPage] Deleting admin with ID:', admin.id);
       await adminService.deleteAdmin(admin.id.toString());
-      console.log('[AdminPage] Admin deleted successfully');
+      // console.log('[AdminPage] Admin deleted successfully');
 
       // Remove the deleted admin from the list
       setAdmins(admins.filter(a => a.id !== admin.id));
@@ -188,7 +188,7 @@ const AdminPage = () => {
       setToastType('success');
       setShowToast(true);
     } catch (err: any) {
-      console.error('[AdminPage] Error deleting admin:', err);
+      // console.error('[AdminPage] Error deleting admin:', err);
       let errorMessage = 'Failed to delete admin';
 
       if (err.response?.status === 403) {
@@ -302,7 +302,7 @@ const AdminPage = () => {
               onDelete={handleDelete}
             />
           ) : isLoading ? (
-            <LoadingSpinner heightClass="py-12" />
+            <LoadingSpinner heightClass="py-[200px]"/>
           ) : error ? (
             <NotFound
               title="Error Loading Admins"

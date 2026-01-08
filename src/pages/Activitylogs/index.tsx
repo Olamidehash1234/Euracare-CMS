@@ -47,15 +47,15 @@ const LogsPage = () => {
 
   // Footer action handlers (local no-op / logging for now)
   const handleSelectAll = () => {
-    console.log('Select all clicked');
+    // console.log('Select all clicked');
   };
 
   const handleMarkAllRead = () => {
-    console.log('Mark all read clicked');
+    // console.log('Mark all read clicked');
   };
 
   const handleDeleteSelected = () => {
-    console.log('Delete selected clicked');
+    // console.log('Delete selected clicked');
   };
 
   return (

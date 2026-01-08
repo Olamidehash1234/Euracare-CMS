@@ -33,7 +33,7 @@ const DoctorProfile = () => {
             setIsLoading(true);
             setError(null);
             try {
-                console.log('[DoctorProfile] Fetching doctor profile for id:', id);
+                // console.log('[DoctorProfile] Fetching doctor profile for id:', id);
                 const response = await doctorService.getDoctorById(id);
                 const doctorData = (response.data?.data as any)?.doctor || response.data?.data;
 
@@ -41,7 +41,7 @@ const DoctorProfile = () => {
                     throw new Error('Doctor data not found');
                 }
 
-                console.log('[DoctorProfile] Doctor data loaded:', doctorData);
+                // console.log('[DoctorProfile] Doctor data loaded:', doctorData);
 
                 // Transform API response to component format
                 const transformedDoctor = {
@@ -69,7 +69,7 @@ const DoctorProfile = () => {
 
                 setDoctor(transformedDoctor);
             } catch (err: any) {
-                console.error('[DoctorProfile] Error fetching doctor:', err);
+                // console.error('[DoctorProfile] Error fetching doctor:', err);
                 let errorMessage = 'Failed to load doctor profile';
 
                 if (err.response?.status === 403) {

@@ -37,11 +37,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           // Restore user from localStorage
           const userData = JSON.parse(storedUser);
           setUser(userData);
-          console.log('[AuthContext] Session restored from localStorage:', userData);
+          // console.log('[AuthContext] Session restored from localStorage:', userData);
         }
       } catch (err) {
         // Token or user data is invalid, clear it
-        console.error('[AuthContext] Failed to restore session:', err);
+        // console.error('[AuthContext] Failed to restore session:', err);
         localStorage.removeItem('authToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('currentUser');
@@ -57,18 +57,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     setError(null);
-    console.log('[AuthContext] Login attempt:', { email });
+    // console.log('[AuthContext] Login attempt:', { email });
     try {
       // Step 1: Call login endpoint to get tokens
       const response = await authService.login({ email, password });
-      console.log('[AuthContext] Login response:', response);
-      console.log('[AuthContext] response.data:', response.data);
-      console.log('[AuthContext] response.data.data:', response.data.data);
+      // console.log('[AuthContext] Login response:', response);
+      // console.log('[AuthContext] response.data:', response.data);
+      // console.log('[AuthContext] response.data.data:', response.data.data);
       
       // Backend returns: { access_token, refresh_token } - NOT { token, user }
       const { access_token, refresh_token } = response.data.data;
-      console.log('[AuthContext] Extracted access_token:', access_token);
-      console.log('[AuthContext] Extracted refresh_token:', refresh_token);
+      // console.log('[AuthContext] Extracted access_token:', access_token);
+      // console.log('[AuthContext] Extracted refresh_token:', refresh_token);
 
       if (!access_token) {
         throw new Error('No access token in login response');
@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Store tokens
       localStorage.setItem('authToken', access_token);
       localStorage.setItem('refreshToken', refresh_token || '');
-      console.log('[AuthContext] Tokens stored in localStorage');
+      // console.log('[AuthContext] Tokens stored in localStorage');
 
       // Set a basic user object from login form data
       // In a real app, you'd fetch the full user profile from an endpoint
@@ -90,16 +90,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       localStorage.setItem('currentUser', JSON.stringify(basicUser));
       setUser(basicUser);
-      console.log('[AuthContext] Login successful, basic user set:', basicUser);
+      // console.log('[AuthContext] Login successful, basic user set:', basicUser);
     } catch (err) {
       // Clear user on login failure so isAuthenticated becomes false
-      console.error('[AuthContext] Login error:', err);
+      // console.error('[AuthContext] Login error:', err);
       setUser(null);
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('currentUser');
       const errorMessage = getErrorMessage(err);
-      console.error('[AuthContext] Error message:', errorMessage);
+      // console.error('[AuthContext] Error message:', errorMessage);
       setError(errorMessage);
       throw err;
     } finally {

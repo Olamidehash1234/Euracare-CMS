@@ -17,41 +17,41 @@ export default function LoginPage(): JSX.Element {
 
   // Debug logs
   useEffect(() => {
-    console.log('[Login] State updated:', {
-      isAuthenticated,
-      isLoading,
-      user: user?.email,
-      error,
-      loginAttempted: loginAttemptedRef.current,
-    });
+    // console.log('[Login] State updated:', {
+    //   isAuthenticated,
+    //   isLoading,
+    //   user: user?.email,
+    //   error,
+    //   loginAttempted: loginAttemptedRef.current,
+    // });
   }, [isAuthenticated, isLoading, user, error]);
 
   // Redirect to overview if already authenticated (only on mount, not during login attempt)
   useEffect(() => {
     if (isAuthenticated && !isLoading && !loginAttemptedRef.current) {
-      console.log('[Login] Redirecting to overview (already authenticated)');
+      // console.log('[Login] Redirecting to overview (already authenticated)');
       navigate('/overview', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 
   // Handle successful login redirect with toast
   useEffect(() => {
-    console.log('[Login] Success effect check:', {
-      loginAttempted: loginAttemptedRef.current,
-      isAuthenticated,
-      hasUser: !!user,
-      isLoading,
-    });
+    // console.log('[Login] Success effect check:', {
+    //   loginAttempted: loginAttemptedRef.current,
+    //   isAuthenticated,
+    //   hasUser: !!user,
+    //   isLoading,
+    // });
 
     if (loginAttemptedRef.current && isAuthenticated && user && !isLoading) {
-      console.log('[Login] Showing success toast and redirecting');
+      // console.log('[Login] Showing success toast and redirecting');
       setToastType('success');
       setToastMessage(`Welcome back, ${user.name}! 👋`);
       setShowToast(true);
       
       // Redirect after a short delay to let user see the success message
       const timer = setTimeout(() => {
-        console.log('[Login] Redirecting to overview');
+        // console.log('[Login] Redirecting to overview');
         navigate('/overview', { replace: true });
       }, 1500);
       
@@ -62,9 +62,9 @@ export default function LoginPage(): JSX.Element {
 
   // Show error toast when error occurs
   useEffect(() => {
-    console.log('[Login] Error check:', { error, loginAttempted: loginAttemptedRef.current });
+    // console.log('[Login] Error check:', { error, loginAttempted: loginAttemptedRef.current });
     if (error) {
-      console.log('[Login] Showing error toast:', error);
+      // console.log('[Login] Showing error toast:', error);
       setToastMessage(error);
       setToastType('error');
       setShowToast(true);
@@ -76,23 +76,23 @@ export default function LoginPage(): JSX.Element {
     e.preventDefault();
     
     if (!email || !password) {
-      console.log('[Login] Empty email or password');
+      // console.log('[Login] Empty email or password');
       return;
     }
 
-    console.log('[Login] Submitting form with email:', email);
+    // console.log('[Login] Submitting form with email:', email);
     setShowToast(true);
     setToastType('loading');
     setToastMessage('Logging in...');
     loginAttemptedRef.current = true;
 
     try {
-      console.log('[Login] Calling login function');
+      // console.log('[Login] Calling login function');
       await login(email, password);
-      console.log('[Login] Login function completed successfully');
+      // console.log('[Login] Login function completed successfully');
       // Success handling is done in the useEffect that watches isAuthenticated
     } catch (err) {
-      console.error('[Login] Login function threw error:', err);
+      // console.error('[Login] Login function threw error:', err);
       // Error is already set in AuthContext, toast will show via useEffect above
       // Don't hide toast here - let the error effect show it
     }

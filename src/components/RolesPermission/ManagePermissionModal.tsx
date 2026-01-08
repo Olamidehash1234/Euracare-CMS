@@ -135,13 +135,13 @@ export default function ManagePermissionModal({
                 }
             }
         } catch (error: any) {
-            console.error('[ManagePermissionModal] Error loading role data:', error);
+            // console.error('[ManagePermissionModal] Error loading role data:', error);
             
             // Log permission errors but don't show in modal - let user know visually
             if (error.response?.status === 403) {
-                console.error('Access denied to load role data');
+                // console.error('Access denied to load role data');
             } else if (error.response?.status === 401) {
-                console.error('Session expired while loading role data');
+                // console.error('Session expired while loading role data');
             }
         } finally {
             setIsLoadingData(false);
@@ -182,7 +182,7 @@ export default function ManagePermissionModal({
                 permissions,
             });
         } catch (error) {
-            console.error('Error saving permission:', error);
+            // console.error('Error saving permission:', error);
         }
     };
 

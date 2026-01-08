@@ -16,7 +16,7 @@ const ServicesPage = () => {
   const [editService, setEditService] = useState<ServiceType | null>(null);
 
   const handleView = (s: ServiceType) => {
-    console.log('view service', s);
+    // console.log('view service', s);
   };
 
   const handleEdit = (s: ServiceType) => {
