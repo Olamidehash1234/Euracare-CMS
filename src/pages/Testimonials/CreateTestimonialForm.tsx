@@ -25,7 +25,7 @@ export default function CreateTestimonialForm({
   onClose,
   isLoading = false,
   isLoadingData = false,
-  testimonialId,
+  // testimonialId,
 }: Props) {
   const [form, setForm] = useState({
     title: initialData?.title || '',

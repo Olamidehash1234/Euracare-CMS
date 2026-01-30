@@ -211,15 +211,14 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
 
       // console.log('[CreateAdminForm] Submitting payload:', payload);
       
-      let response;
       if (mode === 'create') {
-        response = await adminService.createUser(payload);
-        // console.log('[CreateAdminForm] Admin created successfully:', response);
+        await adminService.createUser(payload);
+        // console.log('[CreateAdminForm] Admin created successfully');
         setToastMessage('Admin profile created successfully! ✅');
       } else {
         // For edit mode, use updateAdmin which should be able to handle optional password
-        response = await adminService.updateAdmin(String(initialData?.id || ''), payload);
-        // console.log('[CreateAdminForm] Admin updated successfully:', response);
+        await adminService.updateAdmin(String(initialData?.id || ''), payload);
+        // console.log('[CreateAdminForm] Admin updated successfully');
         setToastMessage('Admin profile updated successfully! ✅');
       }
 

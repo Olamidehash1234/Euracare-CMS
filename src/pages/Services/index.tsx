@@ -15,9 +15,9 @@ const ServicesPage = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [editService, setEditService] = useState<ServiceType | null>(null);
 
-  const handleView = (s: ServiceType) => {
-    // console.log('view service', s);
-  };
+  // const handleView = (s: ServiceType) => {
+  //   // console.log('view service', s);
+  // };
 
   const handleEdit = (s: ServiceType) => {
     setEditService(s);
@@ -90,7 +90,7 @@ const ServicesPage = () => {
           {hasServices ? (
             <ServicesTable
               services={services}
-              onView={handleView}
+              // onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />

@@ -12,6 +12,7 @@ import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
 
 const DoctorsPage = () => {
     const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showCreate, setShowCreate] = useState(false);
@@ -76,13 +77,28 @@ const DoctorsPage = () => {
     //     console.log('search:', q);
     // };
 
+    const getFilteredDoctors = () => {
+        if (!searchTerm.trim()) {
+            return doctors;
+        }
+        
+        const lowercaseSearch = searchTerm.toLowerCase();
+        return doctors.filter(doctor => 
+            doctor.name?.toLowerCase().includes(lowercaseSearch) ||
+            doctor.email?.toLowerCase().includes(lowercaseSearch) ||
+            doctor.specialties?.some(specialty => 
+                specialty?.toLowerCase().includes(lowercaseSearch)
+            )
+        );
+    };
+
     const handleAdd = () => {
         setShowCreate(true);
     };
 
-    const handleView = (d: Doctor) => {
-        // console.log('view doctor', d);
-    };
+    // const handleView = (d: Doctor) => {
+    //     // console.log('view doctor', d);
+    // };
 
     const handleEditDoctor = async (doctor: Doctor) => {
         try {
@@ -174,7 +190,7 @@ const DoctorsPage = () => {
                         mode={editDoctor ? 'edit' : 'create'}
                         initialData={editDoctor || undefined}
                         isLoadingData={isFetchingDoctorData}
-                        onSave={(payload) => {
+                        onSave={() => {
                             // console.log(editDoctor ? 'update' : 'save', payload);
                             setShowCreate(false);
                             setEditDoctor(null);
@@ -208,14 +224,18 @@ const DoctorsPage = () => {
                         </button>
 
                         <div className="flex items-center w-full lg:w-1/2 order-2 lg:order-1">
-                            <SearchBar placeholder="Search for a doctor" />
+                            <SearchBar 
+                                placeholder="Search for a doctor" 
+                                value={searchTerm}
+                                onSearch={setSearchTerm}
+                            />
                         </div>
                     </div>
 
                     {hasDoctors ? (
                         <DoctorsTable 
-                            doctors={doctors} 
-                            onView={handleView}
+                            doctors={getFilteredDoctors()} 
+                            // onView={handleView}
                             onEdit={handleEditDoctor}
                             onDelete={handleDeleteDoctor}
                         />

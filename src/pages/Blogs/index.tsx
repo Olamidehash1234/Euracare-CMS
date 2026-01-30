@@ -18,6 +18,7 @@ const sampleBlogsInitial: BlogType[] = [
 
 const BlogsPage = () => {
   const [blogs, setBlogs] = useState<BlogType[]>(sampleBlogsInitial);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [editBlog, setEditBlog] = useState<BlogPayload | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +36,18 @@ const BlogsPage = () => {
 
   const hideToast = () => {
     setToast((prev) => ({ ...prev, show: false }));
+  };
+
+  const getFilteredBlogs = () => {
+    if (!searchTerm.trim()) {
+      return blogs;
+    }
+
+    const lowercaseSearch = searchTerm.toLowerCase();
+    return blogs.filter(blog =>
+      blog.title?.toLowerCase().includes(lowercaseSearch) ||
+      blog.category?.toLowerCase().includes(lowercaseSearch)
+    );
   };
 
   // Fetch blogs on mount
@@ -88,9 +101,9 @@ const BlogsPage = () => {
     }
   };
 
-  const handleView = (blog: BlogType) => {
-    // console.log('[BlogsPage] Viewing blog:', blog);
-  };
+  // const handleView = (blog: BlogType) => {
+  //   // console.log('[BlogsPage] Viewing blog:', blog);
+  // };
 
   const handleEdit = async (blog: BlogType) => {
     try {
@@ -177,7 +190,7 @@ const BlogsPage = () => {
       if (editBlog && editBlog.blogId) {
         // Update blog
         // console.log('[BlogsPage] Updating blog with ID:', editBlog.blogId);
-        const response = await blogService.updateBlog(editBlog.blogId, payload);
+        // const response = await blogService.updateBlog(editBlog.blogId, payload);
         // console.log('[BlogsPage] Blog updated successfully:', response);
         showToast('Blog updated successfully! ✅', 'success');
         
@@ -282,14 +295,18 @@ const BlogsPage = () => {
             </button>
 
             <div className="flex items-center w-full lg:w-1/2 order-2 lg:order-1">
-              <SearchBar placeholder="Search for a Blog" />
+              <SearchBar 
+                placeholder="Search for a Blog" 
+                value={searchTerm}
+                onSearch={setSearchTerm}
+              />
             </div>
           </div>
 
           {hasBlogs ? (
             <BlogsTable
-              blogs={blogs}
-              onView={handleView}
+              blogs={getFilteredBlogs()}
+              // onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />

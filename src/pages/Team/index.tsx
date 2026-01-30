@@ -237,7 +237,11 @@ const TeamPage = () => {
             </button>
 
             <div className="flex items-center w-full lg:w-1/2 order-2 lg:order-1">
-              <SearchBar placeholder="Search for a team member" />
+              <SearchBar 
+                placeholder="Search for a team member" 
+                value={searchTerm}
+                onSearch={setSearchTerm}
+              />
             </div>
           </div>
 

@@ -17,7 +17,6 @@ const Testimonials = lazy(() => import('./pages/Testimonials'));
 const Careers = lazy(() => import('./pages/Careers'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Roles = lazy(() => import('./pages/Roles&permission'));
-const Accreditations = lazy(() => import('./pages/Accreditations'))
 const ActivityLogs = lazy(() => import('./pages/Activitylogs'));
 const Login = lazy(() => import('./pages/Auth/Login'));
 const ResetPassword = lazy(() => import('./pages/Auth/ResetPassword'));
@@ -64,7 +63,6 @@ function App() {
               <Route path="/admin" element={<Admin />} />
               <Route path="/roles&permission" element={<Roles />} />
               <Route path='/logs' element={ <ActivityLogs/>} />
-              <Route path='/accreditations' element={ <Accreditations/>} />
             </Route>
 
             {/* Catch all - redirect to login */}

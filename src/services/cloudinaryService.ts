@@ -95,11 +95,11 @@ export const uploadToCloudinary = async (
 /**
  * Delete image from Cloudinary
  */
-export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
-  // console.log('[CloudinaryService] Deleting image:', publicId);
-  // Note: This requires a signed request with API key and secret
-  // For now, we'll just log it - implement server-side deletion if needed
-};
+// export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
+//   // console.log('[CloudinaryService] Deleting image:', publicId);
+//   // Note: This requires a signed request with API key and secret
+//   // For now, we'll just log it - implement server-side deletion if needed
+// };
 
 /**
  * Get optimized Cloudinary URL with transformations

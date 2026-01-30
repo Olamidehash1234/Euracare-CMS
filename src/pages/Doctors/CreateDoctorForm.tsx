@@ -133,19 +133,19 @@ export default function DoctorForm({
       const payload = buildPayload();
       // console.log('[DoctorForm] Submitting payload:', payload);
 
-      let response;
+      const isEditMode = mode === 'edit' && initialData?.doctorId;
       if (isEditMode && initialData?.doctorId) {
         // Update doctor
-        response = await doctorService.updateDoctor(initialData.doctorId, payload as any);
-        // console.log('[DoctorForm] Doctor updated successfully:', response);
+        await doctorService.updateDoctor(initialData.doctorId, payload as any);
+        // console.log('[DoctorForm] Doctor updated successfully');
         setToastType('success');
         setToastMessage('Doctor profile updated successfully! ✅');
         // Reset form after successful update
         // resetForm();
       } else {
         // Create doctor
-        response = await doctorService.createDoctor(payload as any);
-        // console.log('[DoctorForm] Doctor created successfully:', response);
+        await doctorService.createDoctor(payload as any);
+        // console.log('[DoctorForm] Doctor created successfully');
         setToastType('success');
         setToastMessage('Doctor profile created successfully! 🎉');
         // Reset form after successful creation

@@ -15,6 +15,7 @@ export const sampleAdminsInitial: AdminType[] = [
 
 const AdminPage = () => {
   const [admins, setAdmins] = useState<AdminType[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -108,7 +109,7 @@ const AdminPage = () => {
     }
   };
 
-  const handleView = (admin: AdminType) => { /* console.log('view admin', admin); */ };
+  // const handleView = (admin: AdminType) => { /* console.log('view admin', admin); */ };
 
   const handleEdit = async (admin: AdminType) => {
     try {
@@ -172,6 +173,19 @@ const AdminPage = () => {
     } finally {
       setIsFetchingAdminData(false);
     }
+  };
+
+  const getFilteredAdmins = () => {
+    if (!searchTerm.trim()) {
+      return admins;
+    }
+
+    const lowercaseSearch = searchTerm.toLowerCase();
+    return admins.filter(admin =>
+      admin.name?.toLowerCase().includes(lowercaseSearch) ||
+      admin.email?.toLowerCase().includes(lowercaseSearch) ||
+      admin.role?.toLowerCase().includes(lowercaseSearch)
+    );
   };
 
   const handleDelete = async (admin: AdminType) => {
@@ -290,14 +304,18 @@ const AdminPage = () => {
             </button>
 
             <div className="flex items-center w-full lg:w-1/2 order-2 lg:order-1">
-              <SearchBar placeholder="Search for an admin" />
+              <SearchBar 
+                placeholder="Search for an admin" 
+                value={searchTerm}
+                onSearch={setSearchTerm}
+              />
             </div>
           </div>
 
           {admins.length > 0 ? (
             <AdminTable
-              admins={admins}
-              onView={handleView}
+              admins={getFilteredAdmins()}
+              // onView={handleView}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />

@@ -13,7 +13,6 @@ import adminIcon from "/icon/admin.svg"
 import departmentIcon from "/icon/department.svg"
 import activityIcon from "/icon/activity.svg"
 // import accreditationsIcon from "/icon/accreditations.svg"
-import testimonialIcon from "/icon/news.svg"
 
 interface NavItem {
   id: string;

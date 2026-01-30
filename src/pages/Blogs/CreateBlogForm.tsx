@@ -27,7 +27,7 @@ interface Props {
   blogId?: string;
 }
 
-export default function CreateBlogForm({ mode = 'create', initialData, onSave, onClose, isLoading = false, isLoadingData = false, blogId }: Props) {
+export default function CreateBlogForm({ mode = 'create', initialData, onSave, onClose, isLoading = false, isLoadingData = false, }: Props) {
   const coverRef = useRef<HTMLInputElement | null>(null);
 
   const [coverPreview, setCoverPreview] = useState<string | null>(initialData?.snippet?.cover_image_url || null);

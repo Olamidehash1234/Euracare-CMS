@@ -11,7 +11,7 @@ export { default as activityLogService } from './activityLogService';
 export { default as notificationService } from './notificationService';
 export { default as overviewService } from './overviewService';
 export { handleApiError, getErrorMessage } from './errorHandler';
-export { uploadToCloudinary, deleteFromCloudinary, getOptimizedUrl } from './cloudinaryService';
+export { uploadToCloudinary, getOptimizedUrl } from './cloudinaryService';
 
 // Export types
 export type * from './authService';
