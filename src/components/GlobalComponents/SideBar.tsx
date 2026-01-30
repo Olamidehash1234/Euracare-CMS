@@ -13,6 +13,7 @@ import adminIcon from "/icon/admin.svg"
 import departmentIcon from "/icon/department.svg"
 import activityIcon from "/icon/activity.svg"
 // import accreditationsIcon from "/icon/accreditations.svg"
+import testimonialIcon from "/icon/news.svg"
 
 interface NavItem {
   id: string;
@@ -39,6 +40,7 @@ const items: NavSection = {
     { id: "team", label: "Our Team", icon: ourTeamIcon },
     { id: "services", label: "Services", icon: servicesIcon },
     { id: "blogs", label: "Blogs & Articles", icon: blogIcon },
+    { id: "testimonials", label: "Testimonials", icon: departmentIcon },
     // { id: "accreditations", label: "Accreditations", icon: accreditationsIcon },
     // { id: "careers", label: "Careers", icon: careerIcon },
   ],
@@ -68,6 +70,7 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
     if (path.startsWith('/team')) return 'team';
     if (path.startsWith('/services')) return 'services';
     if (path.startsWith('/blogs')) return 'blogs';
+    if (path.startsWith('/testimonials')) return 'testimonials';
     // if (path.startsWith('/careers')) return 'careers';
     if (path.startsWith('/admin')) return 'admin';
     // FIX: match sidebar id for roles&permission

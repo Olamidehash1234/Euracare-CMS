@@ -13,6 +13,7 @@ const Notifications = lazy(() => import('./pages/Notifications'));
 const Team = lazy(() => import('./pages/Team'));
 const Services = lazy(() => import('./pages/Services'));
 const Blogs = lazy(() => import('./pages/Blogs'));
+const Testimonials = lazy(() => import('./pages/Testimonials'));
 const Careers = lazy(() => import('./pages/Careers'));
 const Admin = lazy(() => import('./pages/Admin'));
 const Roles = lazy(() => import('./pages/Roles&permission'));
@@ -58,6 +59,7 @@ function App() {
               <Route path="/team" element={<Team />} />
               <Route path="/services" element={<Services />} />
               <Route path="/blogs" element={<Blogs />} />
+              <Route path="/testimonials" element={<Testimonials />} />
               <Route path="/careers" element={<Careers />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/roles&permission" element={<Roles />} />
