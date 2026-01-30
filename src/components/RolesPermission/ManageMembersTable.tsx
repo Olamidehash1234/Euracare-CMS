@@ -33,7 +33,7 @@ export default function ManageMembersTable({ members, onEdit, onDelete }: Props)
               <th className="w-[220px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-0">Date Created</th>
               <th className="w-[250px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-0">Email Address</th>
               <th className="w-[180px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-0">Role</th>
-              <th className="w-[170px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-0">Last Active</th>
+              {/* <th className="w-[170px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-0">Last Active</th> */}
               <th className="w-[180px] pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-0">Account Status</th>
             </tr>
           </thead>
@@ -42,7 +42,7 @@ export default function ManageMembersTable({ members, onEdit, onDelete }: Props)
               const isSuspended = m.status === 'Suspended';
               const badgeClass = isSuspended
                 ? 'bg-[#FF95001A] text-[#FF9500]'
-                : (m.role === 'Super Admin' ? 'bg-[#EBF9F0] text-green-800' : 'bg-amber-100 text-amber-800');
+                : 'bg-[#EBF9F0] text-green-800';
               const badgeText = isSuspended ? 'Suspended' : 'Active';
 
               return (
@@ -55,7 +55,7 @@ export default function ManageMembersTable({ members, onEdit, onDelete }: Props)
                 <td className="py-3 px-0 py-[25px] text-sm">{fmt(m.dateCreated)}</td>
                 <td className="py-3 px-0 py-[25px] text-sm">{m.email}</td>
                 <td className="py-3 px-0 py-[25px] text-sm">{m.role}</td>
-                <td className="py-3 px-0 py-[25px] text-sm">{m.active ?? '-'}</td>
+                {/* <td className="py-3 px-0 py-[25px] text-sm">{m.active ?? '-'}</td> */}
                 <td className="py-3 px-0 py-[25px]">
                   <div className="flex items-center gap-[10px]">
                     <span className={`inline-flex items-center gap-[4px] px-3 py-1 lg:px-[20px] lg:py-[8px] lg:leading-[16px] rounded-[4px] text-sm ${badgeClass}`}>

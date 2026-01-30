@@ -1,7 +1,13 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import TiptapEditor from '../../components/Editor/TiptapEditor';
+import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
+import Toast from '../../components/GlobalComponents/Toast';
+import teamService from '../../services/teamService';
+import type { CreateTeamMemberPayload } from '../../services/teamService';
+import { getErrorMessage } from '../../services';
 
-interface TeamMemberPayload {
+interface TeamMemberFormData {
+  id?: string | number; // For edit mode
   fullName: string;
   role: string;
   category: string;
@@ -11,28 +17,210 @@ interface TeamMemberPayload {
 
 interface Props {
   mode?: 'create' | 'edit';
-  initialData?: TeamMemberPayload;
-  onSave: (data: TeamMemberPayload) => void;
+  initialData?: TeamMemberFormData;
+  onSave: (data: any) => void;
   onClose: () => void;
+}
+
+interface ToastState {
+  show: boolean;
+  type: 'success' | 'error' | 'loading';
+  message: string;
 }
 
 export default function TeamMemberModal({ mode = 'create', initialData, onSave, onClose }: Props) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(initialData?.avatar || null);
+  const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState<string | null>(initialData?.avatar || null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     fullName: initialData?.fullName || '',
     role: initialData?.role || '',
     category: initialData?.category || '',
     bio: initialData?.bio || '',
   });
+  const [toast, setToast] = useState<ToastState>({
+    show: false,
+    type: 'success',
+    message: '',
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave({
-      ...form,
-      avatar: avatarPreview || undefined,
-      bio: form.bio?.trim() || undefined,
+  /**
+   * Sync form state with initialData when it changes
+   * This ensures form fields are pre-filled when editing a team member
+   */
+  useEffect(() => {
+    console.log('[TeamMemberModal] Updating form with initialData:', initialData);
+    setForm({
+      fullName: initialData?.fullName || '',
+      role: initialData?.role || '',
+      category: initialData?.category || '',
+      bio: initialData?.bio || '',
     });
+    setAvatarPreview(initialData?.avatar || null);
+    setUploadedAvatarUrl(initialData?.avatar || null);
+    console.log('[TeamMemberModal] Avatar preview set to:', initialData?.avatar);
+  }, [initialData]);
+
+  const showToast = (type: 'success' | 'error' | 'loading', message: string) => {
+    setToast({ show: true, type, message });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    console.log('[TeamMemberModal] File selected:', { name: file.name, size: file.size, type: file.type });
+
+    // Allowed image types
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+    const allowedFormats = 'PNG, JPG, WebP';
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    // Validate file type
+    if (!allowedTypes.includes(file.type)) {
+      showToast('error', `Invalid image format. Please use ${allowedFormats}`);
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      showToast('error', `Image is too large (${sizeMB}MB). Maximum size is 5MB`);
+      return;
+    }
+
+    // Show local preview immediately
+    const url = URL.createObjectURL(file);
+    setAvatarPreview(url);
+    console.log('[TeamMemberModal] File preview generated');
+
+    // Start uploading to Cloudinary
+    setIsUploadingImage(true);
+    showToast('loading', 'Uploading image...');
+
+    try {
+      // Upload to Cloudinary via team service
+      const imageUrl = await teamService.uploadTeamMemberAvatar(file);
+      console.log('[TeamMemberModal] Image uploaded successfully:', imageUrl);
+
+      // Update preview with Cloudinary URL and store it for submission
+      setAvatarPreview(imageUrl);
+      setUploadedAvatarUrl(imageUrl);
+      showToast('success', 'Image uploaded successfully!');
+    } catch (err) {
+      console.error('[TeamMemberModal] Upload error:', err);
+      const errorMessage = getErrorMessage(err);
+      showToast('error', errorMessage);
+      setAvatarPreview(null);
+      setUploadedAvatarUrl(null);
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate required fields
+    if (!form.fullName.trim()) {
+      showToast('error', 'Full name is required');
+      return;
+    }
+    if (!form.role.trim()) {
+      showToast('error', 'Role is required');
+      return;
+    }
+    if (!form.category.trim()) {
+      showToast('error', 'Category is required');
+      return;
+    }
+
+    setIsSubmitting(true);
+    console.log('[TeamMemberModal] Submitting form:', { mode, form });
+
+    try {
+      showToast('loading', `${mode === 'create' ? 'Creating' : 'Updating'} team member...`);
+
+      const payload: CreateTeamMemberPayload = {
+        full_name: form.fullName.trim(),
+        role: form.role.trim(),
+        category: form.category.trim(),
+        bio: form.bio?.trim() || undefined,
+      };
+
+      if (mode === 'create') {
+        console.log('[TeamMemberModal] Creating new team member');
+        // For create, if avatar was uploaded, add it to payload
+        const response = await teamService.createTeamMember(
+          payload,
+          uploadedAvatarUrl || undefined
+        );
+        
+        // Extract team member from nested response structure
+        const member = (response.data as any)?.team_member || response.data;
+        console.log('[TeamMemberModal] Team member created successfully:', member);
+        showToast('success', 'Team member created successfully!');
+        
+        // Call parent onSave with the response data
+        onSave({
+          id: member.id,
+          name: member.full_name,
+          avatar: member.profile_picture_url,
+          role: member.role,
+          category: member.category,
+          createdAt: member.created_at,
+        });
+
+        // Close modal after short delay to show success message
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      } else {
+        // Edit mode: Update existing team member
+        if (!initialData?.id) {
+          throw new Error('Team member ID is missing');
+        }
+
+        console.log('[TeamMemberModal] Updating team member with ID:', initialData.id);
+        
+        // Call updateTeamMember with ID, payload, and optional avatar URL
+        const response = await teamService.updateTeamMember(
+          String(initialData.id),
+          payload,
+          uploadedAvatarUrl || undefined
+        );
+
+        // Extract team member from nested response structure
+        const member = (response.data as any)?.team_member || response.data;
+        console.log('[TeamMemberModal] Team member updated successfully:', member);
+        showToast('success', 'Team member updated successfully!');
+
+        // Call parent onSave with the updated response data
+        onSave({
+          id: member.id,
+          name: member.full_name,
+          fullName: member.full_name,
+          avatar: member.profile_picture_url,
+          role: member.role,
+          category: member.category,
+          bio: member.bio,
+          createdAt: member.created_at,
+        });
+
+        // Close modal after short delay to show success message
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('[TeamMemberModal] Submit error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save team member. Please try again.';
+      showToast('error', errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -66,10 +254,9 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
 
                   <label
                     htmlFor="team-avatar"
-                    className="mt-2 inline-block bg-[#0C2141] text-white text-[14px] lg:text-[15px] px-[10px] lg:px-[28px] lg:py-[10px] py-[8px] rounded-full cursor-pointer shadow-sm"
-                    onClick={() => fileRef.current?.click()}
+                    className="mt-2 inline-block bg-[#0C2141] text-white text-[14px] lg:text-[15px] px-[10px] lg:px-[28px] lg:py-[10px] py-[8px] rounded-full cursor-pointer shadow-sm hover:bg-opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Change logo
+                    {isUploadingImage ? 'Uploading...' : 'Change logo'}
                   </label>
                   <input
                     id="team-avatar"
@@ -77,45 +264,45 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const url = URL.createObjectURL(file);
-                      setAvatarPreview(url);
-                    }}
+                    onChange={handleFileChange}
+                    disabled={isUploadingImage || isSubmitting}
                   />
+                  <p className="text-xs text-gray-500 mt-2 text-center">PNG, JPG up to 5MB</p>
                 </div>
 
                 {/* Form column */}
                 <div className="flex-1">
                   <div className="grid grid-cols-1 lg:grid-cols-1 gap-4 lg:gap-[30px]">
                     <div className='w-full'>
-                      <label className="block text-sm leading-[24px] text-[#010101] mb-2">Full Name</label>
+                      <label className="block text-sm leading-[24px] text-[#010101] mb-2">Full Name *</label>
                       <input 
                         value={form.fullName}
                         onChange={e => setForm(prev => ({ ...prev, fullName: e.target.value }))}
                         placeholder="Full Name" 
-                        className="w-full rounded-md leading-[24px] border border-[#01010133] font-normal placeholder:text-[#01010180] focus:outline-none px-3 py-[8px] text-sm leading-[24px]" 
+                        className="w-full rounded-md leading-[24px] border border-[#01010133] font-normal placeholder:text-[#01010180] focus:outline-none px-3 py-[8px] text-sm leading-[24px]"
+                        disabled={isSubmitting}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm leading-[24px] text-[#010101] mb-2">Role</label>
+                      <label className="block text-sm leading-[24px] text-[#010101] mb-2">Role *</label>
                       <input 
                         value={form.role}
                         onChange={e => setForm(prev => ({ ...prev, role: e.target.value }))}
-                        placeholder="Role" 
-                        className="w-full rounded-md leading-[24px] border border-[#01010133] font-normal placeholder:text-[#01010180] focus:outline-none px-3 py-[8px] text-sm leading-[24px]" 
+                        placeholder="e.g., Product Manager, Designer" 
+                        className="w-full rounded-md leading-[24px] border border-[#01010133] font-normal placeholder:text-[#01010180] focus:outline-none px-3 py-[8px] text-sm leading-[24px]"
+                        disabled={isSubmitting}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm leading-[24px] text-[#010101] mb-2">Category</label>
+                      <label className="block text-sm leading-[24px] text-[#010101] mb-2">Category *</label>
                       <input 
                         value={form.category}
                         onChange={e => setForm(prev => ({ ...prev, category: e.target.value }))}
-                        placeholder="Category" 
-                        className="w-full rounded-md leading-[24px] font-normal placeholder:text-[#01010180] border border-[#01010133] focus:outline-none px-3 py-[8px] text-sm leading-[24px]" 
+                        placeholder="e.g., Leadership, Development, Design" 
+                        className="w-full rounded-md leading-[24px] font-normal placeholder:text-[#01010180] border border-[#01010133] focus:outline-none px-3 py-[8px] text-sm leading-[24px]"
+                        disabled={isSubmitting}
                       />
                     </div>
 
@@ -138,21 +325,32 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm"
+                  disabled={isSubmitting}
+                  className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
               )}
               <button 
-                type="submit" 
-                className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm"
+                type="submit"
+                disabled={isSubmitting}
+                className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
+                {isSubmitting && <LoadingSpinner />}
                 {mode === 'create' ? 'Create Team Member' : 'Update changes'}
               </button>
             </div>
           </div>
         </form>
       </div>
+
+      {/* Toast notification */}
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        show={toast.show}
+        onHide={() => setToast({ ...toast, show: false })}
+      />
     </div>
   );
 }

@@ -47,23 +47,23 @@ const DepartmentPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      // console.log('[RolesPage] Fetching roles...');
+      console.log('[RolesPage] Fetching roles...');
       const response = await roleService.getAllRoles();
-      // console.log('[RolesPage] Raw API response:', response);
+      console.log('[RolesPage] Raw API response:', response);
 
       // API returns: response.data.data.roles as RoleResponse[]
       const rolesData = response?.data?.data?.roles || [];
 
-      // console.log('[RolesPage] Parsed roles data:', rolesData);
+      console.log('[RolesPage] Parsed roles data:', rolesData);
 
       if (!Array.isArray(rolesData)) {
         throw new Error('Invalid response format: expected array of roles');
       }
 
       setRoles(rolesData);
-      // console.log('[RolesPage] Roles loaded:', rolesData);
+      console.log('[RolesPage] Roles loaded:', rolesData);
     } catch (err: any) {
-      // console.error('[RolesPage] Error fetching roles:', err);
+      console.error('[RolesPage] Error fetching roles:', err);
       
       let errorMessage = 'Failed to load roles';
 
@@ -147,17 +147,17 @@ const DepartmentPage = () => {
         limit: 100 // Get all users for this role
       };
       
-      // console.log('[RolesPage] Fetching members with params:', params);
+      console.log('[RolesPage] Fetching members with params:', params);
       
       const response = await adminService.getAllAdmins(params);
       
-      // console.log('[RolesPage] Full response from backend:', response);
-      // console.log('[RolesPage] Response data:', response?.data);
+      console.log('[RolesPage] Full response from backend:', response);
+      console.log('[RolesPage] Response data:', response?.data);
       
       const usersData = response?.data?.data?.users || [];
       
-      // console.log('[RolesPage] Parsed users data:', usersData);
-      // console.log('[RolesPage] Users count:', usersData.length);
+      console.log('[RolesPage] Parsed users data:', usersData);
+      console.log('[RolesPage] Users count:', usersData.length);
 
       if (Array.isArray(usersData) && usersData.length > 0) {
         // Get the role name from the mockRoles
@@ -166,11 +166,11 @@ const DepartmentPage = () => {
 
         // Transform the users data to AdminType format
         const transformedMembers = usersData.map((user: any) => {
-          // console.log('[RolesPage] Transforming user:', {
-          //   id: user.id || user._id,
-          //   name: user.full_name,
-          //   status: user.status,
-          // });
+          console.log('[RolesPage] Transforming user:', {
+            id: user.id || user._id,
+            name: user.full_name,
+            status: user.status,
+          });
 
           return {
             id: user.id || user._id,
@@ -184,15 +184,15 @@ const DepartmentPage = () => {
           };
         });
 
-        // console.log('[RolesPage] Transformed members:', transformedMembers);
+        console.log('[RolesPage] Transformed members:', transformedMembers);
         setMembersData(transformedMembers);
         setOpenMembersFor(roleId);
       } else {
-        // console.warn('[RolesPage] No users data found or empty array');
+        console.warn('[RolesPage] No users data found or empty array');
         showToast('No members found for this role', 'error');
       }
     } catch (error: any) {
-      // console.error('[RolesPage] Error fetching role members:', error);
+      console.error('[RolesPage] Error fetching role members:', error);
       let errorMessage = 'Failed to load members for this role';
 
       if (error.response?.status === 401) {
@@ -223,7 +223,7 @@ const DepartmentPage = () => {
 
   const handleDeleteRole = async (roleId: string) => {
     try {
-      // console.log('[RolesPage] Deleting role:', roleId);
+      console.log('[RolesPage] Deleting role:', roleId);
       await roleService.deleteRole(roleId);
       showToast('Role deleted successfully!', 'success');
       
@@ -231,7 +231,7 @@ const DepartmentPage = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       fetchRoles();
     } catch (error: any) {
-      // console.error('[RolesPage] Error deleting role:', error);
+      console.error('[RolesPage] Error deleting role:', error);
       let errorMessage = 'Failed to delete role. Please try again.';
 
       if (error.response) {
@@ -316,14 +316,14 @@ const DepartmentPage = () => {
         },
       };
 
-      // console.log('=== Backend Request Body ===');
-      // console.log('Endpoint:', isCreating ? 'POST /api/v1/roles/' : `PUT /api/v1/roles/${selectedRoleForPermission}`);
-      // console.log('Payload:', JSON.stringify(payload, null, 2));
-      // console.log('============================');
+      console.log('=== Backend Request Body ===');
+      console.log('Endpoint:', isCreating ? 'POST /api/v1/roles/' : `PUT /api/v1/roles/${selectedRoleForPermission}`);
+      console.log('Payload:', JSON.stringify(payload, null, 2));
+      console.log('============================');
 
       if (isCreating) {
         await roleService.createRole(payload);
-        // console.log('✅ Role created successfully');
+        console.log('✅ Role created successfully');
         showToast(
           `"${data.roleName}" role created successfully!`,
           'success'
@@ -331,7 +331,7 @@ const DepartmentPage = () => {
       } else if (selectedRoleForPermission) {
         // For update, extract the ID from selectedRoleForPermission or modify as needed
         await roleService.updateRole(selectedRoleForPermission, payload);
-        // console.log('✅ Role updated successfully');
+        console.log('✅ Role updated successfully');
         showToast(
           `"${data.roleName}" role updated successfully!`,
           'success'
