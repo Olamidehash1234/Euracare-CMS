@@ -426,8 +426,8 @@ const DepartmentPage = () => {
                           setOpenMembersFor(null);
                           setMembersData([]);
                         }}
-                        onEdit={(admin) => { /* console.log('edit admin from members table', admin); */ }}
-                        onDelete={(admin) => { /* console.log('delete admin from members table', admin); */ }}
+                        onEdit={() => { /* console.log('edit admin from members table', admin); */ }}
+                        onDelete={() => { /* console.log('delete admin from members table', admin); */ }}
                       />
                     )}
                   </div>
