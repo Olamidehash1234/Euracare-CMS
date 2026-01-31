@@ -36,6 +36,10 @@ export default function CreateTestimonialForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+
+
+
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 

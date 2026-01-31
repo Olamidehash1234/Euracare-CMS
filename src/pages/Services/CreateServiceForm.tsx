@@ -1,4 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { serviceService } from '@/services';
+import Toast from '@/components/GlobalComponents/Toast';
 
 export type ServicePayload = {
   title: string;
@@ -12,20 +15,31 @@ export type ServicePayload = {
   treatments?: string[];
   videoLink?: string;
   overview?: string;
+  serviceId?: string;
 };
 
 interface Props {
   mode?: 'create' | 'edit';
   initialData?: ServicePayload;
   onSave: (data: ServicePayload) => void;
-  onClose: () => void;
+  onClose?: () => void;
+  isLoading?: boolean;
 }
 
-export default function CreateServiceForm({ mode = 'create', initialData, onSave, onClose }: Props) {
+export default function CreateServiceForm({ mode = 'create', initialData, onSave }: Props) {
+  const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement | null>(null);
   const bannerFileRef = useRef<HTMLInputElement | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(initialData?.image || null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(initialData?.bannerImage || null);
+  const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
+  const [isUploadingBannerImage, setIsUploadingBannerImage] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'loading'; show: boolean }>({
+    message: '',
+    type: 'success',
+    show: false,
+  });
+  
   const [form, setForm] = useState({
     title: initialData?.title || '',
     shortDescription: initialData?.shortDescription || '',
@@ -34,37 +48,104 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
   });
 
   const [conditionInput, setConditionInput] = useState('');
-  const [conditions, setConditions] = useState<string[]>([]);
+  const [conditions, setConditions] = useState<string[]>(initialData?.conditions || []);
 
   const [testInput, setTestInput] = useState('');
-  const [tests, setTests] = useState<string[]>([]);
+  const [tests, setTests] = useState<string[]>(initialData?.tests || []);
 
   const [treatmentInput, setTreatmentInput] = useState('');
-  const [treatments, setTreatments] = useState<string[]>([
-  ]);
+  const [treatments, setTreatments] = useState<string[]>(initialData?.treatments || []);
 
-  const handleFile = (file?: File) => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setCoverPreview(url);
+
+
+
+
+  // Update form state when initialData changes (for edit mode)
+  useEffect(() => {
+    if (mode === 'edit' && initialData) {
+      console.log('[CreateServiceForm] Updating form state with initialData');
+      setForm({
+        title: initialData.title || '',
+        shortDescription: initialData.shortDescription || '',
+        overview: initialData.overview || '',
+        videoLink: initialData.videoLink || '',
+      });
+      setCoverPreview(initialData.image || null);
+      setBannerPreview(initialData.bannerImage || null);
+      setConditions(initialData.conditions || []);
+      setTests(initialData.tests || []);
+      setTreatments(initialData.treatments || []);
+      console.log('[CreateServiceForm] Form state updated:', {
+        title: initialData.title,
+        shortDescription: initialData.shortDescription,
+        overview: initialData.overview,
+        videoLink: initialData.videoLink,
+      });
+    }
+  }, [initialData, mode]);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'loading') => {
+    setToast({ message, type, show: true });
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, show: false }));
+  };
+
+  const handleCoverImageUpload = async (file?: File) => {
+    if (!file) return;
+
+    setIsUploadingCoverImage(true);
+
+    try {
+      // Show local preview immediately
+      const url = URL.createObjectURL(file);
+      setCoverPreview(url);
+
+      // Upload to Cloudinary
+      const imageUrl = await serviceService.uploadServiceCoverImage(file);
+      setCoverPreview(imageUrl);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to upload cover image';
+      showToast(errorMessage, 'error');
+      setCoverPreview(null);
+    } finally {
+      setIsUploadingCoverImage(false);
+    }
+  };
+
+  const handleCoverDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    handleFile(file);
+    handleCoverImageUpload(file);
   };
 
-  const handleBannerFile = (file?: File) => {
+  const handleBannerImageUpload = async (file?: File) => {
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setBannerPreview(url);
+
+    setIsUploadingBannerImage(true);
+
+    try {
+      // Show local preview immediately
+      const url = URL.createObjectURL(file);
+      setBannerPreview(url);
+
+      // Upload to Cloudinary
+      const imageUrl = await serviceService.uploadServiceBannerImage(file);
+      setBannerPreview(imageUrl);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to upload banner image';
+      showToast(errorMessage, 'error');
+      setBannerPreview(null);
+    } finally {
+      setIsUploadingBannerImage(false);
+    }
   };
 
   const handleBannerDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    handleBannerFile(file);
+    handleBannerImageUpload(file);
   };
 
   const handleAddCondition = () => {
@@ -91,17 +172,73 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
   };
   const handleRemoveTreatment = (treatment: string) => setTreatments(prev => prev.filter(t => t !== treatment));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      ...form,
-      image: coverPreview || undefined,
-      bannerImage: bannerPreview || undefined,
-      publishedAt: new Date().toISOString(),
-      conditions,
-      tests,
-      treatments,
-    });
+
+    // Validate required fields
+    if (!form.title) {
+      showToast('Service name is required', 'error');
+      return;
+    }
+    if (!coverPreview) {
+      showToast('Cover image is required', 'error');
+      return;
+    }
+    if (!bannerPreview) {
+      showToast('Banner image is required', 'error');
+      return;
+    }
+
+    try {
+      showToast(mode === 'edit' ? 'Updating service...' : 'Creating service...', 'loading');
+
+      // Build the payload matching API structure
+      const payload = {
+        snippet: {
+          service_name: form.title,
+          service_description: form.shortDescription || '',
+          cover_image_url: coverPreview,
+        },
+        page: {
+          banner_image_url: bannerPreview,
+          service_overview: form.overview || '',
+          video_url: form.videoLink || '',
+          conditions_we_treat: conditions,
+          test_and_diagnostics: tests,
+          treatments_and_procedures: treatments,
+        },
+      };
+
+      // Make API call
+      if (mode === 'edit' && initialData?.serviceId) {
+        // Update existing service
+        await serviceService.updateService(initialData.serviceId, payload);
+      } else {
+        // Create new service
+        await serviceService.createService(payload);
+      }
+
+      showToast(mode === 'edit' ? 'Service updated successfully! ✅' : 'Service created successfully! ✅', 'success');
+      
+      onSave({
+        ...form,
+        image: coverPreview,
+        bannerImage: bannerPreview,
+        conditions,
+        tests,
+        treatments,
+        serviceId: initialData?.serviceId,
+      });
+
+      // Keep toast visible during timeout
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Then navigate back to services
+      navigate('/services', { replace: true });
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to save service';
+      showToast(errorMessage, 'error');
+    }
   };
 
   return (
@@ -153,12 +290,17 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
                   <label className="block text-sm text-[#010101] mb-2">Add Cover Image</label>
 
                   <div
-                    onDrop={handleDrop}
+                    onDrop={handleCoverDrop}
                     onDragOver={(e) => e.preventDefault()}
-                    onClick={() => fileRef.current?.click()}
-                    className="w-full h-[150px] lg:h-[200px] rounded-md border border-[#01010133] bg-[#F2F2F2] flex items-center justify-center text-center p-4 cursor-pointer"
+                    onClick={() => !isUploadingCoverImage && fileRef.current?.click()}
+                    className={`w-full h-[150px] lg:h-[200px] rounded-md border border-[#01010133] bg-[#F2F2F2] flex items-center justify-center text-center p-4 ${!isUploadingCoverImage ? 'cursor-pointer' : 'opacity-50'}`}
                   >
-                    {coverPreview ? (
+                    {isUploadingCoverImage ? (
+                      <div className="text-sm">
+                        <div className="animate-spin inline-block w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full mb-2"></div>
+                        <p>Uploading...</p>
+                      </div>
+                    ) : coverPreview ? (
                       <img src={coverPreview} alt="cover" className="h-full w-full object-cover" />
                     ) : (
                       <div>
@@ -175,7 +317,8 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => handleFile(e.target.files?.[0])}
+                      onChange={(e) => handleCoverImageUpload(e.target.files?.[0])}
+                      disabled={isUploadingCoverImage}
                     />
                   </div>
                 </div>
@@ -191,10 +334,15 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
                   <div
                     onDrop={handleBannerDrop}
                     onDragOver={(e) => e.preventDefault()}
-                    onClick={() => bannerFileRef.current?.click()}
-                    className="w-full h-[150px] lg:h-[200px] rounded-md border border-[#01010133] bg-[#F2F2F2] flex items-center justify-center text-center p-4 cursor-pointer"
+                    onClick={() => !isUploadingBannerImage && bannerFileRef.current?.click()}
+                    className={`w-full h-[150px] lg:h-[200px] rounded-md border border-[#01010133] bg-[#F2F2F2] flex items-center justify-center text-center p-4 ${!isUploadingBannerImage ? 'cursor-pointer' : 'opacity-50'}`}
                   >
-                    {bannerPreview ? (
+                    {isUploadingBannerImage ? (
+                      <div className="text-sm">
+                        <div className="animate-spin inline-block w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full mb-2"></div>
+                        <p>Uploading...</p>
+                      </div>
+                    ) : bannerPreview ? (
                       <img src={bannerPreview} alt="banner" className="h-full w-full object-cover" />
                     ) : (
                       <div>
@@ -211,7 +359,8 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => handleBannerFile(e.target.files?.[0])}
+                      onChange={(e) => handleBannerImageUpload(e.target.files?.[0])}
+                      disabled={isUploadingBannerImage}
                     />
                   </div>
                 </div>
@@ -330,12 +479,22 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
               </div>
             </div>
 
+            {/* Error Message Display */}
+            {toast.show && (
+              <Toast 
+                message={toast.message} 
+                type={toast.type} 
+                show={toast.show} 
+                onHide={hideToast}
+              />
+            )}
+
             <div className="mt-6 flex flex-col lg:flex-row justify-end gap-3">
-              <button type="button" onClick={onClose} className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm">
+              <button type="button" onClick={() => navigate('/services')} className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm" disabled={isUploadingCoverImage || isUploadingBannerImage}>
                 Cancel
               </button>
-              <button type="submit" className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm">
-                {mode === 'create' ? 'Create Service' : 'Update changes'}
+              <button type="submit" className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled={isUploadingCoverImage || isUploadingBannerImage}>
+                {isUploadingCoverImage || isUploadingBannerImage ? 'Uploading...' : mode === 'create' ? 'Create Service' : 'Update changes'}
               </button>
             </div>
           </form>

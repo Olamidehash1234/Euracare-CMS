@@ -13,8 +13,10 @@ const sampleTestimonialsInitial: TestimonialType[] = [];
 
 const TestimonialsPage = () => {
   const [testimonials, setTestimonials] = useState<TestimonialType[]>(sampleTestimonialsInitial);
+  
   const [showCreate, setShowCreate] = useState(false);
   const [editTestimonial, setEditTestimonial] = useState<TestimonialPayload | null>(null);
+  
   // const [isLoading, setIsLoading] = useState(false);
   // const [isFetchingData, setIsFetchingData] = useState(false);
   // const [error setError] = useState<string | null>(null);
@@ -23,6 +25,8 @@ const TestimonialsPage = () => {
     type: 'success',
     show: false,
   });
+
+
 
   const showToast = (message: string, type: 'success' | 'error' | 'loading') => {
     setToast({ message, type, show: true });
@@ -37,13 +41,14 @@ const TestimonialsPage = () => {
   // };
 
   const handleEdit = (testimonial: TestimonialType) => {
-    setEditTestimonial({
+    const editData: TestimonialPayload = {
       title: testimonial.title,
       service: testimonial.service,
       patientName: testimonial.patientName,
       videoLink: testimonial.videoLink || '',
       testimonialId: testimonial.id.toString(),
-    });
+    };
+    setEditTestimonial(editData);
     setShowCreate(true);
   };
 
@@ -143,10 +148,10 @@ const TestimonialsPage = () => {
 
           {testimonials.length === 0 ? (
             <NotFound
-              title="Nothing to see here"
-              description="It looks like you haven't added any testimonials yet. Once Added, they'll appear here for you to manage."
+              title="Nothing to see here..Yet"
+              description="It looks like you haven't created any testimonials yet. Once Added, they'll appear here for you to manage."
               onCta={handleAddNew}
-              ctaText="Add New"
+              ctaText="Add New Testimonial"
             />
           // ) : isLoading ? (
           //   <LoadingSpinner heightClass="py-[200px]" />

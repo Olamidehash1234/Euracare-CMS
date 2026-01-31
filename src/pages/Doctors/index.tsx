@@ -15,8 +15,10 @@ const DoctorsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    
     const [showCreate, setShowCreate] = useState(false);
     const [editDoctor, setEditDoctor] = useState<NewDoctorPayload | null>(null);
+    
     const [isFetchingDoctorData, setIsFetchingDoctorData] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('success');
@@ -112,7 +114,7 @@ const DoctorsPage = () => {
             
             if (fullDoctor) {
                 // console.log('[DoctorsPage] Full doctor data loaded:', fullDoctor);
-                setEditDoctor({
+                const editData: NewDoctorPayload = {
                     fullName: fullDoctor.full_name,
                     email: fullDoctor.email || '',
                     phone: fullDoctor.phone || '',
@@ -130,7 +132,9 @@ const DoctorsPage = () => {
                         : (fullDoctor.professional_association ? [fullDoctor.professional_association] : []),
                     certifications: fullDoctor.certification || [],
                     doctorId: doctor.id.toString()
-                });
+                };
+            setEditDoctor(editData);
+            setShowCreate(true);
             }
         } catch (err: any) {
             // console.error('[DoctorsPage] Error fetching doctor details:', err);

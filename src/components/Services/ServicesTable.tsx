@@ -3,6 +3,13 @@ export interface ServiceType {
   title: string;
   image?: string;
   publishedAt: string;
+  shortDescription?: string;
+  overview?: string;
+  videoLink?: string;
+  bannerImage?: string;
+  conditions?: string[];
+  tests?: string[];
+  treatments?: string[];
 }
 
 interface ServicesTableProps {

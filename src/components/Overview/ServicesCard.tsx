@@ -38,15 +38,15 @@ export default function ServicesCard({ services = [], isLoading = false }: Servi
             <div key={s.id} className="flex items-center py-[12px] justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-md overflow-hidden bg-slate-100">
-                  {s.image ? (
-                    <img src={s.image} alt={s.title} className="w-full h-full object-cover" />
+                  {(s.snippet?.image || s.image) ? (
+                    <img src={s.snippet?.image || s.image} alt={s.snippet?.title || s.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gray-300 flex items-center justify-center">
                       <span className="text-xs text-gray-500">No image</span>
                     </div>
                   )}
                 </div>
-                <div className="text-sm font-medium truncate">{s.title}</div>
+                <div className="text-sm font-medium truncate">{s.snippet?.title || s.title || 'Untitled'}</div>
               </div>
 
               <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">

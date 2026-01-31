@@ -19,8 +19,10 @@ const sampleBlogsInitial: BlogType[] = [
 const BlogsPage = () => {
   const [blogs, setBlogs] = useState<BlogType[]>(sampleBlogsInitial);
   const [searchTerm, setSearchTerm] = useState('');
+  
   const [showCreate, setShowCreate] = useState(false);
   const [editBlog, setEditBlog] = useState<BlogPayload | null>(null);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingBlogData, setIsFetchingBlogData] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -118,7 +120,7 @@ const BlogsPage = () => {
       if (fullBlog) {
         // console.log('[BlogsPage] Full blog data loaded:', fullBlog);
 
-        setEditBlog({
+        const editData: BlogPayload = {
           blogId: blog.id.toString(),
           snippet: {
             title: (fullBlog as any).snippet?.title || (fullBlog as any).title || '',
@@ -131,7 +133,8 @@ const BlogsPage = () => {
             video_link_url: (fullBlog as any).page?.video_link_url || '',
           },
           video_link_url: (fullBlog as any).page?.video_link_url || '',
-        });
+        };
+        setEditBlog(editData);
         setShowCreate(true);
       }
     } catch (err: any) {

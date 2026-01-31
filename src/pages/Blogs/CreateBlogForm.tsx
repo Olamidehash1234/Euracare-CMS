@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import TiptapEditor from '../../components/Editor/TiptapEditor';
 import { blogService } from '@/services';
+import { useFormPersist } from '../../hooks/useFormPersist';
 
 export type BlogPayload = {
   snippet?: {
@@ -39,6 +40,22 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
     content: initialData?.page?.content?.additionalProp1 || '',
     videoLink: initialData?.page?.video_link_url || initialData?.video_link_url || '',
   });
+
+  // Form persistence hook
+  const { restoreFormState, clearFormState } = useFormPersist('blog-form-state', [form, coverPreview]);
+
+  // Restore form state on mount if in create mode
+  useEffect(() => {
+    if (mode === 'create' && !initialData) {
+      const restoredState = restoreFormState();
+      if (restoredState && Array.isArray(restoredState) && restoredState.length === 2) {
+        const [restoredForm, restoredCover] = restoredState;
+        setForm(restoredForm);
+        setCoverPreview(restoredCover);
+        // console.log('[CreateBlogForm] Form state restored from session');
+      }
+    }
+  }, [mode, initialData]);
 
   const handleFile = async (file?: File) => {
     if (!file) return;
@@ -111,6 +128,9 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
     // console.log('[CreateBlogForm] Submitting payload:', JSON.stringify(payload, null, 2));
     // console.log('[CreateBlogForm] Mode:', mode);
     // console.log('[CreateBlogForm] Blog ID:', blogId);
+    
+    // Clear form state on successful submission
+    clearFormState();
     onSave(payload);
   };
 

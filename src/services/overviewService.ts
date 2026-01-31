@@ -3,7 +3,11 @@ import apiClient from './apiClient';
 // Article/Blog item in overview
 export interface OverviewArticle {
   id: string;
-  title: string;
+  snippet?: {
+    title?: string;
+    cover_image_url?: string;
+  };
+  title?: string;
   cover_image_url?: string;
   excerpt?: string;
   author?: string;
@@ -26,7 +30,11 @@ export interface OverviewDoctor {
 // Service item in overview
 export interface OverviewService {
   id: string;
-  title: string;
+  snippet?: {
+    title?: string;
+    image?: string;
+  };
+  title?: string;
   image?: string;
   description?: string;
 }

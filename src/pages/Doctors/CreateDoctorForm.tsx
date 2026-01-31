@@ -52,6 +52,10 @@ export default function DoctorForm({
   const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('loading');
   const [showToast, setShowToast] = useState(false);
 
+
+
+
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;

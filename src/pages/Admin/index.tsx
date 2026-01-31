@@ -18,8 +18,10 @@ const AdminPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
   const [showCreate, setShowCreate] = useState(false);
   const [editAdmin, setEditAdmin] = useState<AdminPayload | null>(null);
+  
   const [isFetchingAdminData, setIsFetchingAdminData] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('success');
@@ -157,6 +159,7 @@ const AdminPage = () => {
           countryCode: countryCode,
         });
         setShowCreate(true);
+        setIsFetchingAdminData(false);
       }
     } catch (err: any) {
       // console.error('[AdminPage] Error fetching admin details:', err);
