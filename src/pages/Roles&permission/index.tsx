@@ -47,23 +47,17 @@ const DepartmentPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      console.log('[RolesPage] Fetching roles...');
       const response = await roleService.getAllRoles();
-      console.log('[RolesPage] Raw API response:', response);
 
       // API returns: response.data.data.roles as RoleResponse[]
       const rolesData = response?.data?.data?.roles || [];
-
-      console.log('[RolesPage] Parsed roles data:', rolesData);
 
       if (!Array.isArray(rolesData)) {
         throw new Error('Invalid response format: expected array of roles');
       }
 
       setRoles(rolesData);
-      console.log('[RolesPage] Roles loaded:', rolesData);
     } catch (err: any) {
-      console.error('[RolesPage] Error fetching roles:', err);
       
       let errorMessage = 'Failed to load roles';
 
@@ -89,9 +83,8 @@ const DepartmentPage = () => {
 
   // Build display roles with member info from API response
   const displayRoles = roles.map((role: any) => {
-    const users = role.users || [];
-    const memberCount = users.length;
-    const memberAvatars = users.map((user: any) => user.profile_picture_url).filter(Boolean);
+    const memberCount = role.member_count || 0;
+    const memberAvatars = role.member_images || [];
     
     // Provide default meta if role name not found in roleMeta
     const meta = roleMeta[role.name] || { 
@@ -138,7 +131,11 @@ const DepartmentPage = () => {
   const handleManageMembers = async (roleId: string) => {
     // close the small MoreMenu and open inline members table
     setOpenMenuFor(null);
+    setOpenMembersFor(roleId);
     setIsLoadingMembers(true);
+    
+    // console.log('[RolesPage] Manage Members clicked for roleId:', roleId);
+    // showToast('Loading members...', 'loading');
 
     try {
       // Fetch users filtered by roleId using the list users endpoint
@@ -147,17 +144,9 @@ const DepartmentPage = () => {
         limit: 100 // Get all users for this role
       };
       
-      console.log('[RolesPage] Fetching members with params:', params);
-      
       const response = await adminService.getAllAdmins(params);
       
-      console.log('[RolesPage] Full response from backend:', response);
-      console.log('[RolesPage] Response data:', response?.data);
-      
       const usersData = response?.data?.data?.users || [];
-      
-      console.log('[RolesPage] Parsed users data:', usersData);
-      console.log('[RolesPage] Users count:', usersData.length);
 
       if (Array.isArray(usersData) && usersData.length > 0) {
         // Get the role name from the mockRoles
@@ -166,12 +155,6 @@ const DepartmentPage = () => {
 
         // Transform the users data to AdminType format
         const transformedMembers = usersData.map((user: any) => {
-          console.log('[RolesPage] Transforming user:', {
-            id: user.id || user._id,
-            name: user.full_name,
-            status: user.status,
-          });
-
           return {
             id: user.id || user._id,
             name: user.full_name || user.fullName || '',
@@ -184,15 +167,13 @@ const DepartmentPage = () => {
           };
         });
 
-        console.log('[RolesPage] Transformed members:', transformedMembers);
+        // console.log('[RolesPage] Members loaded successfully:', transformedMembers.length, 'members found');
         setMembersData(transformedMembers);
-        setOpenMembersFor(roleId);
+        // showToast(`${transformedMembers.length} member(s) loaded`, 'success');
       } else {
-        console.warn('[RolesPage] No users data found or empty array');
         showToast('No members found for this role', 'error');
       }
     } catch (error: any) {
-      console.error('[RolesPage] Error fetching role members:', error);
       let errorMessage = 'Failed to load members for this role';
 
       if (error.response?.status === 401) {
@@ -224,6 +205,7 @@ const DepartmentPage = () => {
   const handleDeleteRole = async (roleId: string) => {
     try {
       console.log('[RolesPage] Deleting role:', roleId);
+      showToast('Deleting role...', 'loading');
       await roleService.deleteRole(roleId);
       showToast('Role deleted successfully!', 'success');
       
@@ -231,7 +213,6 @@ const DepartmentPage = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       fetchRoles();
     } catch (error: any) {
-      console.error('[RolesPage] Error deleting role:', error);
       let errorMessage = 'Failed to delete role. Please try again.';
 
       if (error.response) {
@@ -316,14 +297,8 @@ const DepartmentPage = () => {
         },
       };
 
-      console.log('=== Backend Request Body ===');
-      console.log('Endpoint:', isCreating ? 'POST /api/v1/roles/' : `PUT /api/v1/roles/${selectedRoleForPermission}`);
-      console.log('Payload:', JSON.stringify(payload, null, 2));
-      console.log('============================');
-
       if (isCreating) {
         await roleService.createRole(payload);
-        console.log('✅ Role created successfully');
         showToast(
           `"${data.roleName}" role created successfully!`,
           'success'
@@ -331,7 +306,6 @@ const DepartmentPage = () => {
       } else if (selectedRoleForPermission) {
         // For update, extract the ID from selectedRoleForPermission or modify as needed
         await roleService.updateRole(selectedRoleForPermission, payload);
-        console.log('✅ Role updated successfully');
         showToast(
           `"${data.roleName}" role updated successfully!`,
           'success'
@@ -345,18 +319,10 @@ const DepartmentPage = () => {
         fetchRoles();
       }, 1500);
     } catch (error: any) {
-      // console.error('Error saving permission:', error);
-      
       let errorMessage = 'Something went wrong. Please try again.';
 
       // Log backend response details
       if (error.response) {
-        // console.log('=== Backend Error Response ===');
-        // console.log('Status:', error.response.status);
-        // console.log('Status Text:', error.response.statusText);
-        // console.log('Error Data:', JSON.stringify(error.response.data, null, 2));
-        // console.log('==============================');
-
         // Generate user-friendly error messages
         if (error.response.status === 400) {
           errorMessage = error.response.data?.message || 'Invalid role information. Please check and try again.';
@@ -372,10 +338,8 @@ const DepartmentPage = () => {
           errorMessage = error.response.data?.message || errorMessage;
         }
       } else if (error.request) {
-        // console.log('No response from server:', error.request);
         errorMessage = 'No response from server. Please check your connection and try again.';
       } else {
-        // console.log('Error message:', error.message);
         errorMessage = error.message || errorMessage;
       }
 
@@ -426,8 +390,8 @@ const DepartmentPage = () => {
                           setOpenMembersFor(null);
                           setMembersData([]);
                         }}
-                        onEdit={() => { /* console.log('edit admin from members table', admin); */ }}
-                        onDelete={() => { /* console.log('delete admin from members table', admin); */ }}
+                        onEdit={() => {}}
+                        onDelete={() => {}}
                       />
                     )}
                   </div>

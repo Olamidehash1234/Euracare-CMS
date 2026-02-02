@@ -63,7 +63,6 @@ const blogService = {
       const response = await uploadToCloudinary(file, 'euracare/blogs');
       return response.secure_url;
     } catch (error) {
-      // console.error('[BlogService] Cover image upload error:', error);
       throw error;
     }
   },

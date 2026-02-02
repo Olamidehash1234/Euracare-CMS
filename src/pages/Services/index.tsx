@@ -44,10 +44,9 @@ const ServicesPage = () => {
         id: service.id,
         title: service.snippet?.service_name || 'Untitled Service',
         image: service.snippet?.cover_image_url,
-        publishedAt: service.createdAt || new Date().toISOString(),
+        publishedAt: service.created_at || service.createdAt || new Date().toISOString(),
       })));
     } catch (err) {
-      console.error('Failed to fetch services:', err);
       showToast('Failed to load services', 'error');
     } finally {
       setIsLoading(false);
@@ -56,19 +55,13 @@ const ServicesPage = () => {
 
   const fetchServiceDetails = async (serviceId: string) => {
     try {
-      console.log('[ServicesPage] Starting to fetch service details for ID:', serviceId);
+      showToast('Loading service details...', 'loading');
       const response = await serviceService.getServiceById(serviceId);
-      console.log('[ServicesPage] Full API response:', response);
-      console.log('[ServicesPage] Response data:', response.data);
-      console.log('[ServicesPage] Response data.data:', response.data?.data);
       
       // The actual service is nested under response.data.data.service
       const service = response.data?.data?.service;
-      console.log('[ServicesPage] Extracted service data:', service);
       
       if (service) {
-        console.log('[ServicesPage] Service snippet:', service.snippet);
-        console.log('[ServicesPage] Service page:', service.page);
         
         const enrichedService: ServiceType = {
           id: service.id,
@@ -85,22 +78,17 @@ const ServicesPage = () => {
           treatments: service.page?.treatments_and_procedures,
         };
         
-        console.log('[ServicesPage] Enriched service object:', enrichedService);
         setEditService(enrichedService);
-        console.log('[ServicesPage] Edit service state updated');
       } else {
-        console.warn('[ServicesPage] No service data returned from API');
+        // No service data returned
       }
     } catch (err) {
-      console.error('[ServicesPage] Failed to fetch service details:', err);
       showToast('Failed to load service details', 'error');
     }
   };
 
   const handleEdit = (s: ServiceType) => {
     // Fetch full service details for edit mode
-    console.log('[ServicesPage] handleEdit called with service:', s);
-    console.log('[ServicesPage] Service ID being passed to fetchServiceDetails:', String(s.id));
     setEditService(s);
     setShowCreate(true);
     fetchServiceDetails(String(s.id));
@@ -113,7 +101,6 @@ const ServicesPage = () => {
       setServices(prev => prev.filter(x => x.id !== s.id));
       showToast('Service deleted successfully! ✅', 'success');
     } catch (err) {
-      console.error('Failed to delete service:', err);
       showToast('Failed to delete service', 'error');
     }
   };
@@ -141,7 +128,6 @@ const ServicesPage = () => {
         fetchServices();
       }, 1500);
     } catch (err) {
-      console.error('Failed to save service:', err);
       showToast('Failed to save service', 'error');
     }
   };

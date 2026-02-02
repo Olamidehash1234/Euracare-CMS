@@ -1,13 +1,43 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import NotFound from '../commonComponents/NotFound';
+import Toast from '../GlobalComponents/Toast';
+import { doctorService } from '../../services';
+import { getErrorMessage } from '../../services';
 import type { OverviewDoctor } from '../../services/overviewService';
 
 interface DoctorsCardProps {
   doctors?: OverviewDoctor[];
   isLoading?: boolean;
+  onDoctorDeleted?: (doctorId: string) => void;
 }
 
-export default function DoctorsCard({ doctors = [], isLoading = false }: DoctorsCardProps) {
+export default function DoctorsCard({ doctors = [], isLoading = false, onDoctorDeleted }: DoctorsCardProps) {
+  const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'loading'; message: string }>({
+    show: false,
+    type: 'success',
+    message: '',
+  });
+
+  const showToast = (message: string, type: 'success' | 'error' | 'loading') => {
+    setToast({ message, type, show: true });
+  };
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, show: false }));
+  };
+
+  const handleDelete = async (doctor: OverviewDoctor) => {
+    try {
+      showToast('Deleting doctor...', 'loading');
+      await doctorService.deleteDoctor(String(doctor.id));
+      showToast(`${doctor.full_name} deleted successfully! ✅`, 'success');
+      onDoctorDeleted?.(String(doctor.id));
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast(errorMessage, 'error');
+    }
+  };
   const displayDoctors = doctors.slice(0, 5); // Show top 5 doctors
 
   if (isLoading) {
@@ -53,6 +83,14 @@ export default function DoctorsCard({ doctors = [], isLoading = false }: Doctors
               <Link to={`/doctors/${d.id}`} className="px-3 py-2 border border-[#E3E6EE] rounded-md text-sm inline-flex items-center gap-2 hover:bg-gray-50 transition flex-shrink-0">
                 <img src="/icon/eye.svg" alt="view" /> <span>View Profile</span>
               </Link>
+
+              <button 
+                onClick={() => handleDelete(d)}
+                className="px-[12px] py-[10px] text-[#EF4444] hover:bg-red-50 transition"
+                title="Delete"
+              >
+                <img src="/icon/delete.svg" alt="Delete" />
+              </button>
             </div>
           ))
         ) : (
@@ -65,6 +103,14 @@ export default function DoctorsCard({ doctors = [], isLoading = false }: Doctors
           />
         )}
       </div>
+
+      {/* Toast notification */}
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        show={toast.show}
+        onHide={hideToast}
+      />
     </div>
   );
 }

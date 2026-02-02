@@ -76,7 +76,6 @@ export default function VerifyCode(): JSX.Element {
         // simulate verification
         await new Promise(res => setTimeout(res, 600));
         setSubmitting(false);
-        // console.log('Verifying code', code);
         // navigate to overview or next step
         navigate('/update-password');
     };

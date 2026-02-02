@@ -8,7 +8,6 @@ export default function ResetPassword(): JSX.Element {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // TODO: send reset link
-        // console.log('send reset link to', email);
         navigate('/verify-code');
     };
 

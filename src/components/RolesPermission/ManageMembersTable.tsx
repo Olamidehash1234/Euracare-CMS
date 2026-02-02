@@ -79,7 +79,7 @@ export default function ManageMembersTable({ members, onEdit, onDelete }: Props)
                           menuClassName="w-[220px] border border-[#0C2141]" /* increased width for this usage only */
                           onSuspendUser={() => { onDelete?.(m); }}
                           onManagePermission={() => { onEdit?.(m); }}
-                          onViewActivity={() => { /* console.log('View activity for', m); */ }}
+                          onViewActivity={() => {}}
                           onClose={() => setOpenMenuFor(null)}
                         />
                       )}

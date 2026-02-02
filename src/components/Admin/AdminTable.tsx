@@ -43,7 +43,7 @@ export default function AdminTable({ admins, onView, onEdit, onDelete }: AdminTa
             <tr key={admin.id} className="border-t border-[#01010133]">
               <td className="w-[40px] py-[19px] align-middle"><input type="checkbox" /></td>
               <td className="w-[250px] py-[19px] pl-4 pr-0 align-middle">
-                <div className="w-[280px] flex items-center gap-3"> 
+                <div className="w-[250px] flex items-center gap-3"> 
                   <img src={admin.avatar ? admin.avatar : '/placeholder-image.png'} alt="" className="w-10 h-10 lg:w-[44px] lg:h-[44px] rounded-full" />
                   <span className="font-normal text-[14px]">{admin.name}</span>
                 </div>

@@ -61,14 +61,10 @@ const BlogsPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      // console.log('[BlogsPage] Fetching blogs...');
       const response = await blogService.getAllBlogs();
-      // console.log('[BlogsPage] Raw API response:', response);
 
       // API returns: response.data.data.articles.articles = [...]
       const blogsData = response?.data?.data?.articles?.articles || [];
-
-      // console.log('[BlogsPage] Parsed blogs data:', blogsData);
 
       if (!Array.isArray(blogsData)) {
         throw new Error('Invalid response format: expected array of blogs');
@@ -79,14 +75,12 @@ const BlogsPage = () => {
         id: blog.id || blog._id,
         title: blog.snippet?.title || blog.title || 'Untitled',
         image: blog.snippet?.cover_image_url || blog.image || '/image/services/doctor.jpg',
-        publishedAt: blog.createdAt || new Date().toISOString(),
+        publishedAt: blog.created_at || blog.createdAt || new Date().toISOString(),
         category: blog.category || 'General',
       }));
 
       setBlogs(transformedBlogs);
-      // console.log('[BlogsPage] Blogs loaded:', transformedBlogs);
     } catch (err: any) {
-      // console.error('[BlogsPage] Error fetching blogs:', err);
       let errorMessage = 'Failed to load blogs';
 
       if (err.response?.status === 403) {
@@ -103,14 +97,12 @@ const BlogsPage = () => {
     }
   };
 
-  // const handleView = (blog: BlogType) => {
-  //   // console.log('[BlogsPage] Viewing blog:', blog);
-  // };
+
 
   const handleEdit = async (blog: BlogType) => {
     try {
       setIsFetchingBlogData(true);
-      // console.log('[BlogsPage] Attempting to fetch full blog data for ID:', blog.id);
+      showToast('Loading blog details...', 'loading');
 
       // Fetch full blog data by ID
       const response = await blogService.getBlogById(blog.id.toString());
@@ -118,7 +110,6 @@ const BlogsPage = () => {
       const fullBlog = (response.data?.data as any)?.article || response.data?.data;
 
       if (fullBlog) {
-        // console.log('[BlogsPage] Full blog data loaded:', fullBlog);
 
         const editData: BlogPayload = {
           blogId: blog.id.toString(),
@@ -138,7 +129,6 @@ const BlogsPage = () => {
         setShowCreate(true);
       }
     } catch (err: any) {
-      // console.error('[BlogsPage] Error fetching blog details:', err);
       let errorMessage = 'Failed to load blog details for editing';
 
       if (err.response?.status === 403) {
@@ -158,9 +148,8 @@ const BlogsPage = () => {
 
   const handleDelete = async (blog: BlogType) => {
     try {
-      // console.log('[BlogsPage] Deleting blog with ID:', blog.id);
+      showToast('Deleting blog...', 'loading');
       await blogService.deleteBlog(blog.id.toString());
-      // console.log('[BlogsPage] Blog deleted successfully');
 
       // Remove the deleted blog from the list
       setBlogs(blogs.filter(b => b.id !== blog.id));
@@ -168,7 +157,6 @@ const BlogsPage = () => {
       // Show success toast
       showToast('Blog deleted successfully! ✅', 'success');
     } catch (err: any) {
-      // console.error('[BlogsPage] Error deleting blog:', err);
       let errorMessage = 'Failed to delete blog';
 
       if (err.response?.status === 403) {
@@ -188,13 +176,8 @@ const BlogsPage = () => {
     showToast(editBlog ? 'Updating blog...' : 'Creating blog...', 'loading');
 
     try {
-      // console.log('[BlogsPage] Submitting blog payload:', payload);
-
       if (editBlog && editBlog.blogId) {
         // Update blog
-        // console.log('[BlogsPage] Updating blog with ID:', editBlog.blogId);
-        // const response = await blogService.updateBlog(editBlog.blogId, payload);
-        // console.log('[BlogsPage] Blog updated successfully:', response);
         showToast('Blog updated successfully! ✅', 'success');
         
         // Update local state
@@ -205,9 +188,7 @@ const BlogsPage = () => {
         } : b)));
       } else {
         // Create blog
-        // console.log('[BlogsPage] Creating new blog...');
         const response = await blogService.createBlog(payload);
-        // console.log('[BlogsPage] Blog created successfully:', response);
         
         showToast('Blog created successfully! ✅', 'success');
 
@@ -232,11 +213,6 @@ const BlogsPage = () => {
         fetchBlogs();
       }, 1500);
     } catch (error: any) {
-      // console.error('[BlogsPage] Error saving blog:', error);
-      // console.error('[BlogsPage] Error status:', error?.response?.status);
-      // console.error('[BlogsPage] Error data:', error?.response?.data);
-      // console.error('[BlogsPage] Full error response:', JSON.stringify(error?.response?.data, null, 2));
-      
       let errorMessage = 'Failed to save blog';
       if (error.response?.status === 403) {
         errorMessage = 'You do not have permission to perform this action';

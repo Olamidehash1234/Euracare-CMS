@@ -19,7 +19,6 @@ export const useImageUpload = (initialAvatar?: string) => {
 
       // Upload to Cloudinary via doctor service
       const imageUrl = await doctorService.uploadDoctorAvatar(file);
-      // console.log('[ImageUpload] Image uploaded successfully:', imageUrl);
 
       // Update preview with Cloudinary URL
       setAvatarPreview(imageUrl);
@@ -27,7 +26,6 @@ export const useImageUpload = (initialAvatar?: string) => {
 
       return imageUrl;
     } catch (err) {
-      // console.error('[ImageUpload] Error uploading image:', err);
       const errorMessage = getErrorMessage(err);
       setUploadError(errorMessage);
       setAvatarPreview(null);

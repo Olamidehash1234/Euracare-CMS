@@ -39,40 +39,24 @@ const OverviewPage = () => {
   useEffect(() => {
     const fetchOverviewData = async () => {
       try {
-        console.log('[OverviewPage] Initiating data fetch...');
         setIsLoading(true);
         setError(null);
 
         const response = await overviewService.getOverviewData();
 
-        console.log('[OverviewPage] API response received:', response);
-
         if (response.success && response.data.overview) {
           const { articles: fetchedArticles, doctors: fetchedDoctors, services: fetchedServices, activities: fetchedActivities } = response.data.overview;
-
-          console.log('[OverviewPage] Successfully parsed overview data');
-          console.log('[OverviewPage] Articles:', fetchedArticles);
-          console.log('[OverviewPage] Doctors:', fetchedDoctors);
-          console.log('[OverviewPage] Services:', fetchedServices);
-          console.log('[OverviewPage] Activities:', fetchedActivities);
 
           setArticles(fetchedArticles || []);
           setDoctors(fetchedDoctors || []);
           setServices(fetchedServices || []);
           setActivities(fetchedActivities || []);
-
-          console.log('[OverviewPage] State updated successfully');
         } else {
           const errorMsg = 'Failed to fetch overview data - Invalid response structure';
-          console.error('[OverviewPage]', errorMsg);
-          console.error('[OverviewPage] Response structure:', { success: response.success, hasOverview: !!response.data?.overview });
           throw new Error(errorMsg);
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching data';
-        console.error('[OverviewPage] Catch block - Error:', err);
-        console.error('[OverviewPage] Error message:', errorMessage);
-        console.error('[OverviewPage] Error type:', err instanceof Error ? err.constructor.name : typeof err);
         
         setError(errorMessage);
         setToast({
@@ -80,12 +64,8 @@ const OverviewPage = () => {
           type: 'error',
           message: errorMessage,
         });
-
-        // Log error for debugging
-        console.error('[OverviewPage] Data fetch failed:', err);
       } finally {
         setIsLoading(false);
-        console.log('[OverviewPage] Data fetch completed');
       }
     };
 
@@ -97,8 +77,9 @@ const OverviewPage = () => {
     return (
       <div>
         <Header title="Overview" />
-        <div className="p-[16px] lg:px-[40px] lg:py-[50px]">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <div className="p-[16px] lg:px-[40px] lg:mx-[40px] lg:my-[40px] rounded-[20px] border border-red-200 lg:py-[50px] flex items-center justify-center min-h-[calc(100vh-200px)]">
+          <div className="rounded-lg p-6 text-center">
+            <img src="/not-found.png" alt="Error" className="mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-red-900 mb-2">Unable to Load Overview</h3>
             <p className="text-red-700 mb-4">{error}</p>
             <button

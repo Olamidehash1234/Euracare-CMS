@@ -42,40 +42,29 @@ const AdminPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      // console.log('[AdminPage] Fetching admins...');
       const response = await adminService.getAllAdmins();
-      // console.log('[AdminPage] Raw API response:', response);
 
       // API returns: response.data.data.users as AdminResponse[]
       const adminsData = response?.data?.data?.users || [];
-
-      // console.log('[AdminPage] Parsed admins data:', adminsData);
 
       if (!Array.isArray(adminsData)) {
         throw new Error('Invalid response format: expected array of admins');
       }
 
       // Map role ID to display name
-      const getRoleDisplayName = (roleId: string | object) => {
-        if (typeof roleId === 'object' && roleId !== null && '_id' in roleId) {
-          const id = (roleId as any)._id;
-          switch(id) {
-            case '6940060fc2a3695489abc932':
-              return 'Super Admin';
-            case '6940060fc2a3695489abc933':
-              return 'Admin';
-            default:
-              return 'Admin';
+      const getRoleDisplayName = (roleData: string | object) => {
+        // If role is an object with a name property, use it directly
+        if (typeof roleData === 'object' && roleData !== null) {
+          const roleName = (roleData as any).name;
+          if (roleName) {
+            return roleName;
           }
         }
-        switch(roleId) {
-          case '6940060fc2a3695489abc932':
-            return 'Super Admin';
-          case '6940060fc2a3695489abc933':
-            return 'Admin';
-          default:
-            return 'Admin';
+        // Fallback to string if it's a plain string
+        if (typeof roleData === 'string') {
+          return roleData;
         }
+        return 'Admin'; // Default fallback
       };
 
       // Transform API response to match AdminType interface
@@ -83,7 +72,7 @@ const AdminPage = () => {
         id: admin._id || admin.id,
         name: admin.full_name || admin.fullName || '',
         avatar: admin.profile_picture_url || admin.profilePictureUrl,
-        dateCreated: admin.createdAt || new Date().toISOString(),
+        dateCreated: admin.created_at || admin.createdAt || new Date().toISOString(),
         email: admin.email || '',
         role: getRoleDisplayName(admin.role),
         active: admin.lastLogin ? 'Active' : 'Inactive',
@@ -91,9 +80,7 @@ const AdminPage = () => {
       }));
 
       setAdmins(transformedAdmins);
-      // console.log('[AdminPage] Admins loaded:', transformedAdmins);
     } catch (err: any) {
-      // console.error('[AdminPage] Error fetching admins:', err);
       let errorMessage = 'Failed to load admins';
 
       if (err.response?.status === 403) {
@@ -111,20 +98,16 @@ const AdminPage = () => {
     }
   };
 
-  // const handleView = (admin: AdminType) => { /* console.log('view admin', admin); */ };
-
   const handleEdit = async (admin: AdminType) => {
     try {
       setIsFetchingAdminData(true);
-      // console.log('[AdminPage] Attempting to fetch full admin data for ID:', admin.id);
+      showToastMessage('Loading admin details...', 'loading');
 
       // Fetch full admin data by ID
       const response = await adminService.getAdminById(admin.id.toString());
       const fullAdmin = response.data?.data;
 
       if (fullAdmin) {
-        // console.log('[AdminPage] Full admin data loaded:', fullAdmin);
-
         // Map role ID to display name
         const getRoleId = (roleObj: any) => {
           if (typeof roleObj === 'object' && roleObj !== null && '_id' in roleObj) {
@@ -162,7 +145,6 @@ const AdminPage = () => {
         setIsFetchingAdminData(false);
       }
     } catch (err: any) {
-      // console.error('[AdminPage] Error fetching admin details:', err);
       let errorMessage = 'Failed to load admin details for editing';
 
       if (err.response?.status === 403) {
@@ -193,9 +175,8 @@ const AdminPage = () => {
 
   const handleDelete = async (admin: AdminType) => {
     try {
-      // console.log('[AdminPage] Deleting admin with ID:', admin.id);
+      showToastMessage('Deleting admin...', 'loading');
       await adminService.deleteAdmin(admin.id.toString());
-      // console.log('[AdminPage] Admin deleted successfully');
 
       // Remove the deleted admin from the list
       setAdmins(admins.filter(a => a.id !== admin.id));
@@ -205,7 +186,6 @@ const AdminPage = () => {
       setToastType('success');
       setShowToast(true);
     } catch (err: any) {
-      // console.error('[AdminPage] Error deleting admin:', err);
       let errorMessage = 'Failed to delete admin';
 
       if (err.response?.status === 403) {

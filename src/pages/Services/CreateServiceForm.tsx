@@ -63,7 +63,6 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
   // Update form state when initialData changes (for edit mode)
   useEffect(() => {
     if (mode === 'edit' && initialData) {
-      console.log('[CreateServiceForm] Updating form state with initialData');
       setForm({
         title: initialData.title || '',
         shortDescription: initialData.shortDescription || '',
@@ -75,12 +74,6 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
       setConditions(initialData.conditions || []);
       setTests(initialData.tests || []);
       setTreatments(initialData.treatments || []);
-      console.log('[CreateServiceForm] Form state updated:', {
-        title: initialData.title,
-        shortDescription: initialData.shortDescription,
-        overview: initialData.overview,
-        videoLink: initialData.videoLink,
-      });
     }
   }, [initialData, mode]);
 

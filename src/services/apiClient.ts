@@ -124,15 +124,14 @@ apiClient.interceptors.response.use(
     
     if (error.response?.status === 403) {
       // Forbidden - user doesn't have permission
-      // console.error('Access Denied:', error.response.data);
     }
 
     if (error.response?.status === 404) {
-      // console.error('Resource not found');
+      // Resource not found
     }
 
     if (error.response?.status === 500) {
-      // console.error('Server error');
+      // Server error
     }
 
     return Promise.reject(error);

@@ -34,12 +34,9 @@ const DoctorsPage = () => {
         setError(null);
         try {
             const response = await doctorService.getAllDoctors();
-            // console.log('[DoctorsPage] Raw API response:', response);
             
             // API returns: response.data.data.doctor as DoctorResponse[]
             const doctorsData = response?.data?.data?.doctor || [];
-
-            // console.log('[DoctorsPage] Parsed doctors data:', doctorsData);
             
             if (!Array.isArray(doctorsData)) {
                 throw new Error('Invalid response format: expected array of doctors');
@@ -50,15 +47,13 @@ const DoctorsPage = () => {
                 id: doc.id,
                 name: doc.full_name,
                 avatar: doc.profile_picture_url,
-                createdAt: doc.createdAt || new Date().toISOString(),
+                createdAt: doc.created_at || doc.createdAt || new Date().toISOString(),
                 email: doc.email,
                 specialties: doc.programs_and_specialty || [],
             }));
 
             setDoctors(transformedDoctors);
-            // console.log('[DoctorsPage] Doctors loaded:', transformedDoctors);
         } catch (err: any) {
-            // console.error('[DoctorsPage] Error fetching doctors:', err);
             let errorMessage = 'Failed to load doctors';
 
             if (err.response?.status === 403) {
@@ -75,9 +70,7 @@ const DoctorsPage = () => {
         }
     };
 
-    // const handleSearch = (q: string) => {
-    //     console.log('search:', q);
-    // };
+
 
     const getFilteredDoctors = () => {
         if (!searchTerm.trim()) {
@@ -98,14 +91,14 @@ const DoctorsPage = () => {
         setShowCreate(true);
     };
 
-    // const handleView = (d: Doctor) => {
-    //     // console.log('view doctor', d);
-    // };
+
 
     const handleEditDoctor = async (doctor: Doctor) => {
         try {
             setIsFetchingDoctorData(true);
-            // console.log('[DoctorsPage] Attempting to fetch full doctor data for ID:', doctor.id);
+            setToastMessage('Loading doctor details...');
+            setToastType('loading');
+            setShowToast(true);
             
             // Fetch full doctor data by ID
             const response = await doctorService.getDoctorById(doctor.id.toString());
@@ -113,7 +106,6 @@ const DoctorsPage = () => {
             const fullDoctor = (response.data?.data as any)?.doctor || response.data?.data;
             
             if (fullDoctor) {
-                // console.log('[DoctorsPage] Full doctor data loaded:', fullDoctor);
                 const editData: NewDoctorPayload = {
                     fullName: fullDoctor.full_name,
                     email: fullDoctor.email || '',
@@ -135,9 +127,9 @@ const DoctorsPage = () => {
                 };
             setEditDoctor(editData);
             setShowCreate(true);
+            setShowToast(false);
             }
         } catch (err: any) {
-            // console.error('[DoctorsPage] Error fetching doctor details:', err);
             let errorMessage = 'Failed to load doctor details for editing';
 
             if (err.response?.status === 403) {
@@ -147,6 +139,9 @@ const DoctorsPage = () => {
             }
 
             setError(errorMessage);
+            setToastMessage(errorMessage);
+            setToastType('error');
+            setShowToast(true);
         } finally {
             setIsFetchingDoctorData(false);
         }
@@ -154,9 +149,11 @@ const DoctorsPage = () => {
 
     const handleDeleteDoctor = async (doctor: Doctor) => {
         try {
-            // console.log('[DoctorsPage] Deleting doctor with ID:', doctor.id);
+            setToastMessage('Deleting doctor...');
+            setToastType('loading');
+            setShowToast(true);
+            
             await doctorService.deleteDoctor(doctor.id.toString());
-            // console.log('[DoctorsPage] Doctor deleted successfully');
             
             // Remove the deleted doctor from the list
             setDoctors(doctors.filter(d => d.id !== doctor.id));
@@ -166,7 +163,6 @@ const DoctorsPage = () => {
             setToastType('success');
             setShowToast(true);
         } catch (err: any) {
-            // console.error('[DoctorsPage] Error deleting doctor:', err);
             let errorMessage = 'Failed to delete doctor';
 
             if (err.response?.status === 403) {
@@ -195,7 +191,6 @@ const DoctorsPage = () => {
                         initialData={editDoctor || undefined}
                         isLoadingData={isFetchingDoctorData}
                         onSave={() => {
-                            // console.log(editDoctor ? 'update' : 'save', payload);
                             setShowCreate(false);
                             setEditDoctor(null);
                             // Refetch doctors after save

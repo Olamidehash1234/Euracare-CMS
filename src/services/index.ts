@@ -10,6 +10,7 @@ export { default as roleService } from './roleService';
 export { default as activityLogService } from './activityLogService';
 export { default as notificationService } from './notificationService';
 export { default as overviewService } from './overviewService';
+export { default as testimonialService } from './testimonialService';
 export { handleApiError, getErrorMessage } from './errorHandler';
 export { uploadToCloudinary, getOptimizedUrl } from './cloudinaryService';
 
@@ -25,3 +26,4 @@ export type * from './roleService';
 export type * from './activityLogService';
 export type * from './notificationService';
 export type * from './overviewService';
+export type * from './testimonialService';

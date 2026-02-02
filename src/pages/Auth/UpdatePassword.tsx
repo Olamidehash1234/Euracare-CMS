@@ -7,7 +7,6 @@ export default function LoginPage(): JSX.Element {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // TODO: wire auth
-        // console.log('login attempt', { password });
     };
 
     return (

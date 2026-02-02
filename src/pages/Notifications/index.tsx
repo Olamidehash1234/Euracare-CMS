@@ -23,8 +23,8 @@ export default function NotificationsPage() {
               <div className="flex items-center gap-2">
                 <NotificationToolbar
                   onSelectAll={() => setSelectedAll(s => !s)}
-                  onMarkAllRead={() => { /* console.log('Mark all read'); */ }}
-                  onDelete={() => { /* console.log('Delete selected'); */ }}
+                  onMarkAllRead={() => {}}
+                  onDelete={() => {}}
                 />
               </div>
             </div>
@@ -40,7 +40,7 @@ export default function NotificationsPage() {
           <div>Showing 1-12 of 1,253</div>
 
           <div className="text-center">
-            <button className="text-[#005920] text-[14px] font-medium hover:underline" onClick={() => { /* console.log('Mark all as read'); */ }}>
+            <button className="text-[#005920] text-[14px] font-medium hover:underline" onClick={() => {}}>
               Mark all as read
             </button>
           </div>

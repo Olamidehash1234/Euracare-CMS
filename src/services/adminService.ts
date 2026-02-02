@@ -57,7 +57,6 @@ const adminService = {
       const response = await uploadToCloudinary(file, 'euracare/admins');
       return response.secure_url;
     } catch (error) {
-      // console.error('[AdminService] Avatar upload error:', error);
       throw error;
     }
   },

@@ -52,23 +52,7 @@ const serviceService = {
 
   // Get single service
   getServiceById: (id: string) => {
-    console.log('[ServiceService] Fetching service with ID:', id);
     const response = apiClient.get<GetServiceByIdResponse>(`/services/${id}/`);
-    response.then((res) => {
-      console.log('[ServiceService] Service fetched successfully:', res.data);
-      console.log('[ServiceService] Response structure:', {
-        success: res.data?.success,
-        dataContainer: res.data?.data,
-        serviceObject: res.data?.data?.service,
-      });
-      console.log('[ServiceService] Service data structure:', {
-        id: res.data?.data?.service?.id,
-        snippet: res.data?.data?.service?.snippet,
-        page: res.data?.data?.service?.page,
-      });
-    }).catch((err) => {
-      console.error('[ServiceService] Error fetching service:', err);
-    });
     return response;
   },
 
@@ -94,7 +78,6 @@ const serviceService = {
       const response = await uploadToCloudinary(file, 'euracare/services/cover');
       return response.secure_url;
     } catch (error) {
-      console.error('[ServiceService] Cover image upload error:', error);
       throw error;
     }
   },
@@ -105,7 +88,6 @@ const serviceService = {
       const response = await uploadToCloudinary(file, 'euracare/services/banner');
       return response.secure_url;
     } catch (error) {
-      console.error('[ServiceService] Banner image upload error:', error);
       throw error;
     }
   },

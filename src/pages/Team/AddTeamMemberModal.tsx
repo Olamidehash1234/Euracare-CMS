@@ -51,7 +51,6 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
    * This ensures form fields are pre-filled when editing a team member
    */
   useEffect(() => {
-    console.log('[TeamMemberModal] Updating form with initialData:', initialData);
     setForm({
       fullName: initialData?.fullName || '',
       role: initialData?.role || '',
@@ -60,7 +59,6 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
     });
     setAvatarPreview(initialData?.avatar || null);
     setUploadedAvatarUrl(initialData?.avatar || null);
-    console.log('[TeamMemberModal] Avatar preview set to:', initialData?.avatar);
   }, [initialData]);
 
   const showToast = (type: 'success' | 'error' | 'loading', message: string) => {
@@ -70,8 +68,6 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    console.log('[TeamMemberModal] File selected:', { name: file.name, size: file.size, type: file.type });
 
     // Allowed image types
     const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
@@ -94,7 +90,6 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
     // Show local preview immediately
     const url = URL.createObjectURL(file);
     setAvatarPreview(url);
-    console.log('[TeamMemberModal] File preview generated');
 
     // Start uploading to Cloudinary
     setIsUploadingImage(true);
@@ -103,14 +98,12 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
     try {
       // Upload to Cloudinary via team service
       const imageUrl = await teamService.uploadTeamMemberAvatar(file);
-      console.log('[TeamMemberModal] Image uploaded successfully:', imageUrl);
 
       // Update preview with Cloudinary URL and store it for submission
       setAvatarPreview(imageUrl);
       setUploadedAvatarUrl(imageUrl);
       showToast('success', 'Image uploaded successfully!');
     } catch (err) {
-      console.error('[TeamMemberModal] Upload error:', err);
       const errorMessage = getErrorMessage(err);
       showToast('error', errorMessage);
       setAvatarPreview(null);
@@ -138,7 +131,6 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
     }
 
     setIsSubmitting(true);
-    console.log('[TeamMemberModal] Submitting form:', { mode, form });
 
     try {
       showToast('loading', `${mode === 'create' ? 'Creating' : 'Updating'} team member...`);
@@ -151,7 +143,6 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
       };
 
       if (mode === 'create') {
-        console.log('[TeamMemberModal] Creating new team member');
         // For create, if avatar was uploaded, add it to payload
         const response = await teamService.createTeamMember(
           payload,
@@ -160,7 +151,6 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
         
         // Extract team member from nested response structure
         const member = (response.data as any)?.team_member || response.data;
-        console.log('[TeamMemberModal] Team member created successfully:', member);
         showToast('success', 'Team member created successfully!');
         
         // Call parent onSave with the response data
@@ -179,22 +169,16 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
         }, 1000);
       } else {
         // Edit mode: Update existing team member
-        if (!initialData?.id) {
-          throw new Error('Team member ID is missing');
-        }
-
-        console.log('[TeamMemberModal] Updating team member with ID:', initialData.id);
         
         // Call updateTeamMember with ID, payload, and optional avatar URL
         const response = await teamService.updateTeamMember(
-          String(initialData.id),
+          String(initialData?.id),
           payload,
           uploadedAvatarUrl || undefined
         );
 
         // Extract team member from nested response structure
         const member = (response.data as any)?.team_member || response.data;
-        console.log('[TeamMemberModal] Team member updated successfully:', member);
         showToast('success', 'Team member updated successfully!');
 
         // Call parent onSave with the updated response data
@@ -215,7 +199,6 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
         }, 1000);
       }
     } catch (error) {
-      console.error('[TeamMemberModal] Submit error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to save team member. Please try again.';
       showToast('error', errorMessage);
     } finally {

@@ -17,9 +17,8 @@ export function useFormPersist(storageKey: string, dependencies: any[] = []) {
         data: dependencies,
       };
       sessionStorage.setItem(storageKey, JSON.stringify(stateToSave));
-      // console.log(`[useFormPersist] Persisted form state for key: ${storageKey}`);
     } catch (error) {
-      console.error(`[useFormPersist] Error persisting form state:`, error);
+      // Error persisting form state
     }
   }, dependencies); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -28,7 +27,6 @@ export function useFormPersist(storageKey: string, dependencies: any[] = []) {
     try {
       const stored = sessionStorage.getItem(storageKey);
       if (!stored) {
-        // console.log(`[useFormPersist] No persisted state found for key: ${storageKey}`);
         return null;
       }
 
@@ -38,15 +36,13 @@ export function useFormPersist(storageKey: string, dependencies: any[] = []) {
 
       // Optionally expire persisted state after 24 hours
       if (ageInMinutes > 1440) {
-        // console.log(`[useFormPersist] Persisted state expired for key: ${storageKey}`);
         sessionStorage.removeItem(storageKey);
         return null;
       }
 
-      // console.log(`[useFormPersist] Restored form state for key: ${storageKey} (age: ${ageInMinutes.toFixed(2)} minutes)`);
       return parsed.data;
     } catch (error) {
-      console.error(`[useFormPersist] Error restoring form state:`, error);
+      // Error restoring form state
       return null;
     }
   };
@@ -57,9 +53,8 @@ export function useFormPersist(storageKey: string, dependencies: any[] = []) {
   const clearFormState = () => {
     try {
       sessionStorage.removeItem(storageKey);
-      // console.log(`[useFormPersist] Cleared form state for key: ${storageKey}`);
     } catch (error) {
-      console.error(`[useFormPersist] Error clearing form state:`, error);
+      // Error clearing form state
     }
   };
 

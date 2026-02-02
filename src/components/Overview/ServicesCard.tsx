@@ -1,12 +1,47 @@
+import { useState } from 'react';
 import NotFound from '../commonComponents/NotFound';
+import Toast from '../GlobalComponents/Toast';
+import { serviceService } from '../../services';
+import { getErrorMessage } from '../../services';
 import type { OverviewService } from '../../services/overviewService';
 
 interface ServicesCardProps {
   services?: OverviewService[];
   isLoading?: boolean;
+  onServiceDeleted?: (serviceId: string) => void;
+  onServiceEdit?: (service: OverviewService) => void;
 }
 
-export default function ServicesCard({ services = [], isLoading = false }: ServicesCardProps) {
+export default function ServicesCard({ services = [], isLoading = false, onServiceDeleted, onServiceEdit }: ServicesCardProps) {
+  const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'loading'; message: string }>({
+    show: false,
+    type: 'success',
+    message: '',
+  });
+
+  const showToast = (message: string, type: 'success' | 'error' | 'loading') => {
+    setToast({ message, type, show: true });
+  };
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, show: false }));
+  };
+
+  const handleEdit = (service: OverviewService) => {
+    onServiceEdit?.(service);
+  };
+
+  const handleDelete = async (service: OverviewService) => {
+    try {
+      showToast('Deleting service...', 'loading');
+      await serviceService.deleteService(String(service.id));
+      showToast(`Service deleted successfully! ✅`, 'success');
+      onServiceDeleted?.(String(service.id));
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast(errorMessage, 'error');
+    }
+  };
   const displayServices = services.slice(0, 5); // Show top 5 services
 
   if (isLoading) {
@@ -38,15 +73,15 @@ export default function ServicesCard({ services = [], isLoading = false }: Servi
             <div key={s.id} className="flex items-center py-[12px] justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-md overflow-hidden bg-slate-100">
-                  {(s.snippet?.image || s.image) ? (
-                    <img src={s.snippet?.image || s.image} alt={s.snippet?.title || s.title} className="w-full h-full object-cover" />
+                  {(s.page?.banner_image_url || s.snippet?.cover_image_url || s.image) ? (
+                    <img src={s.page?.banner_image_url || s.snippet?.cover_image_url || s.image} alt={s.snippet?.service_name || s.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gray-300 flex items-center justify-center">
                       <span className="text-xs text-gray-500">No image</span>
                     </div>
                   )}
                 </div>
-                <div className="text-sm font-medium truncate">{s.snippet?.title || s.title || 'Untitled'}</div>
+                <div className="text-sm font-medium truncate">{s.snippet?.service_name || s.title || 'Untitled'}</div>
               </div>
 
               <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
@@ -54,11 +89,11 @@ export default function ServicesCard({ services = [], isLoading = false }: Servi
                   <img src="/icon/eye.svg" alt="View" />
                 </button>
 
-                <button className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition" title="Edit">
+                <button onClick={() => handleEdit(s)} className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition" title="Edit">
                   <img src="/icon/edit.svg" alt="Edit" />
                 </button>
 
-                <button className="px-[12px] py-[10px] text-[#EF4444] hover:bg-red-50 transition" title="Delete">
+                <button onClick={() => handleDelete(s)} className="px-[12px] py-[10px] text-[#EF4444] hover:bg-red-50 transition" title="Delete">
                   <img src="/icon/delete.svg" alt="Delete" />
                 </button>
               </div>
@@ -74,6 +109,14 @@ export default function ServicesCard({ services = [], isLoading = false }: Servi
           />
         )}
       </div>
+
+      {/* Toast notification */}
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        show={toast.show}
+        onHide={hideToast}
+      />
     </div>
   );
 }

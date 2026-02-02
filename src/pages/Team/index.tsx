@@ -39,7 +39,6 @@ const TeamPage = () => {
 
   const fetchTeamMembers = async () => {
     try {
-      console.log('[TeamPage] Fetching all team members');
       setIsLoading(true);
       setError(null);
 
@@ -47,7 +46,6 @@ const TeamPage = () => {
       
       // Handle the API response - extract team members from nested structure
       const teamData = (response.data as any)?.data?.team_members || [];
-      console.log('[TeamPage] Team members count:', teamData.length);
 
       if (!Array.isArray(teamData)) {
         throw new Error('Invalid response format: expected array of team members');
@@ -60,13 +58,11 @@ const TeamPage = () => {
         avatar: member.profile_picture_url,
         role: member.role,
         category: member.category,
-        createdAt: member.created_at,
+        createdAt: member.created_at || member.createdAt || new Date().toISOString(),
       }));
 
       setMembers(transformedMembers);
-      console.log('[TeamPage] Team members loaded successfully');
     } catch (err) {
-      console.error('[TeamPage] Error fetching team members:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch team members';
       setError(errorMessage);
       showToast('error', errorMessage);
@@ -77,13 +73,12 @@ const TeamPage = () => {
     }
   };
 
-  const handleView = (m: TeamMember) => {
-    console.log('[TeamPage] View member:', m);
+  const handleView = (_m: TeamMember) => {
+    // View team member details
   };
   
   const handleEdit = async (m: TeamMember) => {
     try {
-      console.log('[TeamPage] Initiating edit for team member:', m.id);
       showToast('loading', 'Loading team member details...');
       
       // Fetch full team member data by ID
@@ -93,7 +88,6 @@ const TeamPage = () => {
       const fullMember = (response.data?.data as any)?.team_member || response.data?.data;
       
       if (fullMember) {
-        console.log('[TeamPage] Full team member data loaded:', fullMember);
         
         // Transform API response to form format (similar to doctors)
         const transformedMember = {
@@ -104,10 +98,9 @@ const TeamPage = () => {
           role: fullMember.role || '',
           category: fullMember.category || '',
           bio: fullMember.bio || '',
-          createdAt: fullMember.created_at,
+          createdAt: fullMember.created_at || fullMember.createdAt || new Date().toISOString(),
         };
         
-        console.log('[TeamPage] Transformed member data:', transformedMember);
         setEditMember(transformedMember as any);
         setOpen(true);
         setToast({ show: false, type: 'success', message: '' });
@@ -115,7 +108,6 @@ const TeamPage = () => {
         throw new Error('Team member data not found');
       }
     } catch (err) {
-      console.error('[TeamPage] Error fetching team member for edit:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to load team member details';
       showToast('error', errorMessage);
     }
@@ -123,7 +115,6 @@ const TeamPage = () => {
 
   const handleDelete = async (m: TeamMember) => {
     try {
-      console.log('[TeamPage] Deleting member:', m.id);
       showToast('loading', 'Deleting team member...');
       
       await teamService.deleteTeamMember(String(m.id));
@@ -132,17 +123,13 @@ const TeamPage = () => {
       setMembers(updatedMembers);
       
       showToast('success', 'Team member deleted successfully');
-      console.log('[TeamPage] Member deleted');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete team member';
-      console.error('[TeamPage] Error deleting member:', err);
       showToast('error', errorMessage);
     }
   };
 
   const handleSave = (data: any) => {
-    console.log('[TeamPage] Saving member:', { editMember, data });
-    
     let updatedMembers: TeamMember[];
 
     if (editMember) {
@@ -156,11 +143,10 @@ const TeamPage = () => {
               role: data.role,
               category: data.category,
               // Keep original createdAt
-              createdAt: m.createdAt,
+              createdAt: data.createdAt || m.createdAt || new Date().toISOString(),
             }
           : m
       );
-      console.log('[TeamPage] Member updated:', updatedMembers.find(m => m.id === editMember.id));
       showToast('success', 'Team member updated successfully! ✅');
     } else {
       // Add new member from API response
@@ -170,10 +156,9 @@ const TeamPage = () => {
         avatar: data.avatar,
         role: data.role,
         category: data.category,
-        createdAt: data.createdAt || new Date().toISOString(),
+        createdAt: data.created_at || data.createdAt || new Date().toISOString(),
       };
       updatedMembers = [...members, newMember];
-      console.log('[TeamPage] New member added:', newMember);
       showToast('success', 'Team member created successfully! 🎉');
     }
     

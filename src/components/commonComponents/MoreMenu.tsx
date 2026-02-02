@@ -54,7 +54,10 @@ export default function MoreMenu({ onManageMembers, onManagePermission: _, onSus
 
         {onManageMembers && (
           <button
-            onClick={() => handleClick(onManageMembers)}
+            onClick={() => {
+              // console.log('[MoreMenu] Manage Members clicked');
+              handleClick(onManageMembers);
+            }}
             className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101]"
           >
             Manage Members

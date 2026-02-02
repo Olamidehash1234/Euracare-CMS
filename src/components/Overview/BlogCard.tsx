@@ -1,12 +1,47 @@
+import { useState } from 'react';
 import NotFound from '../commonComponents/NotFound';
+import Toast from '../GlobalComponents/Toast';
+import { blogService } from '../../services';
+import { getErrorMessage } from '../../services';
 import type { OverviewArticle } from '../../services/overviewService';
 
 interface BlogCardProps {
   articles?: OverviewArticle[];
   isLoading?: boolean;
+  onBlogDeleted?: (blogId: string) => void;
+  onBlogEdit?: (blog: OverviewArticle) => void;
 }
 
-export default function BlogCard({ articles = [], isLoading = false }: BlogCardProps) {
+export default function BlogCard({ articles = [], isLoading = false, onBlogDeleted, onBlogEdit }: BlogCardProps) {
+  const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'loading'; message: string }>({
+    show: false,
+    type: 'success',
+    message: '',
+  });
+
+  const showToast = (message: string, type: 'success' | 'error' | 'loading') => {
+    setToast({ message, type, show: true });
+  };
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, show: false }));
+  };
+
+  const handleEdit = (blog: OverviewArticle) => {
+    onBlogEdit?.(blog);
+  };
+
+  const handleDelete = async (blog: OverviewArticle) => {
+    try {
+      showToast('Deleting blog...', 'loading');
+      await blogService.deleteBlog(String(blog.id));
+      showToast(`Blog deleted successfully! ✅`, 'success');
+      onBlogDeleted?.(String(blog.id));
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast(errorMessage, 'error');
+    }
+  };
   const displayArticles = articles.slice(0, 5); // Show top 5 blogs
 
   if (isLoading) {
@@ -54,11 +89,11 @@ export default function BlogCard({ articles = [], isLoading = false }: BlogCardP
                   <img src="/icon/eye.svg" alt="View" />
                 </button>
 
-                <button className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition" title="Edit">
+                <button onClick={() => handleEdit(b)} className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition" title="Edit">
                   <img src="/icon/edit.svg" alt="Edit" />
                 </button>
 
-                <button className="px-[12px] py-[10px] text-[#EF4444] hover:bg-red-50 transition" title="Delete">
+                <button onClick={() => handleDelete(b)} className="px-[12px] py-[10px] text-[#EF4444] hover:bg-red-50 transition" title="Delete">
                   <img src="/icon/delete.svg" alt="Delete" />
                 </button>
               </div>
@@ -74,6 +109,14 @@ export default function BlogCard({ articles = [], isLoading = false }: BlogCardP
           />
         )}
       </div>
+
+      {/* Toast notification */}
+      <Toast
+        type={toast.type}
+        message={toast.message}
+        show={toast.show}
+        onHide={hideToast}
+      />
     </div>
   );
 }

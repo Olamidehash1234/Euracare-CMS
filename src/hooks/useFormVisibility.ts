@@ -26,7 +26,7 @@ export function useFormVisibility(storageKey: string) {
         sessionStorage.removeItem(storageKey);
       }
     } catch (error) {
-      console.error(`[useFormVisibility] Error saving visibility state:`, error);
+      // Error saving visibility state
     }
   };
 
@@ -38,10 +38,9 @@ export function useFormVisibility(storageKey: string) {
       const stored = sessionStorage.getItem(storageKey);
       if (stored === 'true') {
         setIsOpen(true);
-        // console.log(`[useFormVisibility] Restored visibility state for key: ${storageKey}`);
       }
     } catch (error) {
-      console.error(`[useFormVisibility] Error restoring visibility state:`, error);
+      // Error restoring visibility state
     }
   };
 
@@ -53,7 +52,7 @@ export function useFormVisibility(storageKey: string) {
       sessionStorage.removeItem(storageKey);
       setIsOpen(false);
     } catch (error) {
-      console.error(`[useFormVisibility] Error clearing visibility state:`, error);
+      // Error clearing visibility state
     }
   };
 
@@ -91,7 +90,7 @@ export function useFormModal<T>(storageKey: string, initialData?: T) {
         sessionStorage.removeItem(storageKey);
       }
     } catch (error) {
-      console.error(`[useFormModal] Error saving modal state:`, error);
+      // Error saving modal state
     }
   };
 
@@ -103,11 +102,10 @@ export function useFormModal<T>(storageKey: string, initialData?: T) {
         if (parsed.open && parsed.data) {
           setIsOpen(true);
           setEditData(parsed.data);
-          // console.log(`[useFormModal] Restored modal state for key: ${storageKey}`);
         }
       }
     } catch (error) {
-      console.error(`[useFormModal] Error restoring modal state:`, error);
+      // Error restoring modal state
     }
   };
 
@@ -117,7 +115,7 @@ export function useFormModal<T>(storageKey: string, initialData?: T) {
       setIsOpen(false);
       setEditData(null);
     } catch (error) {
-      console.error(`[useFormModal] Error clearing modal state:`, error);
+      // Error clearing modal state
     }
   };
 

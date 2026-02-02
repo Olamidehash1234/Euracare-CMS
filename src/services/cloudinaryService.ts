@@ -87,7 +87,6 @@ export const uploadToCloudinary = async (
       format: data.format,
     };
   } catch (error) {
-    // console.error('[CloudinaryService] Upload error:', error);
     throw error;
   }
 };
@@ -96,7 +95,6 @@ export const uploadToCloudinary = async (
  * Delete image from Cloudinary
  */
 // export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
-//   // console.log('[CloudinaryService] Deleting image:', publicId);
 //   // Note: This requires a signed request with API key and secret
 //   // For now, we'll just log it - implement server-side deletion if needed
 // };
@@ -130,7 +128,7 @@ export const getOptimizedUrl = (
       return urlObj.toString();
     }
   } catch (error) {
-    // console.error('[CloudinaryService] URL optimization error:', error);
+    // Error handling for URL optimization
   }
 
   return url;

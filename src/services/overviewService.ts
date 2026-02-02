@@ -31,9 +31,20 @@ export interface OverviewDoctor {
 export interface OverviewService {
   id: string;
   snippet?: {
-    title?: string;
-    image?: string;
+    service_name?: string;
+    cover_image_url?: string;
+    service_description?: string;
   };
+  page?: {
+    banner_image_url?: string;
+    service_overview?: string;
+    video_url?: string;
+    conditions_we_treat?: string[];
+    test_and_diagnostics?: string[];
+    treatments_and_procedures?: string[];
+  };
+  created_at?: string;
+  updated_at?: string;
   title?: string;
   image?: string;
   description?: string;
@@ -58,33 +69,15 @@ export interface OverviewResponse {
 const overviewService = {
   getOverviewData: async () => {
     try {
-      console.log('[OverviewService] Fetching overview data from /overview/...');
       const response = await apiClient.get<OverviewResponse>('/overview/');
-      
-      console.log('[OverviewService] Response received:', response.status);
-      console.log('[OverviewService] Response data:', response.data);
       
       // Validate response structure
       if (!response.data.success) {
-        console.warn('[OverviewService] API returned success: false');
-      }
-      
-      if (response.data.data?.overview) {
-        const { articles, doctors, services, activities } = response.data.data.overview;
-        console.log('[OverviewService] Data breakdown:');
-        console.log(`  - Articles: ${articles?.length || 0} items`);
-        console.log(`  - Doctors: ${doctors?.length || 0} items`);
-        console.log(`  - Services: ${services?.length || 0} items`);
-        console.log(`  - Activities: ${activities?.length || 0} items`);
+        throw new Error('Overview data fetch failed');
       }
       
       return response.data;
     } catch (error) {
-      console.error('[OverviewService] Error fetching overview data:', error);
-      if (error instanceof Error) {
-        console.error('[OverviewService] Error message:', error.message);
-        console.error('[OverviewService] Error stack:', error.stack);
-      }
       throw error;
     }
   },
