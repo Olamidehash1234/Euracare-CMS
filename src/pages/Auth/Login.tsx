@@ -153,7 +153,6 @@ export default function LoginPage(): JSX.Element {
             >
               {isLoading ? (
                 <>
-                  <span className="inline-block animate-spin mr-2">⏳</span>
                   Logging in...
                 </>
               ) : (

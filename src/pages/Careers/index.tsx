@@ -39,36 +39,36 @@ export default function CareersPage() {
   
   // Mock data - replace with API calls
   const [jobs, setJobs] = useState<Job[]>([
-    {
-      id: '1',
-      department: 'Clinical Services',
-      jobTitle: 'Medical Officer',
-      location: 'Lagos, Nigeria',
-      jobType: 'Full Time',
-      jobObjective: 'We are seeking a skilled Medical Officer to join our healthcare team.',
-      dutiesResponsibilities: '<ul><li>Conduct patient consultations and diagnoses</li><li>Manage patient medical records</li><li>Collaborate with other healthcare professionals</li></ul>',
-      qualificationsRequirements: '<ul><li>Medical degree (MBBS)</li><li>Valid medical license</li><li>3+ years of experience</li></ul>'
-    },
-    {
-      id: '2',
-      department: 'Clinical Services',
-      jobTitle: 'Nurse',
-      location: 'Lagos, Nigeria',
-      jobType: 'Full Time',
-      jobObjective: 'Join our nursing team to provide excellent patient care.',
-      dutiesResponsibilities: '<ul><li>Monitor patient vital signs</li><li>Administer medications</li><li>Assist in medical procedures</li></ul>',
-      qualificationsRequirements: '<ul><li>Nursing degree</li><li>Valid nursing license</li><li>2+ years of experience</li></ul>'
-    },
-    {
-      id: '3',
-      department: 'Diagnostics & Imaging',
-      jobTitle: 'Medical Laboratory Scientist',
-      location: 'Lagos, Nigeria',
-      jobType: 'Full Time',
-      jobObjective: 'We need a skilled laboratory scientist for our diagnostics department.',
-      dutiesResponsibilities: '<ul><li>Conduct laboratory tests and analysis</li><li>Prepare specimens</li><li>Maintain laboratory equipment</li></ul>',
-      qualificationsRequirements: '<ul><li>Laboratory Science degree</li><li>Valid certification</li><li>2+ years of experience</li></ul>'
-    },
+    // {
+    //   id: '1',
+    //   department: 'Clinical Services',
+    //   jobTitle: 'Medical Officer',
+    //   location: 'Lagos, Nigeria',
+    //   jobType: 'Full Time',
+    //   jobObjective: 'We are seeking a skilled Medical Officer to join our healthcare team.',
+    //   dutiesResponsibilities: '<ul><li>Conduct patient consultations and diagnoses</li><li>Manage patient medical records</li><li>Collaborate with other healthcare professionals</li></ul>',
+    //   qualificationsRequirements: '<ul><li>Medical degree (MBBS)</li><li>Valid medical license</li><li>3+ years of experience</li></ul>'
+    // },
+    // {
+    //   id: '2',
+    //   department: 'Clinical Services',
+    //   jobTitle: 'Nurse',
+    //   location: 'Lagos, Nigeria',
+    //   jobType: 'Full Time',
+    //   jobObjective: 'Join our nursing team to provide excellent patient care.',
+    //   dutiesResponsibilities: '<ul><li>Monitor patient vital signs</li><li>Administer medications</li><li>Assist in medical procedures</li></ul>',
+    //   qualificationsRequirements: '<ul><li>Nursing degree</li><li>Valid nursing license</li><li>2+ years of experience</li></ul>'
+    // },
+    // {
+    //   id: '3',
+    //   department: 'Diagnostics & Imaging',
+    //   jobTitle: 'Medical Laboratory Scientist',
+    //   location: 'Lagos, Nigeria',
+    //   jobType: 'Full Time',
+    //   jobObjective: 'We need a skilled laboratory scientist for our diagnostics department.',
+    //   dutiesResponsibilities: '<ul><li>Conduct laboratory tests and analysis</li><li>Prepare specimens</li><li>Maintain laboratory equipment</li></ul>',
+    //   qualificationsRequirements: '<ul><li>Laboratory Science degree</li><li>Valid certification</li><li>2+ years of experience</li></ul>'
+    // },
   ]);
   
   const [applicants] = useState<Applicant[]>([
