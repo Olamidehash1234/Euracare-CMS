@@ -50,7 +50,7 @@ const TiptapEditor = ({ content, onChange }: TiptapEditorProps) => {
   };
 
   return (
-    <div className="border rounded-md border-[#01010133]">
+    <div className="border-[0.5px] rounded-md border-[#01010133]">
       <div className="flex flex-wrap gap-2 p-2 border-b border-[#01010133] bg-gray-50">
 
         <CustomDropdown

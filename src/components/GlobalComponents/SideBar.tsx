@@ -8,7 +8,7 @@ import doctorsIcon from "/icon/doctor.svg"
 import ourTeamIcon from "/icon/team.svg"
 import servicesIcon from "/icon/services.svg"
 import blogIcon from "/icon/news.svg"
-// import careerIcon from "/icon/careers.svg"
+import careerIcon from "/icon/careers.svg"
 import adminIcon from "/icon/admin.svg"
 import departmentIcon from "/icon/department.svg"
 import activityIcon from "/icon/activity.svg"
@@ -41,7 +41,7 @@ const items: NavSection = {
     { id: "blogs", label: "Blogs & Articles", icon: blogIcon },
     { id: "testimonials", label: "Testimonials", icon: departmentIcon },
     // { id: "accreditations", label: "Accreditations", icon: accreditationsIcon },
-    // { id: "careers", label: "Careers", icon: careerIcon },
+    { id: "careers", label: "Careers", icon: careerIcon },
   ],
 
   system: [
@@ -70,7 +70,7 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
     if (path.startsWith('/services')) return 'services';
     if (path.startsWith('/blogs')) return 'blogs';
     if (path.startsWith('/testimonials')) return 'testimonials';
-    // if (path.startsWith('/careers')) return 'careers';
+    if (path.startsWith('/careers')) return 'careers';
     if (path.startsWith('/admin')) return 'admin';
     // FIX: match sidebar id for roles&permission
     if (path.startsWith('/roles&permission')) return 'roles&permission';
