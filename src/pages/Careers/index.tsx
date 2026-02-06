@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Toast from '@/components/GlobalComponents/Toast';
 import Header from '../../components/commonComponents/Header';
 import SearchBar from '@/components/commonComponents/SearchBar';
@@ -10,6 +10,7 @@ import type { JobFormData } from '@/components/Careers/AddJobModal';
 import JobGrid from '@/components/Careers/JobGrid';
 import ApplicantsTable from '@/components/Careers/ApplicantsTable';
 import type { Applicant } from '@/components/Careers/ApplicantsTable';
+import jobService from '@/services/jobService';
 
 interface Job {
   id: string;
@@ -28,175 +29,362 @@ export default function CareersPage() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('success');
-  const [isLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isJobsLoading, setIsJobsLoading] = useState(false);
+  const [jobsError, setJobsError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
+  const [editingInitialData, setEditingInitialData] = useState<Partial<Job> | undefined>(undefined);
 
   // Filter states for applicants
   const [selectedRole, setSelectedRole] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   
-  // Mock data - replace with API calls
-  const [jobs, setJobs] = useState<Job[]>([
-    // {
-    //   id: '1',
-    //   department: 'Clinical Services',
-    //   jobTitle: 'Medical Officer',
-    //   location: 'Lagos, Nigeria',
-    //   jobType: 'Full Time',
-    //   jobObjective: 'We are seeking a skilled Medical Officer to join our healthcare team.',
-    //   dutiesResponsibilities: '<ul><li>Conduct patient consultations and diagnoses</li><li>Manage patient medical records</li><li>Collaborate with other healthcare professionals</li></ul>',
-    //   qualificationsRequirements: '<ul><li>Medical degree (MBBS)</li><li>Valid medical license</li><li>3+ years of experience</li></ul>'
-    // },
-    // {
-    //   id: '2',
-    //   department: 'Clinical Services',
-    //   jobTitle: 'Nurse',
-    //   location: 'Lagos, Nigeria',
-    //   jobType: 'Full Time',
-    //   jobObjective: 'Join our nursing team to provide excellent patient care.',
-    //   dutiesResponsibilities: '<ul><li>Monitor patient vital signs</li><li>Administer medications</li><li>Assist in medical procedures</li></ul>',
-    //   qualificationsRequirements: '<ul><li>Nursing degree</li><li>Valid nursing license</li><li>2+ years of experience</li></ul>'
-    // },
-    // {
-    //   id: '3',
-    //   department: 'Diagnostics & Imaging',
-    //   jobTitle: 'Medical Laboratory Scientist',
-    //   location: 'Lagos, Nigeria',
-    //   jobType: 'Full Time',
-    //   jobObjective: 'We need a skilled laboratory scientist for our diagnostics department.',
-    //   dutiesResponsibilities: '<ul><li>Conduct laboratory tests and analysis</li><li>Prepare specimens</li><li>Maintain laboratory equipment</li></ul>',
-    //   qualificationsRequirements: '<ul><li>Laboratory Science degree</li><li>Valid certification</li><li>2+ years of experience</li></ul>'
-    // },
-  ]);
-  
-  const [applicants] = useState<Applicant[]>([
-    {
-      id: '1',
-      name: 'Dr. Team Hagidokami',
-      email: 'drhagidokami@email.com',
-      phone: 'DOC 2025/0910',
-      degree: 'MBBS',
-      role: 'Medical Officer',
-      appliedDate: '03 Nov 2025 - 12:30',
-      experience: '5 years Experience',
-      employer: 'General Hospital',
-      currentSalary: 'Current ₦200,000',
-      expectedSalary: 'Expected ₦600,000',
-      cvUrl: '#'
-    },
-    {
-      id: '2',
-      name: 'Dr. Team Hagidokami',
-      email: 'drhagidokami@email.com',
-      phone: 'DOC 2025/0910',
-      degree: 'MBBS',
-      role: 'Nurses',
-      appliedDate: '03 Nov 2025 - 12:30',
-      experience: '5 years Experience',
-      employer: 'General Hospital',
-      currentSalary: 'Current ₦200,000',
-      expectedSalary: 'Expected ₦600,000',
-      cvUrl: '#'
-    },
-    {
-      id: '3',
-      name: 'Dr. Olamide Hagidokami',
-      email: 'drhagidokami@email.com',
-      phone: 'DOC 2025/0910',
-      role: 'Radiographer',
-      degree: 'MBBS',
-      appliedDate: '03 Nov 2025 - 12:30',
-      experience: '5 years Experience',
-      employer: 'General Hospital',
-      currentSalary: 'Current ₦200,000',
-      expectedSalary: 'Expected ₦600,000',
-      cvUrl: '#'
-    },
-    {
-      id: '4',
-      name: 'Dr. Team Hagidokami',
-      email: 'drhagidokami@email.com',
-      phone: 'DOC 2025/0910',
-      degree: 'MBBS',
-      role: 'Quality Improvement Officer',
-      appliedDate: '03 Nov 2025 - 12:30',
-      experience: '5 years Experience',
-      employer: 'General Hospital',
-      currentSalary: 'Current ₦200,000',
-      expectedSalary: 'Expected ₦600,000',
-      cvUrl: '#'
-    },
-    {
-      id: '5',
-      name: 'Dr. Team Hagidokami',
-      email: 'drhagidokami@email.com',
-      phone: 'DOC 2025/0910',
-      degree: 'MBBS',
-      role: 'Nurse Anaesthetist',
-      appliedDate: '03 Nov 2025 - 12:30',
-      experience: '5 years Experience',
-      employer: 'General Hospital',
-      currentSalary: 'Current ₦200,000',
-      expectedSalary: 'Expected ₦600,000',
-      cvUrl: '#'
-    },
-    {
-      id: '6',
-      name: 'Dr. Team Hagidokami',
-      email: 'drhagidokami@email.com',
-      phone: 'DOC 2025/0910',
-      degree: 'MBBS',
-      role: 'Pharmacist',
-      appliedDate: '03 Nov 2025 - 12:30',
-      experience: '5 years Experience',
-      employer: 'General Hospital',
-      currentSalary: 'Current ₦200,000',
-      expectedSalary: 'Expected ₦600,000',
-      cvUrl: '#'
-    },
-    {
-      id: '7',
-      name: 'Dr. Team Hagidokami',
-      email: 'drhagidokami@email.com',
-      phone: 'DOC 2025/0910',
-      degree: 'MBBS',
-      role: 'Medical Laboratory Scientist',
-      appliedDate: '03 Nov 2025 - 12:30',
-      experience: '5 years Experience',
-      employer: 'General Hospital',
-      currentSalary: 'Current ₦200,000',
-      expectedSalary: 'Expected ₦600,000',
-      cvUrl: '#'
-    },
-  ]);
+  // Jobs and applicants
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [isApplicantsLoading, setIsApplicantsLoading] = useState(false);
+  const [applicantsError, setApplicantsError] = useState('');
+
+  // Helper to extract backend message from Axios errors
+  // const extractErrorMessage = (err: any) => {
+  //   try {
+  //     const data = err?.response?.data;
+  //     if (data) {
+  //       if (typeof data === 'string') return data;
+  //       if (data.message) return data.message;
+  //       if (data.error) return data.error;
+  //       if (data.errors) return JSON.stringify(data.errors);
+  //       // Sometimes the backend returns Pydantic detail array
+  //       if (Array.isArray(data.detail)) return JSON.stringify(data.detail);
+  //       return JSON.stringify(data);
+  //     }
+  //   } catch (e) {
+  //     // fallback
+  //   }
+  //   return err?.message || 'Unknown error';
+  // };
+
+  // Convert HTML (editor output) to an object the backend accepts (dict)
+  const htmlToDict = (html: string) => {
+    try {
+      if (!html) return {};
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // If there are list items, return as { list: [...] }
+      const items: string[] = [];
+      doc.querySelectorAll('li').forEach(li => {
+        items.push(li.textContent?.trim() || '');
+      });
+
+      if (items.length) return { list: items };
+
+      // If paragraph(s), return as { text: [ ... ] }
+      const paras: string[] = [];
+      doc.querySelectorAll('p').forEach(p => {
+        const t = p.textContent?.trim();
+        if (t) paras.push(t);
+      });
+      if (paras.length) return { text: paras };
+
+      // Fallback - send raw HTML string inside an object so it's a dict, not a pure string
+      return { html };
+    } catch (e) {
+      return { html };
+    }
+  };
+
+  // Convert backend dict into HTML string for the editor
+  const dictToHtml = (value: any) => {
+    try {
+      if (!value) return '';
+      if (typeof value === 'string') return value;
+      if (Array.isArray(value)) {
+        // assume array of strings -> create list
+        const items = value.map((v: any) => `<li>${String(v)}</li>`).join('');
+        return `<ul>${items}</ul>`;
+      }
+      // check common keys
+      if (value.list && Array.isArray(value.list)) {
+        const items = value.list.map((v: any) => `<li>${String(v)}</li>`).join('');
+        return `<ul>${items}</ul>`;
+      }
+      if (value.text && Array.isArray(value.text)) {
+        return value.text.map((t: string) => `<p>${t}</p>`).join('');
+      }
+
+      // If object with any array value, use first array
+      for (const k of Object.keys(value)) {
+        if (Array.isArray(value[k])) {
+          return value[k].map((t: any) => `<li>${String(t)}</li>`).join('');
+        }
+      }
+
+      // Fallback: stringify into a paragraph
+      return `<p>${JSON.stringify(value)}</p>`;
+    } catch (e) {
+      return '';
+    }
+  };
 
   const handleAdd = () => {
+    setIsEditMode(false);
+    setEditingJobId(null);
+    setEditingInitialData(undefined);
     setIsModalOpen(true);
   };
 
-  const handleModalSubmit = (jobData: JobFormData) => {
-    const newJob: Job = {
-      id: Date.now().toString(),
-      ...jobData,
+  const fetchJobs = async () => {
+    try {
+      setIsJobsLoading(true);
+
+      const res = await jobService.listJobs();
+      // console.log('List Jobs response:', res);
+
+      // Response shape: { success: true, data: { jobs: [...] } }
+      const jobsArray = res?.data?.jobs || [];
+
+      const mapped: Job[] = jobsArray.map((j: any) => ({
+        id: j.id || j._id || j.job_id || j.jobId || String(j.id),
+        department: j.department || j?.department,
+        jobTitle: j.title || j.jobTitle || j.position || '',
+        location: j.location || j?.location || '',
+        jobType: j.type || j.jobType || j?.type || '',
+        jobObjective: j.objective || j.jobObjective || j?.objective || '',
+        // convert backend dict into HTML for editor display
+        dutiesResponsibilities: dictToHtml(j.duties_and_responsibilities || j.dutiesResponsibilities || j?.duties_and_responsibilities || j?.dutiesResponsibilities || ''),
+        qualificationsRequirements: dictToHtml(j.qualifications_and_requirements || j.qualificationsRequirements || j?.qualifications_and_requirements || j?.qualificationsRequirements || ''),
+      }));
+
+      setJobs(mapped);
+    } catch (err: any) {
+      // console.error('Error fetching jobs:', err, err?.response?.data);
+      // set a generic error flag (don't display backend message in UI)
+      setJobsError('error');
+      // show user-friendly toast
+      setToastType('error');
+      setToastMessage('Unable to load job roles. Please try again.');
+      setShowToast(true);
+    } finally {
+      setIsJobsLoading(false);
+    }
+  };
+
+  // Fetch jobs on mount
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const handleModalSubmit = async (jobData: JobFormData) => {
+    // map form to API payload
+    const payload = {
+      title: jobData.jobTitle,
+      department: jobData.department,
+      location: jobData.location,
+      type: jobData.jobType,
+      objective: jobData.jobObjective,
+      // convert HTML to dict so backend accepts a JSON object
+      duties_and_responsibilities: htmlToDict(jobData.dutiesResponsibilities),
+      qualifications_and_requirements: htmlToDict(jobData.qualificationsRequirements),
     };
-    setJobs([...jobs, newJob]);
-    setToastMessage('Job opening published successfully!');
-    setToastType('success');
-    setShowToast(true);
+
+    try {
+      setToastType('loading');
+      setToastMessage(isEditMode ? 'Updating job...' : 'Creating job...');
+      setShowToast(true);
+
+      if (isEditMode && editingJobId) {
+        await jobService.updateJob(editingJobId, payload);
+        // console.log('Update job response:', res);
+
+        // Update job in state
+        setJobs(prev => prev.map(j => (j.id === editingJobId ? {
+          ...j,
+          department: payload.department,
+          jobTitle: payload.title,
+          location: payload.location,
+          jobType: payload.type,
+          jobObjective: payload.objective,
+          dutiesResponsibilities: dictToHtml(payload.duties_and_responsibilities),
+          qualificationsRequirements: dictToHtml(payload.qualifications_and_requirements),
+        } : j)));
+
+        setToastType('success');
+        setToastMessage('Job updated successfully');
+        setShowToast(true);
+      } else {
+        const res = await jobService.createJob(payload as any);
+        // console.log('Create job response:', res);
+
+        // Extract created job from response
+        const created = res?.data?.job || res?.data || res;
+        const newJob: Job = {
+          id: created?.id || created?._id || Date.now().toString(),
+          department: created?.department || payload.department,
+          jobTitle: created?.title || payload.title,
+          location: created?.location || payload.location,
+          jobType: created?.type || payload.type,
+          jobObjective: created?.objective || payload.objective,
+          dutiesResponsibilities: dictToHtml(created?.duties_and_responsibilities || payload.duties_and_responsibilities),
+          qualificationsRequirements: dictToHtml(created?.qualifications_and_requirements || payload.qualifications_and_requirements),
+        };
+        setJobs(prev => [...prev, newJob]);
+
+        setToastType('success');
+        setToastMessage('Job created successfully');
+        setShowToast(true);
+      }
+    } catch (err: any) {
+      // console.error('Error creating/updating job:', err, err?.response?.data);
+      // const serverMsg = extractErrorMessage(err);
+      // console.log('Backend error detail:', serverMsg);
+      setToastType('error');
+      setToastMessage(isEditMode ? 'Failed to update job. Please try again.' : 'Failed to create job. Please try again.');
+      setShowToast(true);
+    }
   };
 
-  const handleEditJob = (job: { id: string; department: string; jobTitle: string; location: string; jobType: string }) => {
-    console.log('Edit job:', job);
-    // Implement edit functionality
+  const handleEditJob = async (job: { id: string }) => {
+    try {
+      setToastType('loading');
+      setToastMessage('Fetching job details...');
+      setShowToast(true);
+      setIsEditMode(true);
+      setEditingJobId(job.id);
+
+      const res = await jobService.getJobById(job.id);
+      // console.log('Get job response:', res);
+      const data = res?.data?.job || res?.data || res;
+
+      const mapped: Partial<Job> = {
+        id: data?.id || data?._id || job.id,
+        department: data?.department || data?.department,
+        jobTitle: data?.title || data?.jobTitle || '',
+        location: data?.location || '',
+        jobType: data?.type || data?.jobType || '',
+        jobObjective: data?.objective || data?.jobObjective || '',
+        dutiesResponsibilities: dictToHtml(data?.duties_and_responsibilities || data?.dutiesResponsibilities || ''),
+        qualificationsRequirements: dictToHtml(data?.qualifications_and_requirements || data?.qualificationsRequirements || ''),
+      };
+
+      setEditingInitialData(mapped);
+      setIsModalOpen(true);
+
+      // setToastType('success');
+      // setToastMessage('Job details loaded');
+      setShowToast(true);
+    } catch (err: any) {
+      // console.error('Error fetching job by id:', err, err?.response?.data);
+      // const serverMsg = extractErrorMessage(err);
+      // console.log('Backend error detail:', serverMsg);
+      setToastType('error');
+      setToastMessage('Failed to load job details. Please try again.');
+      setShowToast(true);
+    }
   };
 
-  const handleDeleteJob = (jobId: string) => {
-    setJobs(jobs.filter(j => j.id !== jobId));
-    setToastMessage('Job deleted successfully!');
-    setToastType('success');
-    setShowToast(true);
+  const handleDeleteJob = async (jobId: string) => {
+    try {
+      setToastType('loading');
+      setToastMessage('Deleting job...');
+      setShowToast(true);
+
+      await jobService.deleteJob(jobId);
+      // console.log('Delete job response:', res);
+
+      setJobs(prev => prev.filter(j => j.id !== jobId));
+
+      setToastType('success');
+      setToastMessage('Job deleted successfully');
+      setShowToast(true);
+    } catch (err: any) {
+      // console.error('Error deleting job:', err, err?.response?.data);
+      // const serverMsg = extractErrorMessage(err);
+      // console.log('Backend error detail:', serverMsg);
+      setToastType('error');
+      setToastMessage('Failed to delete job. Please try again.');
+      setShowToast(true);
+    }
+  };
+
+  // Fetch applicants when applicants tab is active
+  const fetchApplicants = async () => {
+    try {
+      setIsApplicantsLoading(true);
+
+      const res = await jobService.listJobApplications();
+      // console.log('List job applications response:', res);
+      // Response shape: { success: true, data: { job_applications: [...], meta: {...} } }
+      const appsArray = res?.data?.job_applications || [];
+
+      const mapped = appsArray.map((a: any) => ({
+        id: a.id || a._id || a.application_id || String(a.id),
+        name: `${a.first_name || ''} ${a.last_name || ''}`.trim() || a.name || a.applicant_name || '',
+        email: a.email || a.applicant_email || '',
+        phone: a.phone || a.phone_number || a.dob || '',
+        degree: a.degree || a.applicant_degree || '',
+        role: a.role || a.job_title || '',
+        appliedDate: a.created_at || a.applied_at || '',
+        experience: a.yoe || a.experience || a.years_of_experience || '',
+        employer: a.current_employer || a.employer || '',
+        currentSalary: a.current_salary || '',
+        expectedSalary: a.expected_salary || '',
+        cvUrl: a.cv_url || a.cv || undefined,
+      }));
+
+      setApplicants(mapped);
+    } catch (err: any) {
+      console.error('Error fetching applicants:', err, err?.response?.data);
+      setApplicantsError('error');
+      // show user-friendly toast
+      setToastType('error');
+      setToastMessage('Unable to load applicants. Please try again.');
+      setShowToast(true);
+    } finally {
+      setIsApplicantsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'applicants') {
+      fetchApplicants();
+    }
+  }, [activeTab]);
+
+  const handleDownloadCv = async (applicantId: string) => {
+    try {
+      setToastType('loading');
+      setToastMessage('Downloading CV...');
+      setShowToast(true);
+
+      const res = await jobService.downloadCv(applicantId);
+      // console.log('Download CV response:', res);
+      const blob = new Blob([res.data], { type: res.headers['content-type'] || 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const disposition = res.headers['content-disposition'] || '';
+      const fileNameMatch = disposition.match(/filename="?([^;"]+)"?/);
+      const fileName = fileNameMatch ? fileNameMatch[1] : `cv-${applicantId}.pdf`;
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      setToastType('success');
+      setToastMessage('CV downloaded');
+      setShowToast(true);
+    } catch (err: any) {
+      // console.error('Error downloading CV:', err, err?.response?.data);
+      // const serverMsg = extractErrorMessage(err);
+      // console.log('Backend error detail:', serverMsg);
+      setToastType('error');
+      setToastMessage('Failed to download CV. Please try again.');
+      setShowToast(true);
+    }
   };
 
   return (
@@ -212,6 +400,8 @@ export default function CareersPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleModalSubmit}
+        isEdit={isEditMode}
+        initialData={editingInitialData}
       />
 
       <Header title="Careers" />
@@ -264,15 +454,15 @@ export default function CareersPage() {
             </div>
 
             {/* Content based on loading/error/data state */}
-            {isLoading ? (
+            {isJobsLoading ? (
               <LoadingSpinner heightClass="py-[200px]" />
-            ) : error ? (
+            ) : jobsError ? (
               <NotFound
                 title="Error Loading Jobs"
-                description={error}
+                description={'Unable to load job roles. Please try again.'}
                 imageSrc="/not-found.png"
                 ctaText="Try Again"
-                onCta={() => setError('')}
+                onCta={() => { setJobsError(''); fetchJobs(); }}
               />
             ) : jobs.length > 0 ? (
               <JobGrid
@@ -310,15 +500,8 @@ export default function CareersPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">Role:</span>
                   <CustomDropdown
-                    options={[
-                      { label: 'Medical Officer', value: 'Medical Officer' },
-                      { label: 'Nurses', value: 'Nurses' },
-                      { label: 'Radiographer', value: 'Radiographer' },
-                      { label: 'Quality Improvement Officer', value: 'Quality Improvement Officer' },
-                      { label: 'Nurse Anaesthetist', value: 'Nurse Anaesthetist' },
-                      { label: 'Pharmacist', value: 'Pharmacist' },
-                      { label: 'Medical Laboratory Scientist', value: 'Medical Laboratory Scientist' },
-                    ]}
+                    options={Array.from(new Set(applicants.map(app => app.role)))
+                      .map(role => ({ label: role, value: role }))}
                     value={selectedRole}
                     onChange={setSelectedRole}
                     placeholder="Select Role"
@@ -356,28 +539,34 @@ export default function CareersPage() {
                     setToDate('');
                     setSearchTerm('');
                   }}
-                  className="text-red-600 font-medium text-sm hover:text-red-700 whitespace-nowrap"
+                  className="text-[#FF453A] flex items-center gap-[4px] font-medium text-sm hover:text-red-700 whitespace-nowrap"
                 >
+                  <img src="/icon/retry.svg" alt="" />
                   Reset Filter
                 </button>
               </div>
             </div>
 
             {/* Content based on loading/error/data state */}
-            {isLoading ? (
+            {isApplicantsLoading ? (
               <LoadingSpinner heightClass="py-[200px]" />
-            ) : error ? (
+            ) : applicantsError ? (
               <NotFound
                 title="Error Loading Applicants"
-                description={error}
+                description={'Unable to load applicants. Please try again.'}
                 imageSrc="/not-found.png"
                 ctaText="Try Again"
-                onCta={() => setError('')}
+                onCta={() => { setApplicantsError(''); fetchApplicants(); }}
               />
             ) : applicants.length > 0 ? (
               <ApplicantsTable
                 applicants={applicants}
                 searchTerm={searchTerm}
+                isLoading={isApplicantsLoading}
+                onDownload={handleDownloadCv}
+                selectedRole={selectedRole}
+                fromDate={fromDate}
+                toDate={toDate}
               />
             ) : (
               <NotFound

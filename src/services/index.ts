@@ -8,6 +8,7 @@ export { default as adminService } from './adminService';
 export { default as teamService } from './teamService';
 export { default as roleService } from './roleService';
 export { default as activityLogService } from './activityLogService';
+export { default as jobService } from './jobService';
 export { default as notificationService } from './notificationService';
 export { default as overviewService } from './overviewService';
 export { default as testimonialService } from './testimonialService';

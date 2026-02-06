@@ -6,6 +6,8 @@ interface AddJobModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (jobData: JobFormData) => void;
+    isEdit?: boolean;
+    initialData?: Partial<JobFormData>;
 }
 
 export interface JobFormData {
@@ -18,7 +20,7 @@ export interface JobFormData {
     qualificationsRequirements: string;
 }
 
-export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalProps) {
+export default function AddJobModal({ isOpen, onClose, onSubmit, isEdit = false, initialData }: AddJobModalProps) {
     const modalRef = useRef<HTMLDivElement>(null);
     const [formData, setFormData] = useState<JobFormData>({
         jobTitle: '',
@@ -29,6 +31,21 @@ export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalPr
         dutiesResponsibilities: '',
         qualificationsRequirements: '',
     });
+
+    useEffect(() => {
+        if (initialData) {
+            setFormData(prev => ({
+                ...prev,
+                jobTitle: initialData.jobTitle ?? prev.jobTitle,
+                department: initialData.department ?? prev.department,
+                location: initialData.location ?? prev.location,
+                jobType: initialData.jobType ?? prev.jobType,
+                jobObjective: initialData.jobObjective ?? prev.jobObjective,
+                dutiesResponsibilities: initialData.dutiesResponsibilities ?? prev.dutiesResponsibilities,
+                qualificationsRequirements: initialData.qualificationsRequirements ?? prev.qualificationsRequirements,
+            }));
+        }
+    }, [initialData]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -60,15 +77,18 @@ export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalPr
 
     const handleSubmit = () => {
         onSubmit(formData);
-        setFormData({
-            jobTitle: '',
-            department: '',
-            location: '',
-            jobType: 'Full Time',
-            jobObjective: '',
-            dutiesResponsibilities: '',
-            qualificationsRequirements: '',
-        });
+        // Reset only when adding a new job
+        if (!isEdit) {
+            setFormData({
+                jobTitle: '',
+                department: '',
+                location: '',
+                jobType: 'Full Time',
+                jobObjective: '',
+                dutiesResponsibilities: '',
+                qualificationsRequirements: '',
+            });
+        }
         onClose();
     };
 
@@ -79,7 +99,7 @@ export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalPr
             <div ref={modalRef} className="bg-white rounded-[20px] scrollbar-hide w-full max-w-[862px] max-h-[90vh] overflow-y-auto">
 
                 <div className='border-b mb-6 sticky top-0 bg-white z-[100] flex items-center justify-between px-[40px] py-[20px]'>
-                    <h2 className="text-2xl lg:text-[20px] font-medium text-[#010101] leading-[20px]">Add New Job</h2>
+                    <h2 className="text-2xl lg:text-[20px] font-medium text-[#010101] leading-[20px]">{isEdit ? 'Edit Job' : 'Add New Job'}</h2>
                     <button
                         type="button"
                         onClick={onClose}
@@ -103,7 +123,7 @@ export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalPr
                                 value={formData.jobTitle}
                                 onChange={handleInputChange}
                                 placeholder="e.g Medical Officer"
-                                className="w-full px-4 text-[15px] py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-[1px] focus:ring-[#0C2141CC] focus:border-transparent placeholder-gray-400"
+                                className="w-full px-4 text-[15px] py-[9px] border border-gray-300 rounded-lg focus:outline-none focus:ring-[1px] focus:ring-[#0C2141CC] focus:border-transparent placeholder-gray-400"
                             />
                         </div>
                         <div>
@@ -132,7 +152,7 @@ export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalPr
                                 value={formData.location}
                                 onChange={handleInputChange}
                                 placeholder="e.g Lagos, Nigeria"
-                                className="w-full px-4 text-[15px] py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-[1px] focus:ring-[#0C2141CC] focus:border-transparent placeholder-gray-400"
+                                className="w-full px-4 text-[15px] py-[9px] border border-gray-300 rounded-lg focus:outline-none focus:ring-[1px] focus:ring-[#0C2141CC] focus:border-transparent placeholder-gray-400"
                             />
                         </div>
                         <div>
@@ -175,6 +195,7 @@ export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalPr
                                     content={formData.dutiesResponsibilities}
                                     onChange={(content) => handleEditorChange('dutiesResponsibilities', content)}
                                     placeholder="Wellness about the Doctor"
+                                    mode="bulletOnly"
                                 />
                             </div>
                         </div>
@@ -187,6 +208,7 @@ export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalPr
                                     content={formData.qualificationsRequirements}
                                     onChange={(content) => handleEditorChange('qualificationsRequirements', content)}
                                     placeholder="Wellness about the Doctor"
+                                    mode="bulletOnly"
                                 />
                             </div>
                         </div>
@@ -198,7 +220,7 @@ export default function AddJobModal({ isOpen, onClose, onSubmit }: AddJobModalPr
                             type="submit"
                             className="w-full px-8 py-3 bg-[#0C2141] text-white rounded-full font-semibold hover:bg-[#0a1a2f] transition text-center"
                         >
-                            Publish Job Opening
+                            {isEdit ? 'Update Job' : 'Publish Job Opening'}
                         </button>
                     </div>
                 </form>
