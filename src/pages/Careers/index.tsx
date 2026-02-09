@@ -230,7 +230,7 @@ export default function CareersPage() {
           dutiesResponsibilities: dictToHtml(created?.duties_and_responsibilities || payload.duties_and_responsibilities),
           qualificationsRequirements: dictToHtml(created?.qualifications_and_requirements || payload.qualifications_and_requirements),
         };
-        setJobs(prev => [...prev, newJob]);
+        setJobs(prev => [newJob, ...prev]);
 
         setToastType('success');
         setToastMessage('Job created successfully');

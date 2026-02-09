@@ -39,6 +39,7 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
     title: initialData?.snippet?.title || '',
     content: initialData?.page?.content?.additionalProp1 || '',
     videoLink: initialData?.page?.video_link_url || initialData?.video_link_url || '',
+    category: (initialData?.page as any)?.category || '',
   });
 
   // Form persistence hook
@@ -100,6 +101,11 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
       return;
     }
 
+    if (!form.category.trim()) {
+      setUploadError('Please select a blog category');
+      return;
+    }
+
     const payload: BlogPayload = {
       snippet: {
         title: form.title.trim(),
@@ -110,6 +116,7 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
           additionalProp1: form.content.trim(),
         },
         video_link_url: form.videoLink.trim() || undefined,
+        category: form.category.trim(),
       },
       video_link_url: form.videoLink.trim() || undefined,
     };
@@ -208,6 +215,16 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
                   value={form.videoLink}
                   onChange={(e) => setForm(prev => ({ ...prev, videoLink: e.target.value }))}
                   placeholder="Type here"
+                  className="w-full rounded-md border border-[#01010133] px-3 py-[8px] text-sm focus:outline-none"
+                />
+              </div>
+
+              <div className="mb-[14px] lg:mb-[20px]">
+                <label className="block text-sm text-[#010101] mb-2">Category</label>
+                <input
+                  value={form.category}
+                  onChange={(e) => setForm(prev => ({ ...prev, category: e.target.value }))}
+                  placeholder="Enter blog category"
                   className="w-full rounded-md border border-[#01010133] px-3 py-[8px] text-sm focus:outline-none"
                 />
               </div>

@@ -1,58 +1,136 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../../components/commonComponents/Header';
 import SearchBar from '../../components/commonComponents/SearchBar';
 import ActivityTable from '../../components/ActivityLogs/ActivityTable';
 import InlineRoleDropdown from '../../components/commonComponents/InlineRoleDropdown';
+import Toast from '../../components/GlobalComponents/Toast';
+import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
+import NotFound from '../../components/commonComponents/NotFound';
+import { auditService } from '../../services';
 import type { ActivityRow } from '../../components/ActivityLogs/ActivityTable';
+import type { AuditResponse } from '../../services/auditService';
 
 const roleOptions = ['Super Admin', 'Admin', 'System', 'marketing'];
 
-const sampleActivities: ActivityRow[] = [
-  {
-    id: 1,
-    timestamp: '2025-11-10 9:15:22',
-    actor: 'Dr. A.Bello (Admin)',
-    role: 'Admin',
-    action: 'Content Updated',
-    details: "Updated 'Waiting Times' section with Q4 2025 data.",
-    ip: '192.168.1.45',
-  },
-  {
-    id: 2,
-    timestamp: '2025-11-10 9:10:55',
-    actor: 'E-R. Manager (Web Team)',
-    role: 'Web Team',
-    action: 'System Login',
-    details: 'Successful login from IP: 192.168.1.55',
-    ip: '192.168.1.45',
-  },
-  {
-    id: 3,
-    timestamp: '2025-11-10 8:45:10',
-    actor: 'Dr. O. Lade (Physician)',
-    role: 'Physician',
-    action: 'Profile Edited',
-    details: 'Updated phone number and added a new certification image.',
-    ip: '192.168.1.45',
-  },
-];
-
 const LogsPage = () => {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [activities, setActivities] = useState<ActivityRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('success');
+
+  // Fetch audit logs from backend
+  useEffect(() => {
+    const fetchAudits = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('📋 Starting to fetch audit logs...');
+        
+        const response = await auditService.getAudits({ page: 1, limit: 50 });
+        
+        console.log('📨 Raw audit response:', response);
+        
+        // Transform audit data to ActivityRow format
+        const audits = response.data.data?.audits || [];
+        console.log('📊 Audit logs count:', audits.length);
+        
+        const transformedActivities: ActivityRow[] = audits.map((audit: AuditResponse) => {
+          const transformed = {
+            id: audit.id,
+            timestamp: new Date(audit.created_at).toLocaleString(),
+            actor: audit.user || 'Unknown User',
+            role: 'System', // Map from audit data if available
+            action: audit.action_type || 'Unknown Action',
+            details: audit.details || audit.item_affected || 'N/A',
+            ip: audit.ip_address || 'N/A',
+          };
+          console.log('🔄 Transformed audit:', { from: audit, to: transformed });
+          return transformed;
+        });
+        
+        setActivities(transformedActivities);
+        console.log('✅ Successfully loaded', transformedActivities.length, 'audit logs');
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load audit logs';
+        console.error('❌ Error loading audit logs:', errorMessage);
+        setError(errorMessage);
+        setToastType('error');
+        setToastMessage('Unable to load audit logs. Please try again.');
+        setShowToast(true);
+        setActivities([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAudits();
+  }, []);
 
   // resetFilters clears parent's selection (dropdown reads value prop)
   const resetFilters = () => {
     setSelectedRoles([]);
   };
 
+  // Retry fetching audits
+  const handleRetry = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('🔄 Retrying to fetch audit logs...');
+      
+      const response = await auditService.getAudits({ page: 1, limit: 50 });
+      
+      console.log('📨 Raw audit response:', response);
+      
+      const audits = response.data.data?.audits || [];
+      console.log('📊 Audit logs count:', audits.length);
+      
+      const transformedActivities: ActivityRow[] = audits.map((audit: AuditResponse) => {
+        const transformed = {
+          id: audit.id,
+          timestamp: new Date(audit.created_at).toLocaleString(),
+          actor: audit.user || 'Unknown User',
+          role: 'System',
+          action: audit.action_type || 'Unknown Action',
+          details: audit.details || audit.item_affected || 'N/A',
+          ip: audit.ip_address || 'N/A',
+        };
+        console.log('🔄 Transformed audit:', { from: audit, to: transformed });
+        return transformed;
+      });
+      
+      setActivities(transformedActivities);
+      setToastType('success');
+      setToastMessage('Audit logs loaded successfully');
+      setShowToast(true);
+      console.log('✅ Successfully loaded', transformedActivities.length, 'audit logs');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load audit logs';
+      console.error('❌ Error loading audit logs:', errorMessage);
+      setError(errorMessage);
+      setToastType('error');
+      setToastMessage('Failed to load audit logs. Please try again.');
+      setShowToast(true);
+      setActivities([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Footer action handlers (local no-op / logging for now)
   const handleSelectAll = () => {
+    console.log('📌 Select all clicked');
   };
 
   const handleMarkAllRead = () => {
+    console.log('📖 Mark all read clicked');
   };
 
   const handleDeleteSelected = () => {
+    console.log('🗑️ Delete selected clicked');
   };
 
   return (
@@ -92,36 +170,59 @@ const LogsPage = () => {
           </div>
         </div>
 
-        {/* Activity table component */}
-        <ActivityTable activities={sampleActivities} />
-
-        <div className="mt-[30px] flex items-center justify-between text-sm text-[#202224]">
-          <div>Showing 1-12 of 1,253</div>
-
-          <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
-            <button onClick={handleSelectAll} className="px-[14px] py-[12px] text-[#0C2141]" title="Select All">
-                <img src="/icon/download.svg" alt="" />
-            </button>
-
-            <button onClick={handleMarkAllRead} className="px-[14px] py-[12px] text-[#0C2141]" title="Mark All Read">
-                <img src="/icon/info.svg" alt="" />
-            </button>
-
-            <button onClick={handleDeleteSelected} className="px-[14px] py-[12px] text-[#EF4444]" title="Delete">
-                <img src="/icon/delete-black.svg" alt="" />
-            </button>
-         </div>
-
-          <div className="flex items-center border border-[#E6E8EE] divide-x divide-[#E6E8EE] rounded-[8px]">
-            <button className="px-[20px] py-[13px]">
-              <img src="/icon/arrow-left.svg" alt="" />
-            </button>
-            <button className="px-[20px] py-[13px]">
-              <img src="/icon/arrow-right.svg" alt="" />
-            </button>
+        {/* Loading state */}
+        {loading && (
+          <div className="flex items-center justify-center py-[60px]">
+            <LoadingSpinner heightClass="py-[200px]" />
           </div>
-        </div>
+        )}
+
+        {/* Error state with NotFound component */}
+        {!loading && error && (
+          <NotFound
+            title="Failed to Load Audit Logs"
+            description="We encountered an error while loading the audit logs. Please try again."
+            imageSrc="/not-found.png"
+            ctaText="Try Again"
+            onCta={handleRetry}
+          />
+        )}
+
+        {/* Activity table component - show only when not loading and no error */}
+        {!loading && !error && <ActivityTable activities={activities} />}
+
+        {!loading && !error && (
+          <div className="mt-[30px] flex items-center justify-between text-sm text-[#202224]">
+            <div>Showing 1-{activities.length} of {activities.length}</div>
+
+            <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
+              <button onClick={handleSelectAll} className="px-[14px] py-[12px] text-[#0C2141]" title="Select All">
+                  <img src="/icon/download.svg" alt="" />
+              </button>
+
+              <button onClick={handleMarkAllRead} className="px-[14px] py-[12px] text-[#0C2141]" title="Mark All Read">
+                  <img src="/icon/info.svg" alt="" />
+              </button>
+
+              <button onClick={handleDeleteSelected} className="px-[14px] py-[12px] text-[#EF4444]" title="Delete">
+                  <img src="/icon/delete-black.svg" alt="" />
+              </button>
+            </div>
+
+            <div className="flex items-center border border-[#E6E8EE] divide-x divide-[#E6E8EE] rounded-[8px]">
+              <button className="px-[20px] py-[13px]">
+                <img src="/icon/arrow-left.svg" alt="" />
+              </button>
+              <button className="px-[20px] py-[13px]">
+                <img src="/icon/arrow-right.svg" alt="" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Toast notification */}
+      {showToast && <Toast message={toastMessage} show={showToast} type={toastType} onHide={() => setShowToast(false)} />}
     </section>
   );
 };

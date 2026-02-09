@@ -1,6 +1,7 @@
 import React, { useState, type JSX, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useNotifications } from '@/context/NotificationContext';
 import Toast from '@/components/GlobalComponents/Toast';
 
 export default function LoginPage(): JSX.Element {
@@ -13,6 +14,7 @@ export default function LoginPage(): JSX.Element {
   const loginAttemptedRef = useRef(false);
   
   const { login, error, isAuthenticated, user, isLoading } = useAuth();
+  const { connect: connectWebSocket } = useNotifications();
   const navigate = useNavigate();
 
   // Debug logs
@@ -42,6 +44,21 @@ export default function LoginPage(): JSX.Element {
       return () => clearTimeout(timer);
     }
   }, [isAuthenticated, user, isLoading, navigate]);
+
+  // Connect WebSocket after successful login
+  useEffect(() => {
+    if (isAuthenticated && user && !isLoading) {
+      console.log('🔌 [Login] User authenticated, connecting to WebSocket...');
+      connectWebSocket()
+        .then(() => {
+          console.log('✅ [Login] WebSocket connected successfully');
+        })
+        .catch((err) => {
+          console.error('❌ [Login] Failed to connect WebSocket:', err);
+          // Don't fail the entire login, just log the error
+        });
+    }
+  }, [isAuthenticated, user, isLoading, connectWebSocket]);
 
   // Show error toast when error occurs
   useEffect(() => {

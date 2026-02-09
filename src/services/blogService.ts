@@ -11,6 +11,7 @@ export interface BlogPayload {
       [key: string]: any;
     };
     video_link_url?: string;
+    category?: string;
   };
   [key: string]: any;
 }

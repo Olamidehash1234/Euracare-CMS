@@ -3,6 +3,7 @@ import { Suspense, lazy } from 'react';
 import Layout from './components/GlobalComponents/Layout';
 import LoadingSpinner from './components/commonComponents/LoadingSpinner';
 import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 // Lazy load all pages
@@ -25,9 +26,10 @@ const UpdatePassword = lazy(() => import('./pages/Auth/UpdatePassword'));
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Suspense fallback={<LoadingSpinner />}>
+    <NotificationProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             {/* Public / auth routes (no Layout/sidebar) */}
             <Route path="/auth/login" element={<Login />} />
@@ -71,6 +73,7 @@ function App() {
         </Suspense>
       </BrowserRouter>
     </AuthProvider>
+    </NotificationProvider>
   );
 }
 

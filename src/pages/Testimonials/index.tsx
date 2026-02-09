@@ -158,7 +158,7 @@ const TestimonialsPage = () => {
           patientName: data.patientName,
           videoLink: data.videoLink,
         };
-        setTestimonials([...testimonials, newTestimonial]);
+        setTestimonials([newTestimonial, ...testimonials]);
       }
 
       setShowCreate(false);

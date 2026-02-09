@@ -158,7 +158,7 @@ const TeamPage = () => {
         category: data.category,
         createdAt: data.created_at || data.createdAt || new Date().toISOString(),
       };
-      updatedMembers = [...members, newMember];
+      updatedMembers = [newMember, ...members];
       showToast('success', 'Team member created successfully! 🎉');
     }
     

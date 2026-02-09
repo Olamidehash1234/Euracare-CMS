@@ -26,20 +26,20 @@ export default function ActivityTable({ activities = [] }: Props) {
               <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[140px]">Role</th>
               <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[170px]">Action</th>
               <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 min-w-[300px]">Details</th>
-              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">IP Address</th>
+              {/* <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">IP Address</th> */}
             </tr>
           </thead>
 
           {activities.length > 0 ? (
             <tbody>
               {activities.map((a) => (
-                <tr key={a.id ?? `${a.timestamp}-${a.actor}`} className="border-t border-[#01010133]">
+                <tr key={a.id ?? `${a.timestamp}-${a.actor}`} className="table-auto border-t border-[#01010133]">
                   <td className="py-[19px] px-4 text-[14px] align-middle">{a.timestamp ?? '-'}</td>
                   <td className="py-[19px] px-4 text-[14px] align-middle">{a.actor ?? '-'}</td>
                   <td className="py-[19px] px-4 text-[14px] align-middle">{a.role ?? '-'}</td>
                   <td className="py-[19px] px-4 text-[14px] align-middle">{a.action ?? '-'}</td>
                   <td className="py-[19px] px-4 text-[14px] align-middle min-w-[300px]">{a.details ?? '-'}</td>
-                  <td className="py-[19px] px-4 text-[14px] align-middle">{a.ip ?? '-'}</td>
+                  {/* <td className="py-[19px] px-4 text-[14px] align-middle">{a.ip ?? '-'}</td> */}
                 </tr>
               ))}
             </tbody>

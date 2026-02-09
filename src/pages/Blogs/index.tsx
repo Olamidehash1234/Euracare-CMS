@@ -122,6 +122,7 @@ const BlogsPage = () => {
               additionalProp1: (fullBlog as any).page?.content?.additionalProp1 || '',
             },
             video_link_url: (fullBlog as any).page?.video_link_url || '',
+            category: (fullBlog as any).page?.category || (fullBlog as any).category || '',
           },
           video_link_url: (fullBlog as any).page?.video_link_url || '',
         };
@@ -194,14 +195,14 @@ const BlogsPage = () => {
 
         // Update local state
         setBlogs(prev => [
-          ...prev,
           {
             id: response?.data?.data?.id || Date.now(),
             title: payload.snippet?.title || 'New Blog',
             image: payload.snippet?.cover_image_url || '/image/services/doctor.jpg',
             publishedAt: new Date().toISOString(),
-            category: 'General',
+            category: payload.page?.category || 'General',
           },
+          ...prev,
         ]);
       }
 

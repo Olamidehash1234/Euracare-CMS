@@ -230,7 +230,6 @@ const AdminPage = () => {
       setToastMessage('Admin updated successfully! ✅');
     } else {
       setAdmins(prev => [
-        ...prev,
         {
           id: Date.now(),
           name: payload.fullName,
@@ -239,6 +238,7 @@ const AdminPage = () => {
           avatar: payload.avatar,
           dateCreated: new Date().toISOString()
         },
+        ...prev,
       ]);
       setToastMessage('Admin created successfully! ✅');
     }

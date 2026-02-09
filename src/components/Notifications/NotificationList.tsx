@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import NotificationItem from './NotificationItem';
+import { useNotifications } from '@/context/NotificationContext';
 
 export type NotificationRow = {
-  id: number;
+  id: string;
   title: string;
   role?: string;
   message?: string;
@@ -10,38 +11,49 @@ export type NotificationRow = {
   read?: boolean;
 };
 
-const sampleData: NotificationRow[] = [];
-
 interface Props {
   search?: string;
   selectAll?: boolean;
+  onSelectionChange?: (selectedIds: string[]) => void;
 }
 
-export default function NotificationList({ search = '', selectAll = false }: Props) {
-  const [selected, setSelected] = useState<Record<number, boolean>>({});
+export default function NotificationList({ search = '', selectAll = false, onSelectionChange }: Props) {
+  const { notifications } = useNotifications();
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
 
   const filtered = useMemo(
-    () => sampleData.filter(s => {
+    () => notifications.filter(s => {
       if (!search) return true;
       const q = search.toLowerCase();
       return s.title.toLowerCase().includes(q) || s.message?.toLowerCase().includes(q) || (s.role || '').toLowerCase().includes(q);
     }),
-    [search]
+    [search, notifications]
   );
 
   // when selectAll toggles, update selected map
   React.useEffect(() => {
     if (selectAll) {
-      const all: Record<number, boolean> = {};
+      const all: Record<string, boolean> = {};
       filtered.forEach(f => all[f.id] = true);
       setSelected(all);
+      onSelectionChange?.(filtered.map(f => f.id));
     } else {
       setSelected({});
+      onSelectionChange?.([]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectAll, filtered]);
 
-  const toggle = (id: number) => setSelected(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggle = (id: string) => {
+    setSelected(prev => {
+      const updated = { ...prev, [id]: !prev[id] };
+      const selectedIds = Object.entries(updated)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([id, _]) => id);
+      onSelectionChange?.(selectedIds);
+      return updated;
+    });
+  };
 
   return (
     <div className="max-h-[560px] overflow-auto">

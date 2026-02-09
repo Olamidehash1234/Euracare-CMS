@@ -34,6 +34,14 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('🔐 [apiClient] Auth header added to request:', {
+        url: config.url,
+        method: config.method,
+        hasToken: !!token,
+        tokenStart: token.substring(0, 20) + '...',
+      });
+    } else {
+      console.warn('⚠️ [apiClient] No auth token found for request:', config.url);
     }
     return config;
   },
@@ -122,16 +130,34 @@ apiClient.interceptors.response.use(
     //   }
     // }
     
+    // Log error details for debugging
+    console.error('❌ [apiClient] API Error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: (error.config as any)?.url,
+      method: (error.config as any)?.method,
+      message: error.message,
+      responseData: error.response?.data,
+    });
+
+    if (error.response?.status === 401) {
+      // Unauthorized
+      console.warn('⚠️ [apiClient] 401 Unauthorized - Backend message:', error.response.data?.message || error.response.data);
+    }
+
     if (error.response?.status === 403) {
       // Forbidden - user doesn't have permission
+      console.warn('⚠️ [apiClient] 403 Forbidden:', error.response.data?.message);
     }
 
     if (error.response?.status === 404) {
       // Resource not found
+      console.warn('⚠️ [apiClient] 404 Not Found:', error.response.data?.message);
     }
 
     if (error.response?.status === 500) {
       // Server error
+      console.error('❌ [apiClient] 500 Server Error:', error.response.data?.message);
     }
 
     return Promise.reject(error);

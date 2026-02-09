@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useNotifications } from "../../context/NotificationContext";
 import OverviewIcon from "/icon/overview.svg"
 import notificationIcon from "/icon/notification.svg"
 import doctorsIcon from "/icon/doctor.svg"
@@ -61,6 +62,7 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { unreadCount } = useNotifications();
 
   const pathToId = (path: string) => {
     if (!path || path === '/' || path === '/overview') return 'overview';
@@ -144,6 +146,10 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
                   setActive(it.id);
                   navigate(`/${it.id === "overview" ? "" : it.id}`, { replace: true });
                 };
+                
+                // Use real unread count for notifications
+                const badgeCount = it.id === 'notifications' ? unreadCount : it.badge;
+                
                 return (
                   <button
                     key={it.id}
@@ -159,9 +165,9 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
                     {!collapsed && (
                       <div className="flex-1 flex items-center">
                         <span className="flex-1 text-[#010101] text-left">{it.label}</span>
-                        {it.badge ? (
+                        {badgeCount ? (
                           <span className="inline-flex items-center justify-center min-w-[28px] h-6 rounded-[50px] bg-[#0C2141] text-white text-xs px-2">
-                            {it.badge}
+                            {badgeCount}
                           </span>
                         ) : null}
                       </div>
@@ -271,7 +277,11 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
                         <img src={it.icon as string} className="" alt={it.label} />
                       </span>
                       <span className="flex-1 text[#010101] text-left">{it.label}</span>
-                      {it.badge ? <span className="inline-flex items-center justify-center min-w-[28px] h-6 rounded-full bg-sky-600 text-white text-xs px-2">{it.badge}</span> : null}
+                      {it.id === 'notifications' && unreadCount ? (
+                        <span className="inline-flex items-center justify-center min-w-[28px] h-6 rounded-full bg-sky-600 text-white text-xs px-2">{unreadCount}</span>
+                      ) : it.badge ? (
+                        <span className="inline-flex items-center justify-center min-w-[28px] h-6 rounded-full bg-sky-600 text-white text-xs px-2">{it.badge}</span>
+                      ) : null}
                     </button>
                   ))}
                 </nav>
