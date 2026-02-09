@@ -232,7 +232,7 @@ const TeamPage = () => {
 
           {isLoading ? (
             <div className="flex items-center justify-center min-h-[400px]">
-              <LoadingSpinner />
+              <LoadingSpinner heightClass='250px'/>
             </div>
           ) : hasMembers ? (
             <>

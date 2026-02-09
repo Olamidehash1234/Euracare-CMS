@@ -15,9 +15,11 @@ interface Props {
   search?: string;
   selectAll?: boolean;
   onSelectionChange?: (selectedIds: string[]) => void;
+  onMarkAsRead?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-export default function NotificationList({ search = '', selectAll = false, onSelectionChange }: Props) {
+export default function NotificationList({ search = '', selectAll = false, onSelectionChange, onMarkAsRead, onDelete }: Props) {
   const { notifications } = useNotifications();
   const [selected, setSelected] = useState<Record<string, boolean>>({});
 
@@ -56,7 +58,7 @@ export default function NotificationList({ search = '', selectAll = false, onSel
   };
 
   return (
-    <div className="max-h-[560px] overflow-auto">
+    <div className="max-h-[570px] overflow-y-auto w-full">
       <table className="w-full table-auto">
         <tbody>
           {filtered.map(n => (
@@ -65,6 +67,8 @@ export default function NotificationList({ search = '', selectAll = false, onSel
               data={n}
               checked={!!selected[n.id]}
               onToggle={() => toggle(n.id)}
+              onMarkAsRead={onMarkAsRead}
+              onDelete={onDelete}
             />
           ))}
 

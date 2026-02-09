@@ -5,7 +5,6 @@ import NotFound from '../../components/commonComponents/NotFound';
 import ServicesTable from '../../components/Services/ServicesTable';
 import type { ServiceType } from '../../components/Services/ServicesTable';
 import CreateServiceForm from './CreateServiceForm';
-import type { ServicePayload } from './CreateServiceForm';
 import { serviceService } from '@/services';
 import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
 import Toast from '@/components/GlobalComponents/Toast';
@@ -105,31 +104,12 @@ const ServicesPage = () => {
     }
   };
 
-  const handleSave = async (payload: ServicePayload) => {
-    try {
-      showToast(editService ? 'Updating service...' : 'Creating service...', 'loading');
-
-      if (editService) {
-        // Update existing service (the API call is already made in the form)
-        setServices(prev => prev.map(s => s.id === editService.id ? { ...s, title: payload.title, image: payload.image } : s));
-        showToast('Service updated successfully! ✅', 'success');
-      } else {
-        // Create new service (the API call is already made in the form)
-        // Fetch the updated list to get the new service with proper ID
-        await fetchServices();
-        showToast('Service created successfully! ✅', 'success');
-      }
-
-      // Close form after delay
-      setTimeout(() => {
-        setShowCreate(false);
-        setEditService(null);
-        // Refetch services after save
-        fetchServices();
-      }, 1500);
-    } catch (err) {
-      showToast('Failed to save service', 'error');
-    }
+  const handleSave = () => {
+    // Close form and refetch services
+    setShowCreate(false);
+    setEditService(null);
+    // Refetch services after save
+    fetchServices();
   };
 
   const hasServices = services.length > 0;

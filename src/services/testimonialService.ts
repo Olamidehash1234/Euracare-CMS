@@ -24,7 +24,7 @@ const testimonialService = {
 
   // Get single testimonial by ID
   getTestimonialById: (id: string) =>
-    apiClient.get<{ data: { testimonial: TestimonialResponse } }>(`/testimonials/${id}`),
+    apiClient.get<{ data: { testimonial: TestimonialResponse } }>(`/testimonials/${id}/`),
 
   // Create testimonial
   createTestimonial: (payload: TestimonialPayload) =>

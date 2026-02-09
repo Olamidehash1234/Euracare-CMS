@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import websocketService from '../services/websocketService';
 import notificationService from '../services/notificationService';
 import type { WebSocketMessage } from '../services/websocketService';
+import { formatNotificationTime } from '../utils/dateFormatter';
 
 // Match the NotificationRow type from NotificationList
 export interface NotificationRow {
@@ -24,8 +25,9 @@ interface NotificationContextType {
   addNotification: (notification: NotificationRow) => void;
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  bulkDeleteNotifications: (ids: string[]) => Promise<void>;
   connect: (token?: string) => Promise<void>;
   disconnect: () => void;
   loadNotifications: () => Promise<void>;
@@ -35,13 +37,27 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 // Helper function to convert backend REST API notification to NotificationRow
 const mapBackendRestNotification = (notif: any): NotificationRow => {
+  // Extract title from module (e.g., "Job-module" → "Career")
+  const extractModuleTitle = (module: string): string => {
+    if (!module) return 'Notification';
+    
+    // Special mapping for Job-module
+    if (module.toLowerCase() === 'job-module') {
+      return 'Careers';
+    }
+    
+    // Remove "-module" suffix if present and capitalize
+    const title = module.replace(/-module$/i, '').replace(/-/g, ' ');
+    return title.charAt(0).toUpperCase() + title.slice(1);
+  };
+
   return {
     id: notif.id,
-    title: notif.event || 'Notification',
-    role: notif.module || 'System',
+    title: extractModuleTitle(notif.module),
+    role: notif.module ? notif.module.replace(/-/g, ' ').toLowerCase() : 'System',
     message: notif.action || 'No details',
-    time: new Date(notif.created_at).toLocaleTimeString(),
-    read: false,
+    time: formatNotificationTime(notif.created_at),
+    read: notif.read || false,
   };
 };
 
@@ -49,17 +65,32 @@ const mapBackendRestNotification = (notif: any): NotificationRow => {
 const mapBackendMessageToNotification = (message: WebSocketMessage): NotificationRow => {
   console.log('🔄 [mapBackendMessageToNotification] Converting message:', message);
   
-  // Create a stable ID based on the message content (event + action) to prevent duplicates
-  let uniqueId = '';
-  if (message.event && message.payload) {
-    uniqueId = `${message.event}-${message.payload.action || ''}-${Math.floor(Date.now() / 1000)}`;
-  } else if (message.type && message.data) {
-    uniqueId = `${message.type}-${JSON.stringify(message.data).substring(0, 50)}-${Math.floor(Date.now() / 1000)}`;
+  // First, try to use the real ID from the backend if available
+  let id = '';
+  
+  // Check if payload has an id (MongoDB ObjectId from backend)
+  if (message.payload?.id) {
+    id = message.payload.id;
+    console.log('🔄 [mapBackendMessageToNotification] Using real ID from payload:', id);
+  } 
+  // Check if data has an id (MongoDB ObjectId from backend)
+  else if (message.data?.id) {
+    id = message.data.id;
+    console.log('🔄 [mapBackendMessageToNotification] Using real ID from data:', id);
+  }
+  // Otherwise create a synthetic ID (fallback for older messages without ID)
+  else {
+    if (message.event && message.payload) {
+      id = `${message.event}-${message.payload.action || ''}-${Math.floor(Date.now() / 1000)}`;
+    } else if (message.type && message.data) {
+      id = `${message.type}-${JSON.stringify(message.data).substring(0, 50)}-${Math.floor(Date.now() / 1000)}`;
+    } else {
+      id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+    console.log('🔄 [mapBackendMessageToNotification] Using synthetic ID:', id);
   }
   
-  const id = uniqueId || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
-  // Handle the backend's event/payload format
+  // Handle the backend's event/payload format with module/action
   if (message.event && message.payload) {
     const { event, payload } = message as any;
     return {
@@ -67,18 +98,20 @@ const mapBackendMessageToNotification = (message: WebSocketMessage): Notificatio
       title: event || 'Notification',
       role: payload.module || 'System',
       message: payload.action || 'No details',
-      time: new Date().toLocaleTimeString(),
+      time: formatNotificationTime(payload.created_at || new Date().toISOString()),
       read: false,
     };
   }
   
-  // Fallback for type/data format
+  // Fallback for type/data format with module/action
   if (message.type && message.data) {
+    const data = message.data as any;
     return {
       id,
       title: message.type,
-      message: typeof message.data === 'string' ? message.data : JSON.stringify(message.data),
-      time: new Date().toLocaleTimeString(),
+      role: data.module || 'System',
+      message: data.action || (typeof message.data === 'string' ? message.data : JSON.stringify(message.data)),
+      time: formatNotificationTime(data.created_at || new Date().toISOString()),
       read: false,
     };
   }
@@ -88,7 +121,7 @@ const mapBackendMessageToNotification = (message: WebSocketMessage): Notificatio
     id,
     title: 'New Notification',
     message: JSON.stringify(message),
-    time: new Date().toLocaleTimeString(),
+    time: formatNotificationTime(new Date().toISOString()),
     read: false,
   };
 };
@@ -260,17 +293,67 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     setNotifications([]);
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(n => (n.id === id ? { ...n, read: true } : n))
-    );
+  const markAsRead = async (id: string) => {
+    try {
+      console.log('📖 [NotificationContext] Marking notification as read:', id);
+      // Find the notification to log details
+      const notif = notifications.find(n => n.id === id);
+      if (notif) {
+        console.log('📖 [NotificationContext] Found notification:', notif.title, notif.message);
+      } else {
+        console.warn('⚠️ [NotificationContext] Notification not found in state:', id);
+      }
+      
+      // Call backend API to mark as read
+      await notificationService.markAsRead(id);
+      
+      // Update local state
+      setNotifications(prev =>
+        prev.map(n => (n.id === id ? { ...n, read: true } : n))
+      );
+      console.log('✅ [NotificationContext] Notification marked as read');
+    } catch (err) {
+      console.error('❌ [NotificationContext] Error marking notification as read:', err);
+      throw err;
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  const markAllAsRead = async () => {
+    try {
+      console.log('📖 [NotificationContext] Marking all notifications as read...');
+      // Call backend API to mark all as read
+      await notificationService.markAllAsRead();
+      
+      // Update local state
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      console.log('✅ [NotificationContext] All notifications marked as read');
+    } catch (err) {
+      console.error('❌ [NotificationContext] Error marking all notifications as read:', err);
+      throw err;
+    }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const bulkDeleteNotifications = async (ids: string[]) => {
+    try {
+      console.log('🗑️ [NotificationContext] Bulk deleting notifications:', ids);
+      // Call backend API to bulk delete
+      await notificationService.bulkDeleteNotifications(ids);
+      
+      // Update local state - remove deleted notifications
+      setNotifications(prev => prev.filter(n => !ids.includes(n.id)));
+      console.log('✅ [NotificationContext] Notifications deleted');
+    } catch (err) {
+      console.error('❌ [NotificationContext] Error bulk deleting notifications:', err);
+      throw err;
+    }
+  };
+
+  // Calculate unread count efficiently using useMemo - best practice for expensive calculations
+  const unreadCount = useMemo(() => {
+    const count = notifications.filter(n => !n.read).length;
+    console.log('📊 [NotificationContext] Unread count recalculated:', count);
+    return count;
+  }, [notifications]);
 
   const value: NotificationContextType = {
     notifications,
@@ -284,6 +367,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     clearNotifications,
     markAsRead,
     markAllAsRead,
+    bulkDeleteNotifications,
     connect,
     disconnect,
     loadNotifications: loadInitialNotifications,

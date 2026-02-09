@@ -42,21 +42,45 @@ const OverviewPage = () => {
         setIsLoading(true);
         setError(null);
 
+        console.log('👁️ [OverviewPage] Starting to fetch overview data...');
         const response = await overviewService.getOverviewData();
+        console.log('👁️ [OverviewPage] Received response:', response);
+        console.log('👁️ [OverviewPage] Response.success:', response.success);
+        console.log('👁️ [OverviewPage] Response.data:', response.data);
+        console.log('👁️ [OverviewPage] Response.data.overview:', response.data?.overview);
 
         if (response.success && response.data.overview) {
-          const { articles: fetchedArticles, doctors: fetchedDoctors, services: fetchedServices, activities: fetchedActivities } = response.data.overview;
+          const overview = response.data.overview;
+          console.log('👁️ [OverviewPage] Overview object destructured:', overview);
+          
+          const { articles: fetchedArticles, doctors: fetchedDoctors, services: fetchedServices, activities: fetchedActivities } = overview;
+          
+          console.log('👁️ [OverviewPage] Fetched articles:', fetchedArticles);
+          console.log('👁️ [OverviewPage] Fetched doctors:', fetchedDoctors);
+          console.log('👁️ [OverviewPage] Fetched services:', fetchedServices);
+          console.log('👁️ [OverviewPage] Fetched activities:', fetchedActivities);
+          console.log('👁️ [OverviewPage] Activities count:', fetchedActivities?.length);
+          
+          if (fetchedActivities && fetchedActivities.length > 0) {
+            console.log('👁️ [OverviewPage] Activity 1:', fetchedActivities[0]);
+            console.log('👁️ [OverviewPage] Activity 1 structure:', Object.keys(fetchedActivities[0]));
+          }
 
           setArticles(fetchedArticles || []);
           setDoctors(fetchedDoctors || []);
           setServices(fetchedServices || []);
           setActivities(fetchedActivities || []);
+          
+          console.log('👁️ [OverviewPage] States set successfully');
         } else {
           const errorMsg = 'Failed to fetch overview data - Invalid response structure';
+          console.error('👁️ [OverviewPage] Invalid response structure:', { success: response.success, hasOverview: !!response.data?.overview });
           throw new Error(errorMsg);
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching data';
+        console.error('👁️ [OverviewPage] Error caught:', err);
+        console.error('👁️ [OverviewPage] Error message:', errorMessage);
         
         setError(errorMessage);
         setToast({
@@ -66,6 +90,7 @@ const OverviewPage = () => {
         });
       } finally {
         setIsLoading(false);
+        console.log('👁️ [OverviewPage] Loading complete');
       }
     };
 

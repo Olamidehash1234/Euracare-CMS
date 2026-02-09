@@ -475,7 +475,7 @@ export default function CareersPage() {
                 title="No Job Roles Yet"
                 description={`It looks like you haven't added any job roles yet. Once Added, they'll appear here for you to manage.`}
                 imageSrc="/not-found.png"
-                ctaText="Add New Job"
+                ctaText="Add New Job Role"
                 onCta={handleAdd}
               />
             )}

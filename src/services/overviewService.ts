@@ -69,7 +69,24 @@ export interface OverviewResponse {
 const overviewService = {
   getOverviewData: async () => {
     try {
+      console.log('📊 [overviewService] Fetching overview data from /overview/');
       const response = await apiClient.get<OverviewResponse>('/overview/');
+      
+      console.log('📊 [overviewService] Full response:', response);
+      console.log('📊 [overviewService] Response data:', response.data);
+      console.log('📊 [overviewService] Overview object:', response.data?.data?.overview);
+      
+      if (response.data?.data?.overview) {
+        const overview = response.data.data.overview;
+        console.log('📊 [overviewService] Articles:', overview.articles);
+        console.log('📊 [overviewService] Doctors:', overview.doctors);
+        console.log('📊 [overviewService] Services:', overview.services);
+        console.log('📊 [overviewService] Activities:', overview.activities);
+        console.log('📊 [overviewService] Activities count:', overview.activities?.length);
+        if (overview.activities && overview.activities.length > 0) {
+          console.log('📊 [overviewService] First activity:', overview.activities[0]);
+        }
+      }
       
       // Validate response structure
       if (!response.data.success) {
@@ -78,6 +95,7 @@ const overviewService = {
       
       return response.data;
     } catch (error) {
+      console.error('❌ [overviewService] Error fetching overview:', error);
       throw error;
     }
   },

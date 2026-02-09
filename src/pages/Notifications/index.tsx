@@ -3,6 +3,7 @@ import SearchBar from '../../components/commonComponents/SearchBar';
 import NotificationToolbar from '../../components/Notifications/NotificationToolbar';
 import NotificationList from '../../components/Notifications/NotificationList';
 import NotificationSkeleton from '../../components/commonComponents/NotificationSkeleton';
+import Toast from '../../components/GlobalComponents/Toast';
 import { useState, useEffect, useRef } from 'react';
 import { useNotifications } from '@/context/NotificationContext';
 
@@ -10,8 +11,22 @@ export default function NotificationsPage() {
   const [query, setQuery] = useState('');
   const [selectedAll, setSelectedAll] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const { notifications, unreadCount, isLoading, error, markAllAsRead, removeNotification, loadNotifications } = useNotifications();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'loading'; show: boolean }>({
+    message: '',
+    type: 'success',
+    show: false,
+  });
+  const { notifications, unreadCount, isLoading, error, markAsRead, markAllAsRead, bulkDeleteNotifications, loadNotifications } = useNotifications();
   const loadAttemptedRef = useRef(false);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'loading') => {
+    setToast({ message, type, show: true });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, show: false }));
+  };
 
   // Load notifications on component mount (only once due to ref)
   useEffect(() => {
@@ -23,6 +38,71 @@ export default function NotificationsPage() {
       });
     }
   }, [loadNotifications]);
+
+  const handleMarkAllRead = async () => {
+    try {
+      setIsProcessing(true);
+      showToast('Marking all as read...', 'loading');
+      await markAllAsRead();
+      showToast('All notifications marked as read ✅', 'success');
+      console.log('✅ [NotificationsPage] All notifications marked as read');
+    } catch (err: any) {
+      const message = err?.response?.data?.message || 'Failed to mark all as read';
+      showToast(message, 'error');
+      console.error('❌ [NotificationsPage] Error marking all as read:', err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) {
+      showToast('No notifications selected', 'error');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      showToast(`Deleting ${selectedIds.length} notification(s)...`, 'loading');
+      await bulkDeleteNotifications(selectedIds);
+      showToast(`${selectedIds.length} notification(s) deleted ✅`, 'success');
+      setSelectedIds([]);
+      setSelectedAll(false);
+      console.log(`✅ [NotificationsPage] ${selectedIds.length} notification(s) deleted`);
+    } catch (err: any) {
+      const message = err?.message || err?.response?.data?.message || 'Failed to delete notifications';
+      showToast(message, 'error');
+      console.error('❌ [NotificationsPage] Error deleting notifications:', err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      console.log('📖 [NotificationsPage] Marking notification as read:', id);
+      await markAsRead(id);
+      console.log('✅ [NotificationsPage] Notification marked as read');
+    } catch (err: any) {
+      const message = err?.message || 'Failed to mark as read';
+      showToast(message, 'error');
+      console.error('❌ [NotificationsPage] Error marking as read:', err);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      console.log('🗑️ [NotificationsPage] Deleting notification:', id);
+      // Use bulkDeleteNotifications with a single id
+      await bulkDeleteNotifications([id]);
+      showToast('Notification deleted ✅', 'success');
+      console.log('✅ [NotificationsPage] Notification deleted');
+    } catch (err: any) {
+      const message = err?.message || err?.response?.data?.message || 'Failed to delete notification';
+      showToast(message, 'error');
+      console.error('❌ [NotificationsPage] Error deleting notification:', err);
+    }
+  };
 
   return (
     <section>
@@ -39,19 +119,10 @@ export default function NotificationsPage() {
               <div className="flex items-center gap-2">
                 <NotificationToolbar
                   onSelectAll={() => setSelectedAll(s => !s)}
-                  onMarkAllRead={() => {
-                    markAllAsRead();
-                    console.log('✅ [NotificationsPage] All notifications marked as read');
-                  }}
-                  onDelete={() => {
-                    selectedIds.forEach(id => {
-                      removeNotification(id);
-                    });
-                    setSelectedIds([]);
-                    setSelectedAll(false);
-                    console.log(`✅ [NotificationsPage] ${selectedIds.length} notification(s) deleted`);
-                  }}
+                  onMarkAllRead={handleMarkAllRead}
+                  onDelete={handleBulkDelete}
                   selectedCount={selectedIds.length}
+                  isProcessing={isProcessing}
                 />
               </div>
             </div>
@@ -76,6 +147,8 @@ export default function NotificationsPage() {
                 search={query} 
                 selectAll={selectedAll}
                 onSelectionChange={setSelectedIds}
+                onMarkAsRead={handleMarkAsRead}
+                onDelete={handleDelete}
               />
             )}
           </div>
@@ -86,11 +159,9 @@ export default function NotificationsPage() {
 
           <div className="text-center">
             <button 
-              className="text-[#005920] text-[14px] font-medium hover:underline" 
-              onClick={() => {
-                markAllAsRead();
-                console.log('✅ Mark all notifications as read');
-              }}
+              className="text-[#005920] text-[14px] font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed" 
+              onClick={handleMarkAllRead}
+              disabled={isProcessing || notifications.length === 0}
             >
               Mark all as read ({unreadCount})
             </button>
@@ -106,6 +177,14 @@ export default function NotificationsPage() {
           </div>
         </div>
       </div>
+      {toast.show && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type}
+          show={toast.show}
+          onHide={hideToast}
+        />
+      )}
     </section>
   );
 }

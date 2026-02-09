@@ -19,7 +19,7 @@ const fmt = (iso?: string) => {
   return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) + ' - ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 };
 
-export default function BlogsTable({ blogs, onView, onEdit, onDelete }: BlogsTableProps) {
+export default function BlogsTable({ blogs, onEdit, onDelete }: BlogsTableProps) {
   return (
     <div className="overflow-x-auto w-full border-[0.3px] px-[24px] border-[#B9B9B9] rounded-[14px]">
       <table className="w-full text-left table-auto">
@@ -51,9 +51,9 @@ export default function BlogsTable({ blogs, onView, onEdit, onDelete }: BlogsTab
               <td className="w-[200px] py-[19px] px-4 text-[14px] align-middle">{fmt(b.publishedAt)}</td>
               <td className="w-[150px] py-[19px] px-4 align-middle text-center">
                 <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
-                  <button onClick={() => onView?.(b)} className="px-[12px] py-[10px] text-[#0C2141]" title="View">
+                  {/* <button onClick={() => onView?.(b)} className="px-[12px] py-[10px] text-[#0C2141]" title="View">
                     <img src="/icon/eye.svg" alt="View" />
-                  </button>
+                  </button> */}
 
                   <button onClick={() => onEdit?.(b)} className="px-[12px] py-[10px] text-[#0C2141]" title="Edit">
                     <img src="/icon/edit.svg" alt="Edit" />

@@ -52,14 +52,14 @@ const DoctorsTable: React.FC<DoctorsTableProps> = ({ doctors, onEdit, onDelete }
                 <div className="flex items-center gap-3">
                   <img src={d.avatar ? d.avatar : '/placeholder-image.png'} alt={d.name} className="w-10 h-10 lg:w-[46px] lg:h-[46px] rounded-full object-cover" />
                   <div>
-                    <div className="font-normal text-[13px]">{d.name}</div>
+                    <div className="font-normal capitalize text-[13px]">{d.name}</div>
                   </div>
                 </div>
               </td>
               <td className="py-[29px] px-4 text-[14px] align-middle">{formatDate(d.createdAt)}</td>
               <td className="py-[29px] px-4 text-[14px] align-middle">{d.email ?? '-'}</td>
               <td className="py-[29px] px-4 align-middle">
-                <div className="text-[13px] text-gray-700 max-w-[183px]">
+                <div className="text-[13px] capitalize max-w-[183px]">
                   {d.specialties?.join(', ') ?? '-'}
                 </div>
               </td>

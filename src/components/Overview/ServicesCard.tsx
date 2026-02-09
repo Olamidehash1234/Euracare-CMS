@@ -85,9 +85,9 @@ export default function ServicesCard({ services = [], isLoading = false, onServi
               </div>
 
               <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
-                <button className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition" title="View">
+                {/* <button className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition" title="View">
                   <img src="/icon/eye.svg" alt="View" />
-                </button>
+                </button> */}
 
                 <button onClick={() => handleEdit(s)} className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition" title="Edit">
                   <img src="/icon/edit.svg" alt="Edit" />

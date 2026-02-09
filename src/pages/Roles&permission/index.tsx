@@ -134,7 +134,7 @@ const DepartmentPage = () => {
     setOpenMembersFor(roleId);
     setIsLoadingMembers(true);
     
-    // console.log('[RolesPage] Manage Members clicked for roleId:', roleId);
+    console.log('👥 [RolesPage] Manage Members clicked for roleId:', roleId);
     // showToast('Loading members...', 'loading');
 
     try {
@@ -144,7 +144,11 @@ const DepartmentPage = () => {
         limit: 100 // Get all users for this role
       };
       
+      console.log('📋 [RolesPage] Fetching members with params:', params);
       const response = await adminService.getAllAdmins(params);
+      
+      console.log('📨 [RolesPage] Backend response:', response.data);
+      console.log('📨 [RolesPage] Members data:', response?.data?.data?.users);
       
       const usersData = response?.data?.data?.users || [];
 
@@ -155,6 +159,7 @@ const DepartmentPage = () => {
 
         // Transform the users data to AdminType format
         const transformedMembers = usersData.map((user: any) => {
+          console.log('🔄 [RolesPage] Transforming user:', { id: user.id, name: user.full_name, status: user.status });
           return {
             id: user.id || user._id,
             name: user.full_name || user.fullName || '',
@@ -167,10 +172,12 @@ const DepartmentPage = () => {
           };
         });
 
-        // console.log('[RolesPage] Members loaded successfully:', transformedMembers.length, 'members found');
+        console.log('✅ [RolesPage] Members loaded successfully:', transformedMembers.length, 'members found');
+        console.log('📄 [RolesPage] Transformed members:', transformedMembers);
         setMembersData(transformedMembers);
         // showToast(`${transformedMembers.length} member(s) loaded`, 'success');
       } else {
+        console.warn('⚠️ [RolesPage] No members found for this role');
         showToast('No members found for this role', 'error');
       }
     } catch (error: any) {
@@ -182,6 +189,7 @@ const DepartmentPage = () => {
         errorMessage = 'You do not have permission to view members.';
       }
 
+      console.error('❌ [RolesPage] Error loading members:', error);
       showToast(errorMessage, 'error');
     } finally {
       setIsLoadingMembers(false);
@@ -391,7 +399,6 @@ const DepartmentPage = () => {
                           setMembersData([]);
                         }}
                         onEdit={() => {}}
-                        onDelete={() => {}}
                       />
                     )}
                   </div>

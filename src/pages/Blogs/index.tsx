@@ -76,7 +76,7 @@ const BlogsPage = () => {
         title: blog.snippet?.title || blog.title || 'Untitled',
         image: blog.snippet?.cover_image_url || blog.image || '/image/services/doctor.jpg',
         publishedAt: blog.created_at || blog.createdAt || new Date().toISOString(),
-        category: blog.category || 'General',
+        category: blog.page?.category || blog.category || 'General',
       }));
 
       setBlogs(transformedBlogs);

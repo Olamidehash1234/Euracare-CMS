@@ -39,9 +39,9 @@ export default function TestimonialsTable({ testimonials, onView, onEdit, onDele
               <td className="w-[200px] py-[19px] px-4 align-middle text-[14px] text-[#010101]">{t.patientName}</td>
               <td className="w-[150px] py-[19px] px-4 align-middle text-center">
                 <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
-                  <button onClick={() => onView?.(t)} className="px-[12px] py-[10px] text-[#0C2141]" title="View">
+                  {/* <button onClick={() => onView?.(t)} className="px-[12px] py-[10px] text-[#0C2141]" title="View">
                     <img src="/icon/eye.svg" alt="View" />
-                  </button>
+                  </button> */}
 
                   <button onClick={() => onEdit?.(t)} className="px-[12px] py-[10px] text-[#0C2141]" title="Edit">
                     <img src="/icon/edit.svg" alt="Edit" />

@@ -8,7 +8,7 @@ const Layout = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
-      <div className="flex flex-col lg:flex-row flex-grow">
+      <div className="flex flex-row flex-grow">
         <SideBar />
         <div className="flex flex-col flex-grow">
           <main className="flex-grow bg-[#fafbfc]">

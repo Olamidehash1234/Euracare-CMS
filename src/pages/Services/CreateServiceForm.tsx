@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { serviceService } from '@/services';
 import Toast from '@/components/GlobalComponents/Toast';
 
@@ -26,8 +25,7 @@ interface Props {
   isLoading?: boolean;
 }
 
-export default function CreateServiceForm({ mode = 'create', initialData, onSave }: Props) {
-  const navigate = useNavigate();
+export default function CreateServiceForm({ mode = 'create', initialData, onSave, onClose }: Props) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const bannerFileRef = useRef<HTMLInputElement | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(initialData?.image || null);
@@ -212,7 +210,11 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
       }
 
       showToast(mode === 'edit' ? 'Service updated successfully! ✅' : 'Service created successfully! ✅', 'success');
+
+      // Keep toast visible during timeout
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // Call onSave callback to close form and return to services list
       onSave({
         ...form,
         image: coverPreview,
@@ -222,12 +224,6 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
         treatments,
         serviceId: initialData?.serviceId,
       });
-
-      // Keep toast visible during timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Then navigate back to services
-      navigate('/services', { replace: true });
     } catch (error: any) {
       const errorMessage = error?.message || 'Failed to save service';
       showToast(errorMessage, 'error');
@@ -483,7 +479,7 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
             )}
 
             <div className="mt-6 flex flex-col lg:flex-row justify-end gap-3">
-              <button type="button" onClick={() => navigate('/services')} className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm" disabled={isUploadingCoverImage || isUploadingBannerImage}>
+              <button type="button" onClick={onClose} className="px-[50px] py-[12px] rounded-[48px] border border-[#0C2141] text-sm" disabled={isUploadingCoverImage || isUploadingBannerImage}>
                 Cancel
               </button>
               <button type="submit" className="px-[40px] py-[12px] rounded-[48px] bg-[#0C2141] text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled={isUploadingCoverImage || isUploadingBannerImage}>

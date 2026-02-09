@@ -112,7 +112,7 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
 
       {/* Sidebar container (desktop & tablet) */}
       <aside
-        className={`hidden z-100 lg:flex flex-col border-r-[1.5px] border-[#01010133] h-screen sticky top-0 px-[20px] pt-[8px] pb-[17px] transition-all duration-200 ${collapsed ? "w-20" : "w-64"}`}
+        className={`hidden z-100 lg:flex flex-col border-r-[1.5px] border-[#01010133] h-screen sticky top-0 px-[20px] pt-[8px] pb-[17px] transition-all duration-200 ${collapsed ? "w-[80px]" : "w-[250px]"}`}
         aria-label="Sidebar"
       >
         {/* top logo + collapse toggle */}
@@ -135,7 +135,7 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
           </div>
         </div>
 
-        <div className="overflow-auto scrollbar-hide pb-">
+        <div className="overflow-auto scrollbar-hide pb-4">
           {/* General */}
           <div>
             {!collapsed && <div className="text-xs text-[#010101] uppercase mt-[18px] mb-2 px-1">General</div>}
@@ -163,10 +163,10 @@ export default function DashboardSidebar({ initialActiveItem = "overview" }: Sid
                     </span>
 
                     {!collapsed && (
-                      <div className="flex-1 flex items-center">
-                        <span className="flex-1 text-[#010101] text-left">{it.label}</span>
+                      <div className="flex items-center justify-between gap-2 flex-1 min-w-0">
+                        <span className="text-[#010101] text-left truncate">{it.label}</span>
                         {badgeCount ? (
-                          <span className="inline-flex items-center justify-center min-w-[28px] h-6 rounded-[50px] bg-[#0C2141] text-white text-xs px-2">
+                          <span className="flex-shrink-0 inline-flex items-center justify-center min-w-[24px] h-5 rounded-full bg-[#0C2141] text-white text-xs px-1.5">
                             {badgeCount}
                           </span>
                         ) : null}

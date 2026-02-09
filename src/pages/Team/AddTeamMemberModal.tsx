@@ -237,7 +237,7 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
 
                   <label
                     htmlFor="team-avatar"
-                    className="mt-2 inline-block bg-[#0C2141] text-white text-[14px] lg:text-[15px] px-[10px] lg:px-[28px] lg:py-[10px] py-[8px] rounded-full cursor-pointer shadow-sm hover:bg-opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-0 inline-block bg-[#0C2141] text-white text-[14px] lg:text-[15px] px-[10px] lg:px-[28px] lg:py-[10px] py-[8px] rounded-full cursor-pointer shadow-sm hover:bg-opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isUploadingImage ? 'Uploading...' : 'Change logo'}
                   </label>
@@ -289,13 +289,14 @@ export default function TeamMemberModal({ mode = 'create', initialData, onSave, 
                       />
                     </div>
 
-                    {/* Short Bio (rich text) */}
+                    {/* Short Bio (plain text with paragraphs) */}
                     <div>
                       <label className="block text-sm leading-[24px] text-[#010101] mb-2">Short Bio</label>
                       <TiptapEditor
                         content={form.bio}
                         onChange={(bio) => setForm(prev => ({ ...prev, bio }))}
                         placeholder="Writeup about the team member"
+                        mode="paragraphOnly"
                       />
                     </div>
                   </div>

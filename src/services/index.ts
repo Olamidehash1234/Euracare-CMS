@@ -1,6 +1,6 @@
-// Export all API services for easy importing
 export { default as apiClient } from './apiClient';
 export { default as authService } from './authService';
+export { default as userService } from './userService';
 export { default as doctorService } from './doctorService';
 export { default as blogService } from './blogService';
 export { default as serviceService } from './serviceService';
@@ -19,6 +19,7 @@ export { uploadToCloudinary, getOptimizedUrl } from './cloudinaryService';
 
 // Export types
 export type * from './authService';
+export type * from './userService';
 export type * from './doctorService';
 export type * from './blogService';
 export type * from './serviceService';

@@ -25,7 +25,7 @@ export default function AvatarUpload({
           // eslint-disable-next-line
           <img src={preview} alt="avatar" className="w-full h-full object-cover" />
         ) : (
-          <div className="text-[#01010180]"><img src="/image/doctor/test.png" alt="" /></div>
+          <div className="text-[#01010180]"><img src="/test-avatar.png" alt="" /></div>
         )}
       </div>
 

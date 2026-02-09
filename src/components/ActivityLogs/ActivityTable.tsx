@@ -20,21 +20,21 @@ export default function ActivityTable({ activities = [] }: Props) {
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left table-auto">
           <thead>
-            <tr className="text-[14px] text-[#0C2141]">
-              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[160px]">Timestamp</th>
-              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[220px]">User/Actor</th>
-              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[140px]">Role</th>
-              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[170px]">Action</th>
+            <tr className="text-[14px] text-[#0C2141] bg-gray-50">
+              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[270px] whitespace-nowrap">Timestamp</th>
+              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[290px]">User/Actor</th>
+              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[200px]">Role</th>
+              <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 w-[200px]">Action</th>
               <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4 min-w-[300px]">Details</th>
               {/* <th className="pt-[22px] pb-[25px] text-[14px] font-medium leading-[20px] px-4">IP Address</th> */}
             </tr>
           </thead>
 
           {activities.length > 0 ? (
-            <tbody>
+            <tbody className="divide-y divide-[#01010133]">
               {activities.map((a) => (
-                <tr key={a.id ?? `${a.timestamp}-${a.actor}`} className="table-auto border-t border-[#01010133]">
-                  <td className="py-[19px] px-4 text-[14px] align-middle">{a.timestamp ?? '-'}</td>
+                <tr key={a.id ?? `${a.timestamp}-${a.actor}`} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-[19px] px-4 text-[14px] align-middle whitespace-nowrap">{a.timestamp ?? '-'}</td>
                   <td className="py-[19px] px-4 text-[14px] align-middle">{a.actor ?? '-'}</td>
                   <td className="py-[19px] px-4 text-[14px] align-middle">{a.role ?? '-'}</td>
                   <td className="py-[19px] px-4 text-[14px] align-middle">{a.action ?? '-'}</td>
@@ -46,7 +46,7 @@ export default function ActivityTable({ activities = [] }: Props) {
           ) : (
             <tbody>
               <tr>
-                <td colSpan={6} className="py-6 px-4 align-middle">
+                <td colSpan={5} className="py-12 px-4 align-middle">
                   <div className="flex items-center justify-center">
                     <ActivityLogsNotFound
                       title="No Activity Logged Yet"

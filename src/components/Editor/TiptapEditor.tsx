@@ -2,13 +2,14 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextStyle from '@tiptap/extension-text-style';
 import TextAlign from '@tiptap/extension-text-align';
+import { useEffect } from 'react';
 import CustomDropdown from '../commonComponents/CustomDropdown';
 
 interface TiptapEditorProps {
   content: string;
   onChange: (content: string) => void;
   placeholder?: string;
-  mode?: 'default' | 'bulletOnly';
+  mode?: 'default' | 'bulletOnly' | 'paragraphOnly';
 }
 
 const fontSizeOptions = [
@@ -22,16 +23,36 @@ const fontSizeOptions = [
 ];
 
 const TiptapEditor = ({ content, onChange, mode = 'default' }: TiptapEditorProps) => {
-  const extensions: any[] = [StarterKit];
-  // Only add text style / align when in default mode
-  if (mode === 'default') {
-    extensions.push(TextStyle);
-    extensions.push(
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-        alignments: ['left', 'center', 'right', 'justify'],
-      })
-    );
+  const extensions: any[] = [];
+  
+  // Configure extensions based on mode
+  if (mode === 'paragraphOnly') {
+    // In paragraphOnly mode, use minimal extensions - just paragraph handling
+    extensions.push(StarterKit.configure({
+      bold: false,
+      italic: false,
+      code: false,
+      codeBlock: false,
+      heading: false,
+      bulletList: false,
+      orderedList: false,
+      listItem: false,
+      blockquote: false,
+      horizontalRule: false,
+      strike: false,
+    }));
+  } else {
+    extensions.push(StarterKit);
+    // Only add text style / align when in default mode
+    if (mode === 'default') {
+      extensions.push(TextStyle);
+      extensions.push(
+        TextAlign.configure({
+          types: ['heading', 'paragraph'],
+          alignments: ['left', 'center', 'right', 'justify'],
+        })
+      );
+    }
   }
 
   const editor = useEditor({
@@ -47,12 +68,44 @@ const TiptapEditor = ({ content, onChange, mode = 'default' }: TiptapEditorProps
     },
   });
 
+  // Auto-enable bullet list on first focus in bulletOnly mode
+  useEffect(() => {
+    if (!editor || mode !== 'bulletOnly') return;
+
+    const handleFocus = () => {
+      // Enable bullet list if content is empty and not already enabled
+      if (editor.isEmpty && !editor.isActive('bulletList')) {
+        setTimeout(() => {
+          editor.chain().focus().toggleBulletList().run();
+        }, 0);
+      }
+    };
+
+    editor.on('focus', handleFocus);
+    return () => {
+      editor.off('focus', handleFocus);
+    };
+  }, [editor, mode]);
+
   if (!editor) return null;
 
   const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
     e.preventDefault();
     action();
   };
+
+  // Hide toolbar in paragraphOnly and bulletOnly modes
+  if (mode === 'paragraphOnly' || mode === 'bulletOnly') {
+    return (
+      <div className="border-[0.5px] rounded-md border-[#01010133]">
+        <EditorContent 
+          editor={editor} 
+          onClick={() => editor?.chain().focus().run()}
+          className="p-3 min-h-[200px] focus:outline-none text-base leading-relaxed cursor-text [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0" 
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="border-[0.5px] rounded-md border-[#01010133]">
@@ -157,7 +210,7 @@ const TiptapEditor = ({ content, onChange, mode = 'default' }: TiptapEditorProps
       <EditorContent 
         editor={editor} 
         onClick={() => editor?.chain().focus().run()}
-        className="p-3 min-h-[200px] focus:outline-none text-base leading-relaxed cursor-text" 
+        className="p-3 min-h-[200px] focus:outline-none text-base leading-relaxed cursor-text [&_ul]:list-disc [&_ul]:pl-6 [&_li]:my-0" 
       />
     </div>
   );

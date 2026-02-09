@@ -16,6 +16,15 @@ interface RecentActivityCardProps {
 export default function RecentActivityCard({ activities = [], isLoading = false }: RecentActivityCardProps) {
   const displayActivities = activities.slice(0, 5); // Show top 5 activities
 
+  console.log('📌 [RecentActivityCard] Props received:', { activities, isLoading });
+  console.log('📌 [RecentActivityCard] Activities count:', activities.length);
+  console.log('📌 [RecentActivityCard] Display activities (first 5):', displayActivities);
+  
+  if (activities.length > 0) {
+    console.log('📌 [RecentActivityCard] Activity item structure:', activities[0]);
+    console.log('📌 [RecentActivityCard] Activity keys:', Object.keys(activities[0]));
+  }
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-[10px]">

@@ -4,13 +4,15 @@ interface MoreMenuProps {
   onManageMembers?: () => void;
   onManagePermission?: () => void;
   onSuspendUser?: () => void;
+  onReactivateUser?: () => void;
+  onDeleteUser?: () => void;
   onDeleteRole?: () => void;
   onViewActivity?: () => void;
   onClose?: () => void;
   menuClassName?: string; // optional override for menu width / styling
 }
 
-export default function MoreMenu({ onManageMembers, onManagePermission: _, onSuspendUser, onDeleteRole: __, onViewActivity, onClose, menuClassName }: MoreMenuProps) {
+export default function MoreMenu({ onManageMembers, onManagePermission: _, onSuspendUser, onReactivateUser, onDeleteUser, onClose, menuClassName }: MoreMenuProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   const handleClick = (cb?: () => void) => {
@@ -52,6 +54,24 @@ export default function MoreMenu({ onManageMembers, onManagePermission: _, onSus
           </button>
         )}
 
+        {onReactivateUser && (
+          <button
+            onClick={() => handleClick(onReactivateUser)}
+            className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-green-50 text-[14px] text-green-700 font-medium flex items-center gap-2"
+          >
+            Reactivate User
+          </button>
+        )}
+
+        {onDeleteUser && (
+          <button
+            onClick={() => handleClick(onDeleteUser)}
+            className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-red-50 text-[14px] text-red-500 font-medium flex items-center gap-2"
+          >
+            Delete User
+          </button>
+        )}
+
         {onManageMembers && (
           <button
             onClick={() => {
@@ -82,14 +102,14 @@ export default function MoreMenu({ onManageMembers, onManagePermission: _, onSus
           </button>
         )} */}
 
-        {onViewActivity && (
+        {/* {onViewActivity && (
           <button
             onClick={() => handleClick(onViewActivity)}
             className="w-full text-left px-[12.5px] py-[12.5px] rounded-[8px] hover:bg-[#0C214133] text-[14px] text-[#010101]"
           >
             View Activity Log
           </button>
-        )}
+        )} */}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Toast from '@/components/GlobalComponents/Toast';
 import { testimonialService, getErrorMessage } from '@/services';
 import type { TestimonialPayload as APITestimonialPayload } from '@/services/testimonialService';
@@ -28,6 +29,7 @@ export default function CreateTestimonialForm({
   onClose,
   isLoadingData = false,
 }: Props) {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     title: initialData?.title || '',
     service: initialData?.service || '',
@@ -144,7 +146,7 @@ export default function CreateTestimonialForm({
         onHide={() => setShowToast(false)}
       />
       <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
-        <a href="/testimonials" className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px]">
+        <a href='/testimonials' className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px] bg-none border-none cursor-pointer">
           <img src="/icon/right.svg" alt="" /> Back to Testimonials Page
         </a>
 

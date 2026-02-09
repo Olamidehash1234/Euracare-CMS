@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import CustomDropdown from '../../components/commonComponents/CustomDropdown';
 import Toast from '../../components/GlobalComponents/Toast';
-import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
 import { adminService, roleService } from '@/services';
 import { getErrorMessage } from '@/services';
 
@@ -252,8 +251,6 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
           }
         }}
       />
-
-      {isSubmitting && toastType === 'loading' && <LoadingSpinner heightClass="fixed inset-0 h-screen" />}
 
       <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
         <a href="/admin" className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px]">
