@@ -80,11 +80,11 @@ class WebSocketService {
           }
         };
 
-        this.ws.onerror = (event) => {
+        this.ws.onerror = (_event) => {
           reject(new Error('WebSocket connection error'));
         };
 
-        this.ws.onclose = (event) => {
+        this.ws.onclose = (_event) => {
           this.notifyConnectionHandlers(false);
 
           // Attempt to reconnect if not manually closed
@@ -189,7 +189,7 @@ class WebSocketService {
    */
   private notifyMessageHandlers(message: WebSocketMessage): void {
     const handlers = Array.from(this.messageHandlers);
-    handlers.forEach((handler, index) => {
+    handlers.forEach((handler, _index) => {
       try {
         handler(message);
       } catch (err) {
@@ -202,7 +202,7 @@ class WebSocketService {
    */
   private notifyConnectionHandlers(isConnected: boolean): void {
     const handlers = Array.from(this.connectionHandlers);
-    handlers.forEach((handler, index) => {
+    handlers.forEach((handler, _index) => {
       try {
         handler(isConnected);
       } catch (err) {
@@ -220,7 +220,7 @@ class WebSocketService {
 
     this.reconnectTimeout = setTimeout(() => {
       if (this.accessToken) {
-        this.connect(this.accessToken).catch((err) => {
+        this.connect(this.accessToken).catch((_err) => {
         });
       } else {
       }

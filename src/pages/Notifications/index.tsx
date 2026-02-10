@@ -33,7 +33,7 @@ export default function NotificationsPage() {
     if (!loadAttemptedRef.current) {
       loadAttemptedRef.current = true;
       // console.log('📋 [NotificationsPage] Component mounted, loading notifications...');
-      loadNotifications().catch(err => {
+      loadNotifications().catch(_err => {
         // console.error('❌ [NotificationsPage] Error loading notifications:', err);
       });
     }
