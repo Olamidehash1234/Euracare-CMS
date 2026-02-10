@@ -4,6 +4,7 @@ interface AvatarUploadProps {
   preview: string | null;
   isUploading: boolean;
   disabled?: boolean;
+  buttonLabel?: string;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -11,6 +12,7 @@ export default function AvatarUpload({
   preview,
   isUploading,
   disabled = false,
+  buttonLabel = 'Tap to change image',
   onFileChange,
 }: AvatarUploadProps): React.ReactElement {
   return (
@@ -35,7 +37,7 @@ export default function AvatarUpload({
           isUploading || disabled ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >
-        {isUploading ? 'Uploading...' : 'Tap to change image'}
+        {isUploading ? 'Uploading...' : buttonLabel}
       </label>
       <input
         id="avatar"

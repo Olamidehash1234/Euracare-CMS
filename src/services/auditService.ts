@@ -34,7 +34,7 @@ const auditService = {
     console.log('🔍 Fetching audits with params:', params);
     return apiClient.get<{ success: boolean; data: { audits: AuditResponse[] }; meta?: any }>('/audits/', { params })
       .then((response) => {
-        console.log('✅ Audit logs response:', response.data);
+        console.log('  Audit logs response:', response.data);
         return response;
       })
       .catch((error) => {
@@ -50,7 +50,7 @@ const auditService = {
     console.log(`🔍 Fetching audits for user: ${userId}`, params);
     return apiClient.get<{ success: boolean; data: { audits: AuditResponse[] } }>(`/audits/user/${userId}/`, { params })
       .then((response) => {
-        console.log(`✅ Audit logs for user ${userId}:`, response.data);
+        console.log(`  Audit logs for user ${userId}:`, response.data);
         return response;
       })
       .catch((error) => {
@@ -66,7 +66,7 @@ const auditService = {
     console.log(`🔍 Fetching audit with ID: ${id}`);
     return apiClient.get<{ success: boolean; data: AuditResponse }>(`/audits/${id}/`)
       .then((response) => {
-        console.log(`✅ Audit log ${id}:`, response.data);
+        console.log(`  Audit log ${id}:`, response.data);
         return response;
       })
       .catch((error) => {
@@ -82,7 +82,7 @@ const auditService = {
     console.log('🔍 Exporting audits with format:', params?.format);
     return apiClient.get('/audits/export/', { params, responseType: 'blob' })
       .then((response) => {
-        console.log('✅ Audit logs exported successfully');
+        console.log('  Audit logs exported successfully');
         return response;
       })
       .catch((error) => {

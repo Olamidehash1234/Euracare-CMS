@@ -156,7 +156,7 @@ const BlogsPage = () => {
       setBlogs(blogs.filter(b => b.id !== blog.id));
 
       // Show success toast
-      showToast('Blog deleted successfully! ✅', 'success');
+      showToast('Blog deleted successfully!  ', 'success');
     } catch (err: any) {
       let errorMessage = 'Failed to delete blog';
 
@@ -179,7 +179,7 @@ const BlogsPage = () => {
     try {
       if (editBlog && editBlog.blogId) {
         // Update blog
-        showToast('Blog updated successfully! ✅', 'success');
+        showToast('Blog updated successfully!  ', 'success');
         
         // Update local state
         setBlogs(prev => prev.map(b => (b.id === editBlog.blogId ? { 
@@ -191,7 +191,7 @@ const BlogsPage = () => {
         // Create blog
         const response = await blogService.createBlog(payload);
         
-        showToast('Blog created successfully! ✅', 'success');
+        showToast('Blog created successfully!  ', 'success');
 
         // Update local state
         setBlogs(prev => [

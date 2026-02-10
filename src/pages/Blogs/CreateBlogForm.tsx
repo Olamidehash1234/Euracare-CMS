@@ -13,6 +13,7 @@ export type BlogPayload = {
       [key: string]: any;
     };
     video_link_url?: string;
+    category?: string;
   };
   video_link_url?: string;
   blogId?: string;
@@ -129,9 +130,9 @@ export default function CreateBlogForm({ mode = 'create', initialData, onSave, o
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
-        <a href="/blogs" className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px]">
+        <button onClick={onClose} className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px] bg-none border-none cursor-pointer hover:text-[#0a1a2f] transition">
           <img src="/icon/right.svg" alt="" /> Back to Blogs & Articles Page
-        </a>
+        </button>
 
         <div className="bg-white rounded-xl border border-[#B9B9B9] overflow-hidden">
           <div className="px-[16px] lg:px-[30px] py-[14px] lg:py-[20px] border-b border-[#0000001A]">

@@ -41,20 +41,28 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
     try {
       setIsLoading(true);
       console.log('⏸️ [ManageMembersTable] Suspending user:', member.id);
+      console.log('👤 [ManageMembersTable] Current member status:', member.status);
       showToast('Suspending user...', 'loading');
 
       // Call the suspend user endpoint
       const response = await userService.suspendUser(member.id.toString());
-      console.log('📨 [ManageMembersTable] Suspend response:', response.data);
+      console.log('📨 [ManageMembersTable] Suspend response received');
+      console.log('📊 [ManageMembersTable] Response success:', response.data.success);
+      console.log('📊 [ManageMembersTable] Backend user status:', response.data.data?.status);
 
-      // Update the member's status in local state
-      setUpdatedMembers((prev) =>
-        prev.map((m) =>
-          m.id === member.id ? { ...m, status: 'Suspended' } : m
-        )
-      );
+      // Update the member's status in local state with backend response status
+      const newStatus = (response.data.data?.status || 'Suspended') as 'Active' | 'Suspended';
+      console.log('🔄 [ManageMembersTable] Updating local state with status:', newStatus);
+      
+      setUpdatedMembers((prev) => {
+        const updated = prev.map((m) =>
+          m.id === member.id ? { ...m, status: newStatus } : m
+        );
+        console.log('✅ [ManageMembersTable] Local state updated, new members:', updated);
+        return updated;
+      });
 
-      showToast('User suspended successfully ✅', 'success');
+      showToast('User suspended successfully', 'success');
       setOpenMenuFor(null);
     } catch (error: any) {
       let errorMessage = 'Failed to suspend user';
@@ -77,21 +85,29 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
   const handleReactivateUser = async (member: AdminType) => {
     try {
       setIsLoading(true);
-      console.log('✅ [ManageMembersTable] Reactivating user:', member.id);
+      console.log('♻️ [ManageMembersTable] Reactivating user:', member.id);
+      console.log('👤 [ManageMembersTable] Current member status:', member.status);
       showToast('Reactivating user...', 'loading');
 
       // Call the reactivate user endpoint
       const response = await userService.reactivateUser(member.id.toString());
-      console.log('📨 [ManageMembersTable] Reactivate response:', response.data);
+      console.log('📨 [ManageMembersTable] Reactivate response received');
+      console.log('📊 [ManageMembersTable] Response success:', response.data.success);
+      console.log('📊 [ManageMembersTable] Backend user status:', response.data.data?.status);
 
-      // Update the member's status in local state
-      setUpdatedMembers((prev) =>
-        prev.map((m) =>
-          m.id === member.id ? { ...m, status: 'Active' } : m
-        )
-      );
+      // Update the member's status in local state with backend response status
+      const newStatus = (response.data.data?.status || 'Active') as 'Active' | 'Suspended';
+      console.log('🔄 [ManageMembersTable] Updating local state with status:', newStatus);
+      
+      setUpdatedMembers((prev) => {
+        const updated = prev.map((m) =>
+          m.id === member.id ? { ...m, status: newStatus } : m
+        );
+        console.log('✅ [ManageMembersTable] Local state updated, new members:', updated);
+        return updated;
+      });
 
-      showToast('User reactivated successfully ✅', 'success');
+      showToast('User reactivated successfully', 'success');
       setOpenMenuFor(null);
     } catch (error: any) {
       let errorMessage = 'Failed to reactivate user';
@@ -124,7 +140,7 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
       // Remove the member from local state
       setUpdatedMembers((prev) => prev.filter((m) => m.id !== member.id));
 
-      showToast('User deleted successfully ✅', 'success');
+      showToast('User deleted  successfully ', 'success');
       setOpenMenuFor(null);
     } catch (error: any) {
       let errorMessage = 'Failed to delete user';

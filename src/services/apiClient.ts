@@ -142,22 +142,26 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401) {
       // Unauthorized
-      console.warn('⚠️ [apiClient] 401 Unauthorized - Backend message:', error.response.data?.message || error.response.data);
+      const respData: any = error.response?.data;
+      console.warn('⚠️ [apiClient] 401 Unauthorized - Backend message:', respData?.message || respData);
     }
 
     if (error.response?.status === 403) {
       // Forbidden - user doesn't have permission
-      console.warn('⚠️ [apiClient] 403 Forbidden:', error.response.data?.message);
+      const respData: any = error.response?.data;
+      console.warn('⚠️ [apiClient] 403 Forbidden:', respData?.message || respData);
     }
 
     if (error.response?.status === 404) {
       // Resource not found
-      console.warn('⚠️ [apiClient] 404 Not Found:', error.response.data?.message);
+      const respData: any = error.response?.data;
+      console.warn('⚠️ [apiClient] 404 Not Found:', respData?.message || respData);
     }
 
     if (error.response?.status === 500) {
       // Server error
-      console.error('❌ [apiClient] 500 Server Error:', error.response.data?.message);
+      const respData: any = error.response?.data;
+      console.error('❌ [apiClient] 500 Server Error:', respData?.message || respData);
     }
 
     return Promise.reject(error);

@@ -46,7 +46,7 @@ export default function CustomDropdown({ options, value, onChange, placeholder =
       </button>
 
       {isOpen && (
-        <div className="absolute z-80 w-full mt-1 bg-white border border-[#01010133] rounded-md shadow-lg">
+        <div className="absolute z-[80] w-full mt-1 bg-white border border-[#01010133] rounded-md shadow-lg pointer-events-auto">
           <div className="max-h-[140px] overflow-y-auto">
             {options.map((option) => (
               <button

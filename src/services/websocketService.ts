@@ -83,9 +83,9 @@ class WebSocketService {
         console.log('🔌 [WebSocket.connect] Initial readyState:', this.ws.readyState, '(0=CONNECTING)');
 
         this.ws.onopen = () => {
-          console.log('✅ [WebSocket.onopen] ====== CONNECTION SUCCESSFUL ======');
-          console.log('✅ [WebSocket.onopen] WebSocket connected successfully');
-          console.log('✅ [WebSocket.onopen] Ready state:', this.ws?.readyState, '(1=OPEN)');
+          console.log('  [WebSocket.onopen] ====== CONNECTION SUCCESSFUL ======');
+          console.log('  [WebSocket.onopen] WebSocket connected successfully');
+          console.log('  [WebSocket.onopen] Ready state:', this.ws?.readyState, '(1=OPEN)');
           this.reconnectAttempts = 0;
           this.notifyConnectionHandlers(true);
           resolve();
@@ -167,7 +167,7 @@ class WebSocketService {
       console.log('🔌 [WebSocket.disconnect] Closing WebSocket...');
       this.ws.close();
       this.ws = null;
-      console.log('✅ [WebSocket.disconnect] WebSocket closed and nullified');
+      console.log('  [WebSocket.disconnect] WebSocket closed and nullified');
     } else {
       console.warn('⚠️ [WebSocket.disconnect] WebSocket is null, nothing to disconnect');
     }
@@ -195,7 +195,7 @@ class WebSocketService {
     try {
       const jsonString = JSON.stringify(message);
       this.ws.send(jsonString);
-      console.log('✅ [WebSocket.send] Message sent successfully. Size:', jsonString.length, 'bytes');
+      console.log('  [WebSocket.send] Message sent successfully. Size:', jsonString.length, 'bytes');
     } catch (err) {
       console.error('❌ [WebSocket.send] Error sending WebSocket message:', err);
       console.error('❌ [WebSocket.send] Error details:', {
@@ -276,7 +276,7 @@ class WebSocketService {
       try {
         console.log(`📨 [WebSocket.notifyMessageHandlers] Calling handler ${index + 1}`);
         handler(message);
-        console.log(`✅ [WebSocket.notifyMessageHandlers] Handler ${index + 1} executed successfully`);
+        console.log(`  [WebSocket.notifyMessageHandlers] Handler ${index + 1} executed successfully`);
       } catch (err) {
         console.error(`❌ [WebSocket.notifyMessageHandlers] Error in handler ${index + 1}:`, err);
       }
@@ -293,7 +293,7 @@ class WebSocketService {
       try {
         console.log(`🔗 [WebSocket.notifyConnectionHandlers] Calling handler ${index + 1}`);
         handler(isConnected);
-        console.log(`✅ [WebSocket.notifyConnectionHandlers] Handler ${index + 1} executed successfully`);
+        console.log(`  [WebSocket.notifyConnectionHandlers] Handler ${index + 1} executed successfully`);
       } catch (err) {
         console.error(`❌ [WebSocket.notifyConnectionHandlers] Error in handler ${index + 1}:`, err);
       }

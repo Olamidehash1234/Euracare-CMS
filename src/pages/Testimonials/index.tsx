@@ -38,21 +38,28 @@ const TestimonialsPage = () => {
     setError(null);
     try {
       const response = await testimonialService.getAllTestimonials();
+      // console.log('📥 [Testimonials] Full API Response:', response);
+      
       const testimonialsData = response?.data?.data?.testimonials || [];
+      // console.log('📋 [Testimonials] Testimonials Data:', testimonialsData);
 
       if (!Array.isArray(testimonialsData)) {
         throw new Error('Invalid response format: expected array of testimonials');
       }
 
       // Transform API response to match TestimonialType interface
-      const transformedTestimonials: TestimonialType[] = testimonialsData.map((testimonial: any) => ({
-        id: testimonial.id,
-        title: testimonial.title || '',
-        service: testimonial.service || '',
-        patientName: testimonial.patient_name || '',
-        videoLink: testimonial.video_url || '',
-      }));
+      const transformedTestimonials: TestimonialType[] = testimonialsData.map((testimonial: any) => {
+        return {
+          id: testimonial.id,
+          title: testimonial.title || '',
+          service: testimonial.service || '',
+          patientName: testimonial.patient_name || '',
+          videoLink: testimonial.video_url || '',
+          thumbnailUrl: testimonial.thumbnail_url || '',
+        };
+      });
 
+      // console.log('✅ [Testimonials] Transformed Testimonials:', transformedTestimonials);
       setTestimonials(transformedTestimonials);
     } catch (err: any) {
       const errorMessage = getErrorMessage(err);
@@ -79,9 +86,11 @@ const TestimonialsPage = () => {
 
       // Fetch full testimonial data by ID
       const response = await testimonialService.getTestimonialById(testimonialId);
+      // console.log('📥 [Testimonials Edit] Full API Response:', response);
 
       // The actual testimonial is nested under data.data.testimonial
       const fullTestimonial = response.data?.data?.testimonial;
+      // console.log('🎬 [Testimonials Edit] Full Testimonial Data:', fullTestimonial);
 
       if (fullTestimonial) {
         const editData: TestimonialPayload = {
@@ -89,8 +98,10 @@ const TestimonialsPage = () => {
           service: fullTestimonial.service || '',
           patientName: fullTestimonial.patient_name || '',
           videoLink: fullTestimonial.video_url || '',
+          thumbnailUrl: fullTestimonial.thumbnail_url || '',
           testimonialId: fullTestimonial.id,
         };
+        // console.log('✅ [Testimonials Edit] Edit Data:', editData);
         setEditTestimonial(editData);
         setShowCreate(true);
         setIsFetchingData(false);
@@ -124,7 +135,7 @@ const TestimonialsPage = () => {
       
       // Remove the deleted testimonial from the list
       setTestimonials(testimonials.filter((t) => t.id !== testimonial.id));
-      showToast('Testimonial deleted successfully ✅', 'success');
+      showToast('Testimonial deleted  successfully ', 'success');
     } catch (err: any) {
       const errorMessage = getErrorMessage(err);
       showToast(errorMessage, 'error');
@@ -145,6 +156,7 @@ const TestimonialsPage = () => {
                   service: data.service,
                   patientName: data.patientName,
                   videoLink: data.videoLink,
+                  thumbnailUrl: data.thumbnailUrl,
                 }
               : t
           )
@@ -157,6 +169,7 @@ const TestimonialsPage = () => {
           service: data.service,
           patientName: data.patientName,
           videoLink: data.videoLink,
+          thumbnailUrl: data.thumbnailUrl,
         };
         setTestimonials([newTestimonial, ...testimonials]);
       }

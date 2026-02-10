@@ -51,7 +51,7 @@ export default function LoginPage(): JSX.Element {
       console.log('🔌 [Login] User authenticated, connecting to WebSocket...');
       connectWebSocket()
         .then(() => {
-          console.log('✅ [Login] WebSocket connected successfully');
+          console.log('  [Login] WebSocket connected successfully');
         })
         .catch((err) => {
           console.error('❌ [Login] Failed to connect WebSocket:', err);

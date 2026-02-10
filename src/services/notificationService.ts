@@ -36,7 +36,7 @@ const isValidMongoObjectId = (id: string): boolean => {
 const resolveSyntheticId = async (id: string): Promise<string> => {
   // If it's already a valid MongoDB ObjectId, return as-is
   if (isValidMongoObjectId(id)) {
-    console.log('✅ [resolveSyntheticId] ID is already valid MongoDB ObjectId:', id);
+    console.log('  [resolveSyntheticId] ID is already valid MongoDB ObjectId:', id);
     return id;
   }
   
@@ -65,7 +65,7 @@ const resolveSyntheticId = async (id: string): Promise<string> => {
       // Find notification with matching action
       const match = notifications.find(n => n.action.includes(actionKeyword));
       if (match) {
-        console.log('✅ [resolveSyntheticId] Resolved synthetic ID to real ID:', match.id);
+        console.log('  [resolveSyntheticId] Resolved synthetic ID to real ID:', match.id);
         return match.id;
       }
     }
@@ -74,7 +74,7 @@ const resolveSyntheticId = async (id: string): Promise<string> => {
     // This is a fallback, not ideal but better than failing
     console.warn('⚠️ [resolveSyntheticId] No exact match found, using most recent notification');
     const mostRecent = notifications[0];
-    console.log('✅ [resolveSyntheticId] Using most recent notification ID:', mostRecent.id);
+    console.log('  [resolveSyntheticId] Using most recent notification ID:', mostRecent.id);
     return mostRecent.id;
   } catch (err) {
     console.error('❌ [resolveSyntheticId] Failed to resolve synthetic ID:', err);
@@ -108,7 +108,7 @@ const notificationService = {
         console.log('📨 [notificationService] All notification keys:', Object.keys(response.data.data.notifications[0]));
       }
       
-      console.log('✅ [notificationService] Notifications fetched:', response.data?.data?.notifications?.length || 0);
+      console.log('  [notificationService] Notifications fetched:', response.data?.data?.notifications?.length || 0);
       return response.data?.data?.notifications || [];
     } catch (err: any) {
       console.error('❌ [notificationService] Failed to fetch notifications:', err);
@@ -134,7 +134,7 @@ const notificationService = {
     console.log('📊 [notificationService] Fetching unread notification count...');
     return apiClient.get<{ success: boolean; data: { count: number } }>('/notification/unread-count/')
       .then((response) => {
-        console.log('✅ [notificationService] Unread count:', response.data?.data?.count);
+        console.log('  [notificationService] Unread count:', response.data?.data?.count);
         return response;
       })
       .catch((error) => {
@@ -154,7 +154,7 @@ const notificationService = {
       const response = await apiClient.patch<{ success: boolean; data: BackendNotification }>(
         `/notification${realId}/mark-as-read`
       );
-      console.log('✅ [notificationService] Notification marked as read:', realId);
+      console.log('  [notificationService] Notification marked as read:', realId);
       return response;
     } catch (error: any) {
       console.error('❌ [notificationService] Error marking notification as read:', error.message);
@@ -167,7 +167,7 @@ const notificationService = {
     console.log('📖 [notificationService] Marking all notifications as read...');
     return apiClient.patch<{ success: boolean; data: { count: number } }>('/notification/mark-all-as-read')
       .then((response) => {
-        console.log('✅ [notificationService] All notifications marked as read');
+        console.log('  [notificationService] All notifications marked as read');
         return response;
       })
       .catch((error) => {
@@ -193,13 +193,13 @@ const notificationService = {
         ids.map(id => resolveSyntheticId(id))
       );
       
-      console.log('✅ [notificationService] Resolved IDs:', resolvedIds);
+      console.log('  [notificationService] Resolved IDs:', resolvedIds);
       
       const response = await apiClient.delete<{ success: boolean; data: { deleted_count: number } }>(
         '/notification/bulk-delete',
         { data: { notification_ids: resolvedIds } }
       );
-      console.log('✅ [notificationService] Notifications deleted:', response.data?.data?.deleted_count);
+      console.log('  [notificationService] Notifications deleted:', response.data?.data?.deleted_count);
       return response;
     } catch (error: any) {
       console.error('❌ [notificationService] Error bulk deleting notifications:', error.message);

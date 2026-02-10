@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MoreOptionsModal from './MoreOptionsModal';
-
 import { Link } from 'react-router-dom';
+import { formatTableDateTime } from '../../utils/dateFormatter';
 
 export interface Doctor {
   id: string | number;
@@ -22,8 +22,7 @@ interface DoctorsTableProps {
 const formatDate = (iso?: string) => {
   if (!iso) return '-';
   try {
-    const d = new Date(iso);
-    return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) + ' - ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    return formatTableDateTime(iso);
   } catch (e) {
     return iso;
   }

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Toast from '@/components/GlobalComponents/Toast';
+import AvatarUpload from '@/components/commonComponents/AvatarUpload';
 import { testimonialService, getErrorMessage } from '@/services';
+import { uploadToCloudinary } from '@/services/cloudinaryService';
 import type { TestimonialPayload as APITestimonialPayload } from '@/services/testimonialService';
 
 export type TestimonialPayload = {
@@ -9,6 +10,7 @@ export type TestimonialPayload = {
   service: string;
   patientName: string;
   videoLink: string;
+  thumbnailUrl?: string;
   testimonialId?: string;
 };
 
@@ -29,13 +31,14 @@ export default function CreateTestimonialForm({
   onClose,
   isLoadingData = false,
 }: Props) {
-  const navigate = useNavigate();
   const [form, setForm] = useState({
     title: initialData?.title || '',
     service: initialData?.service || '',
     patientName: initialData?.patientName || '',
     videoLink: initialData?.videoLink || '',
   });
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(initialData?.thumbnailUrl || null);
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +48,6 @@ export default function CreateTestimonialForm({
 
   // Update form when initialData changes
   useEffect(() => {
-    
     if (initialData) {
       setForm({
         title: initialData.title || '',
@@ -53,7 +55,7 @@ export default function CreateTestimonialForm({
         patientName: initialData.patientName || '',
         videoLink: initialData.videoLink || '',
       });
-    } else {
+      setThumbnailPreview(initialData.thumbnailUrl || null);
     }
   }, [initialData]);
 
@@ -80,6 +82,40 @@ export default function CreateTestimonialForm({
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingThumbnail(true);
+    setToastType('loading');
+    setToastMessage('Uploading thumbnail...');
+    setShowToast(true);
+
+    try {
+      // Show local preview immediately
+      const localUrl = URL.createObjectURL(file);
+      setThumbnailPreview(localUrl);
+
+      // Upload to Cloudinary
+      const response = await uploadToCloudinary(file, 'testimonials');
+      
+      // Update preview with Cloudinary URL
+      setThumbnailPreview(response.secure_url);
+
+      setToastType('success');
+      setToastMessage('Thumbnail uploaded successfully!');
+      setShowToast(true);
+    } catch (error) {
+      console.error('Thumbnail upload failed:', error);
+      setThumbnailPreview(null);
+      setToastType('error');
+      setToastMessage(`Failed to upload thumbnail: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setShowToast(true);
+    } finally {
+      setIsUploadingThumbnail(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -98,17 +134,20 @@ export default function CreateTestimonialForm({
         patient_name: form.patientName.trim(),
         service: form.service.trim(),
         video_url: form.videoLink.trim(),
+        thumbnail_url: thumbnailPreview || undefined,
       };
+
+      console.log('📤 [Testimonials Form] Sending API Payload:', apiPayload);
 
       if (mode === 'create') {
         await testimonialService.createTestimonial(apiPayload);
-        setToastMessage('Testimonial created successfully! ✅');
+        setToastMessage('Testimonial created successfully!  ');
       } else {
         if (!initialData?.testimonialId) {
           throw new Error('Testimonial ID is missing');
         }
         await testimonialService.updateTestimonial(initialData.testimonialId.toString(), apiPayload);
-        setToastMessage('Testimonial updated successfully! ✅');
+        setToastMessage('Testimonial updated successfully!  ');
       }
 
       setToastType('success');
@@ -121,6 +160,7 @@ export default function CreateTestimonialForm({
         service: form.service.trim(),
         patientName: form.patientName.trim(),
         videoLink: form.videoLink.trim(),
+        thumbnailUrl: thumbnailPreview || undefined,
         testimonialId: initialData?.testimonialId,
       };
 
@@ -146,9 +186,9 @@ export default function CreateTestimonialForm({
         onHide={() => setShowToast(false)}
       />
       <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
-        <a href='/testimonials' className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px] bg-none border-none cursor-pointer">
+        <button onClick={onClose} className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px] bg-none border-none cursor-pointer hover:text-[#0a1a2f] transition">
           <img src="/icon/right.svg" alt="" /> Back to Testimonials Page
-        </a>
+        </button>
 
         <div className="bg-white rounded-xl border border-[#B9B9B9] overflow-hidden">
           <div className="px-[16px] lg:px-[30px] py-[14px] lg:py-[20px] border-b border-[#0000001A]">
@@ -160,6 +200,17 @@ export default function CreateTestimonialForm({
           <form onSubmit={handleSubmit} className="p-[16px] lg:px-[40px] lg:py-[30px]">
             <div className="border rounded-[10px] border-[#0101011A] p-[16px] lg:p-6">
               <h3 className="text-[16px] font-medium mb-4 lg:mb-[25px]">Testimonial Details</h3>
+
+              {/* Thumbnail Upload Section */}
+              <div className="flex gap-6 items-start mb-6">
+                <AvatarUpload
+                  preview={thumbnailPreview}
+                  isUploading={isUploadingThumbnail}
+                  buttonLabel="Add a thumbnail image "
+                  onFileChange={handleThumbnailUpload}
+                />
+                <div className="flex-1" />
+              </div>
 
               <div className="grid grid-cols-1 gap-6 lg:gap-0">
                 {/* Title */}

@@ -13,11 +13,7 @@ interface BlogsTableProps {
   onDelete?: (b: BlogType) => void;
 }
 
-const fmt = (iso?: string) => {
-  if (!iso) return '-';
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) + ' - ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-};
+import { formatTableDateTime } from '../../utils/dateFormatter';
 
 export default function BlogsTable({ blogs, onEdit, onDelete }: BlogsTableProps) {
   return (
@@ -48,7 +44,7 @@ export default function BlogsTable({ blogs, onEdit, onDelete }: BlogsTableProps)
                 <div className="font-normal text-[14px] truncate">{b.title}</div>
               </td>
               <td className="w-[200px] py-[19px] px-4 align-middle text-[14px] text-[#010101]">{b.category ?? '-'}</td>
-              <td className="w-[200px] py-[19px] px-4 text-[14px] align-middle">{fmt(b.publishedAt)}</td>
+              <td className="w-[200px] py-[19px] px-4 text-[14px] align-middle">{formatTableDateTime(b.publishedAt)}</td>
               <td className="w-[150px] py-[19px] px-4 align-middle text-center">
                 <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
                   {/* <button onClick={() => onView?.(b)} className="px-[12px] py-[10px] text-[#0C2141]" title="View">

@@ -10,9 +10,12 @@ interface BlogCardProps {
   isLoading?: boolean;
   onBlogDeleted?: (blogId: string) => void;
   onBlogEdit?: (blog: OverviewArticle) => void;
+  onBlogCreate?: () => void;
+  onRefresh?: () => void;
 }
 
-export default function BlogCard({ articles = [], isLoading = false, onBlogDeleted, onBlogEdit }: BlogCardProps) {
+export default function BlogCard({ articles = [], isLoading = false, onBlogDeleted, onBlogEdit, onRefresh }: BlogCardProps) {
+  const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'loading'; message: string }>({
     show: false,
     type: 'success',
@@ -33,13 +36,19 @@ export default function BlogCard({ articles = [], isLoading = false, onBlogDelet
 
   const handleDelete = async (blog: OverviewArticle) => {
     try {
+      setLoadingItemId(String(blog.id));
       showToast('Deleting blog...', 'loading');
       await blogService.deleteBlog(String(blog.id));
-      showToast(`Blog deleted successfully! ✅`, 'success');
+      showToast(`Blog deleted successfully!  `, 'success');
       onBlogDeleted?.(String(blog.id));
+      
+      // Refresh the blogs card after successful deletion
+      setTimeout(() => onRefresh?.(), 500);
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast(errorMessage, 'error');
+    } finally {
+      setLoadingItemId(null);
     }
   };
   const displayArticles = articles.slice(0, 5); // Show top 5 blogs
@@ -49,7 +58,10 @@ export default function BlogCard({ articles = [], isLoading = false, onBlogDelet
       <div className="bg-white rounded-[10px]">
         <div className="flex items-center border-b p-5 lg:px-[20px] lg:py-[16px] justify-between mb-4">
           <h3 className="font-medium text-[#010101] text-lg lg:text-[18px] leading-[140%]">Blog</h3>
-          <a href="/blogs" className="text-[14px] items-center flex leading-[140%] font-medium text-[#0C2141]">View all <span className="ml-1"><img src="/icon/right1.svg" alt="" /></span></a>
+          <div className="flex items-center gap-3">
+            {/* <button onClick={onBlogCreate} className="text-[14px] px-3 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition">+ Add</button> */}
+            <a href="/blogs" className="text-[14px] items-center flex leading-[140%] font-medium text-[#0C2141]">View all <span className="ml-1"><img src="/icon/right1.svg" alt="" /></span></a>
+          </div>
         </div>
         <div className="p-5 lg:px-[20px] space-y-3">
           {[...Array(3)].map((_, i) => (
@@ -64,13 +76,24 @@ export default function BlogCard({ articles = [], isLoading = false, onBlogDelet
     <div className="bg-white rounded-[10px]">
       <div className="flex items-center border-b p-5 lg:px-[20px] lg:py-[16px] justify-between mb-4">
         <h3 className="font-medium text-[#010101] text-lg lg:text-[18px] leading-[140%]">Blog</h3>
-        <a href="/blogs" className="text-[14px] items-center flex leading-[140%] font-medium text-[#0C2141]">View all <span className="ml-1"><img src="/icon/right1.svg" alt="" /></span></a>
+        <div className="flex items-center gap-3">
+          {/* <button onClick={onBlogCreate} className="text-[14px] px-3 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition">+ Add</button> */}
+          <a href="/blogs" className="text-[14px] items-center flex leading-[140%] font-medium text-[#0C2141]">View all <span className="ml-1"><img src="/icon/right1.svg" alt="" /></span></a>
+        </div>
       </div>
 
-      <div className="divide-y p-5 lg:px-[20px] lg:pb-[10px] lg:pt-0">
+      <div className="divide-y p-5 lg:px-[20px] lg:pb-[20px] lg:pt-0">
         {displayArticles.length > 0 ? (
           displayArticles.map(b => (
-            <div key={b.id} className="flex items-center py-[12px] justify-between gap-4">
+            <div key={b.id} className={`flex items-center py-[12px] justify-between gap-4 relative ${loadingItemId === String(b.id) ? 'opacity-60' : ''}`}>
+              {loadingItemId === String(b.id) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/40 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-xs text-gray-600 font-medium">Processing...</span>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center gap-3 flex-1">
                 <div className="w-12 h-12 rounded-md overflow-hidden bg-slate-100 flex-shrink-0">
                   {(b.snippet?.cover_image_url || b.cover_image_url) ? (
@@ -89,12 +112,16 @@ export default function BlogCard({ articles = [], isLoading = false, onBlogDelet
                   <img src="/icon/eye.svg" alt="View" />
                 </button> */}
 
-                <button onClick={() => handleEdit(b)} className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition" title="Edit">
+                <button onClick={() => handleEdit(b)} disabled={loadingItemId !== null} className="px-[12px] py-[10px] text-[#0C2141] hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed" title="Edit">
                   <img src="/icon/edit.svg" alt="Edit" />
                 </button>
 
-                <button onClick={() => handleDelete(b)} className="px-[12px] py-[10px] text-[#EF4444] hover:bg-red-50 transition" title="Delete">
-                  <img src="/icon/delete.svg" alt="Delete" />
+                <button onClick={() => handleDelete(b)} disabled={loadingItemId !== null} className="px-[12px] py-[10px] text-[#EF4444] hover:bg-red-50 transition disabled:opacity-50 disabled:cursor-not-allowed" title="Delete">
+                  {loadingItemId === String(b.id) ? (
+                    <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <img src="/icon/delete.svg" alt="Delete" />
+                  )}
                 </button>
               </div>
             </div>

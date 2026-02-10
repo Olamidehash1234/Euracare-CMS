@@ -44,8 +44,8 @@ export default function NotificationsPage() {
       setIsProcessing(true);
       showToast('Marking all as read...', 'loading');
       await markAllAsRead();
-      showToast('All notifications marked as read ✅', 'success');
-      console.log('✅ [NotificationsPage] All notifications marked as read');
+      showToast('All notifications marked as read  ', 'success');
+      console.log('  [NotificationsPage] All notifications marked as read');
     } catch (err: any) {
       const message = err?.response?.data?.message || 'Failed to mark all as read';
       showToast(message, 'error');
@@ -65,10 +65,10 @@ export default function NotificationsPage() {
       setIsProcessing(true);
       showToast(`Deleting ${selectedIds.length} notification(s)...`, 'loading');
       await bulkDeleteNotifications(selectedIds);
-      showToast(`${selectedIds.length} notification(s) deleted ✅`, 'success');
+      showToast(`${selectedIds.length} notification(s) deleted  `, 'success');
       setSelectedIds([]);
       setSelectedAll(false);
-      console.log(`✅ [NotificationsPage] ${selectedIds.length} notification(s) deleted`);
+      console.log(`  [NotificationsPage] ${selectedIds.length} notification(s) deleted`);
     } catch (err: any) {
       const message = err?.message || err?.response?.data?.message || 'Failed to delete notifications';
       showToast(message, 'error');
@@ -82,7 +82,7 @@ export default function NotificationsPage() {
     try {
       console.log('📖 [NotificationsPage] Marking notification as read:', id);
       await markAsRead(id);
-      console.log('✅ [NotificationsPage] Notification marked as read');
+      console.log('  [NotificationsPage] Notification marked as read');
     } catch (err: any) {
       const message = err?.message || 'Failed to mark as read';
       showToast(message, 'error');
@@ -95,8 +95,8 @@ export default function NotificationsPage() {
       console.log('🗑️ [NotificationsPage] Deleting notification:', id);
       // Use bulkDeleteNotifications with a single id
       await bulkDeleteNotifications([id]);
-      showToast('Notification deleted ✅', 'success');
-      console.log('✅ [NotificationsPage] Notification deleted');
+      showToast('Notification deleted  ', 'success');
+      console.log('  [NotificationsPage] Notification deleted');
     } catch (err: any) {
       const message = err?.message || err?.response?.data?.message || 'Failed to delete notification';
       showToast(message, 'error');

@@ -19,11 +19,7 @@ interface ServicesTableProps {
   onDelete?: (s: ServiceType) => void;
 }
 
-const fmt = (iso?: string) => {
-  if (!iso) return '-';
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) + ' - ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-};
+import { formatTableDateTime } from '../../utils/dateFormatter';
 
 export default function ServicesTable({ services, onView, onEdit, onDelete }: ServicesTableProps) {
   return (
@@ -50,7 +46,7 @@ export default function ServicesTable({ services, onView, onEdit, onDelete }: Se
               <td className="py-[19px] px-4 align-middle">
                 <div className="font-normal text-[14px]">{s.title}</div>
               </td>
-              <td className="py-[19px] px-4 text-[14px] align-middle">{fmt(s.publishedAt)}</td>
+              <td className="py-[19px] px-4 text-[14px] align-middle">{formatTableDateTime(s.publishedAt)}</td>
               <td className="py-[19px] px-4 align-middle text-center">
                 <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
                   <button onClick={() => onView?.(s)} className="px-[12px] py-[10px] text-[#0C2141]" title="View">

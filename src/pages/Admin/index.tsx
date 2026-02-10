@@ -182,7 +182,7 @@ const AdminPage = () => {
       setAdmins(admins.filter(a => a.id !== admin.id));
 
       // Show success toast
-      setToastMessage('Admin deleted successfully! ✅');
+      setToastMessage('Admin deleted successfully!  ');
       setToastType('success');
       setShowToast(true);
     } catch (err: any) {
@@ -227,7 +227,7 @@ const AdminPage = () => {
             }
           : a
       ));
-      setToastMessage('Admin updated successfully! ✅');
+      setToastMessage('Admin updated successfully!  ');
     } else {
       setAdmins(prev => [
         {
@@ -240,7 +240,7 @@ const AdminPage = () => {
         },
         ...prev,
       ]);
-      setToastMessage('Admin created successfully! ✅');
+      setToastMessage('Admin created successfully!  ');
     }
     setToastType('success');
     setShowToast(true);

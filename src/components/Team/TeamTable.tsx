@@ -14,11 +14,7 @@ interface TeamTableProps {
   onDelete?: (m: TeamMember) => void;
 }
 
-const fmt = (iso?: string) => {
-  if (!iso) return '-';
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' }) + ' - ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-};
+import { formatTableDateTime } from '../../utils/dateFormatter';
 
 export default function TeamTable({ members, onView, onEdit, onDelete }: TeamTableProps) {
   return (
@@ -46,7 +42,7 @@ export default function TeamTable({ members, onView, onEdit, onDelete }: TeamTab
                   </div>
                 </div>
               </td>
-              <td className="py-[29px] px-4 text-[14px] align-middle">{fmt(m.createdAt)}</td>
+              <td className="py-[29px] px-4 text-[14px] align-middle">{formatTableDateTime(m.createdAt)}</td>
               <td className="py-[29px] px-4 text-[14px] align-middle">{m.role ?? '-'}</td>
               <td className="py-[29px] px-4 text-[14px] align-middle">{m.category ?? '-'}</td>
               <td className="py-[29px] px-4 align-middle text-center">

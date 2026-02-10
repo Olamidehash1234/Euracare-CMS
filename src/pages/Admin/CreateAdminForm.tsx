@@ -63,7 +63,7 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
       // Update preview with Cloudinary URL
       setAvatarPreview(imageUrl);
 
-      setToastMessage('Image uploaded successfully! ✅');
+      setToastMessage('Image uploaded successfully!  ');
       setToastType('success');
       setShowToast(true);
     } catch (err: any) {
@@ -210,11 +210,11 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
 
       if (mode === 'create') {
         await adminService.createUser(payload);
-        setToastMessage('Admin profile created successfully! ✅');
+        setToastMessage('Admin profile created successfully!  ');
       } else {
         // For edit mode, use updateAdmin which should be able to handle optional password
         await adminService.updateAdmin(String(initialData?.id || ''), payload);
-        setToastMessage('Admin profile updated successfully! ✅');
+        setToastMessage('Admin profile updated successfully!  ');
       }
 
       setToastType('success');
@@ -253,9 +253,9 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
       />
 
       <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
-        <a href="/admin" className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px]">
+        <button onClick={onClose} className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px] bg-none border-none cursor-pointer hover:text-[#0a1a2f] transition">
           <img src="/icon/right.svg" alt="" /> Back to Admin Management
-        </a>
+        </button>
 
         <div className="bg-white rounded-xl border border-[#B9B9B9] overflow-hidden">
           <div className="px-6 lg:px-[30px] py-5 lg:py-[20px] border-b border-[#0000001A]">

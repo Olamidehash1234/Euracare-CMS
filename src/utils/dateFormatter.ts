@@ -1,27 +1,32 @@
 /**
- * Format date to user-friendly format
+ * Format date to user-friendly format (Lagos, Nigeria timezone)
  * Examples: "Today at 3:30 PM", "Yesterday at 2:45 PM", "2 days ago", "Feb 8, 2:30 PM"
  */
 export function formatNotificationTime(dateString: string): string {
   try {
     const date = new Date(dateString);
+    
+    // Convert to Lagos timezone (UTC+1)
+    const lagosDate = new Date(date.toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }));
     const now = new Date();
+    const lagosNow = new Date(now.toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }));
     
     // Reset time to compare dates only
-    const today = new Date(now);
+    const today = new Date(lagosNow);
     today.setHours(0, 0, 0, 0);
     
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     
-    const notificationDate = new Date(date);
+    const notificationDate = new Date(lagosDate);
     notificationDate.setHours(0, 0, 0, 0);
     
-    // Format time part
-    const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    // Format time part using Nigeria locale and Lagos timezone
+    const timeFormatter = new Intl.DateTimeFormat('en-NG', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
+      timeZone: 'Africa/Lagos',
     });
     const timeStr = timeFormatter.format(date);
     
@@ -35,18 +40,19 @@ export function formatNotificationTime(dateString: string): string {
     }
     
     // If within last 7 days
-    const daysAgo = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    const daysAgo = Math.floor((lagosNow.getTime() - lagosDate.getTime()) / (1000 * 60 * 60 * 24));
     if (daysAgo < 7 && daysAgo > 0) {
       return `${daysAgo} day${daysAgo > 1 ? 's' : ''} ago`;
     }
     
-    // Older dates: show month and day with time
-    const monthDayFormatter = new Intl.DateTimeFormat('en-US', {
+    // Older dates: show month and day with time (Nigeria locale)
+    const monthDayFormatter = new Intl.DateTimeFormat('en-NG', {
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
+      timeZone: 'Africa/Lagos',
     });
     
     return monthDayFormatter.format(date);
@@ -56,22 +62,22 @@ export function formatNotificationTime(dateString: string): string {
   }
 }
 
-/**
- * Format date for display in tables (alternative shorter format)
- * Examples: "Feb 8", "Today", "Yesterday"
- */
 export function formatNotificationDate(dateString: string): string {
   try {
     const date = new Date(dateString);
     const now = new Date();
     
-    const today = new Date(now);
+    // Convert to Lagos timezone (UTC+1)
+    const lagosDate = new Date(date.toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }));
+    const lagosNow = new Date(now.toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }));
+    
+    const today = new Date(lagosNow);
     today.setHours(0, 0, 0, 0);
     
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     
-    const notificationDate = new Date(date);
+    const notificationDate = new Date(lagosDate);
     notificationDate.setHours(0, 0, 0, 0);
     
     if (notificationDate.getTime() === today.getTime()) {
@@ -82,15 +88,61 @@ export function formatNotificationDate(dateString: string): string {
       return 'Yesterday';
     }
     
-    // Otherwise show month and day
-    const formatter = new Intl.DateTimeFormat('en-US', {
+    // Otherwise show month and day (Nigeria locale)
+    const formatter = new Intl.DateTimeFormat('en-NG', {
       month: 'short',
       day: 'numeric',
+      timeZone: 'Africa/Lagos',
     });
     
     return formatter.format(date);
   } catch (error) {
     console.error('Error formatting date:', error);
     return 'Recently';
+  }
+}
+
+/**
+ * Format date and time for table display (Lagos timezone)
+ * Examples: "8 Feb, 3:30 PM", "10 Feb, 2:45 PM"
+ */
+export function formatTableDateTime(dateString: string): string {
+  try {
+    if (!dateString) return '-';
+    
+    console.log('📅 [formatTableDateTime] Input dateString:', dateString);
+    
+    // If the date string doesn't have a timezone indicator (no Z, +, - at the end),
+    // treat it as UTC by appending 'Z'
+    let correctedDateString = dateString;
+    if (!dateString.includes('Z') && !dateString.includes('+') && !dateString.includes('-', dateString.length - 6)) {
+      correctedDateString = dateString + 'Z';
+      console.log('📅 [formatTableDateTime] Added Z suffix. Corrected dateString:', correctedDateString);
+    }
+    
+    const date = new Date(correctedDateString);
+    
+    console.log('📅 [formatTableDateTime] Parsed Date object:', date);
+    console.log('📅 [formatTableDateTime] Date.getTime():', date.getTime());
+    console.log('📅 [formatTableDateTime] Date.toISOString():', date.toISOString());
+    
+    // Format without forcing timezone - let the system's local interpretation handle it
+    // This respects the user's system timezone settings
+    const formatter = new Intl.DateTimeFormat('en-NG', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+    
+    const formatted = formatter.format(date);
+    console.log('📅 [formatTableDateTime] Formatted result (System local time):', formatted);
+    
+    return formatted;
+  } catch (error) {
+    console.error('❌ [formatTableDateTime] Error formatting date:', error, 'Input:', dateString);
+    return dateString || '-';
   }
 }

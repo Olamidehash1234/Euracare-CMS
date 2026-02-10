@@ -147,7 +147,7 @@ const TeamPage = () => {
             }
           : m
       );
-      showToast('success', 'Team member updated successfully! ✅');
+      showToast('success', 'Team member updated successfully!  ');
     } else {
       // Add new member from API response
       const newMember: TeamMember = {

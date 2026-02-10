@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { doctorService, getErrorMessage } from '@/services';
 import Toast from '@/components/GlobalComponents/Toast';
 import LoadingSpinner from '@/components/commonComponents/LoadingSpinner';
-import AvatarUpload from '@/components/Doctors/AvatarUpload';
+import AvatarUpload from '@/components/commonComponents/AvatarUpload';
 import BasicInformation from '@/components/Doctors/BasicInformation';
 import ProfessionalInformation from '@/components/Doctors/ProfessionalInformation';
 import { useDoctorForm } from '@/hooks/useDoctorForm';
@@ -39,6 +39,7 @@ interface DoctorFormProps {
 export default function DoctorForm({
   mode = 'create',
   initialData,
+  onSave,
   onClose,
   isLoadingData = false,
 }: DoctorFormProps): React.ReactElement {
@@ -141,23 +142,43 @@ export default function DoctorForm({
         // Update doctor
         await doctorService.updateDoctor(initialData.doctorId, payload as any);
         setToastType('success');
-        setToastMessage('Doctor profile updated successfully! ✅');
-        // Reset form after successful update
-        // resetForm();
+        setToastMessage('Doctor profile updated successfully!  ');
       } else {
         // Create doctor
         await doctorService.createDoctor(payload as any);
         setToastType('success');
         setToastMessage('Doctor profile created successfully! 🎉');
-        // Reset form after successful creation
         resetForm();
       }
 
       // Keep toast visible during timeout
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Then navigate
-      navigate('/doctors', { replace: true });
+      // If onSave callback is provided (from Overview/parent component), call it
+      // Convert API payload to form-shaped NewDoctorPayload for the callback
+      if (onSave) {
+        const callbackPayload: NewDoctorPayload = {
+          fullName: form.fullName,
+          email: form.email,
+          phone: form.phone,
+          languages: form.language,
+          regNumber: form.regNumber || undefined,
+          yearsExperience: form.yearsExperience || undefined,
+          bio: form.bio || undefined,
+          avatar: imageUpload.avatarPreview || undefined,
+          programs: profInfo.programs.length > 0 ? profInfo.programs : undefined,
+          researchInterests: profInfo.researchInterests.length > 0 ? profInfo.researchInterests : undefined,
+          qualifications: profInfo.qualifications.length > 0 ? profInfo.qualifications : undefined,
+          trainings: profInfo.trainings.length > 0 ? profInfo.trainings : undefined,
+          associations: profInfo.associations.length > 0 ? profInfo.associations : undefined,
+          certifications: profInfo.certifications.length > 0 ? profInfo.certifications : undefined,
+          doctorId: initialData?.doctorId,
+        };
+
+        onSave(callbackPayload);
+      } else {
+        navigate('/doctors', { replace: true });
+      }
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       setToastType('error');
@@ -169,7 +190,7 @@ export default function DoctorForm({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       <Toast
         message={toastMessage}
         type={toastType}
@@ -185,12 +206,12 @@ export default function DoctorForm({
       {isLoadingData && <LoadingSpinner />}
 
       <div className="" style={{ opacity: isLoadingData ? 0.5 : 1, pointerEvents: isLoadingData ? 'none' : 'auto' }}>
-        <a
-          href="/doctors"
-          className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 lg:mb-[30px] lg:leading-[140%] gap-[4px]"
+        <button
+          onClick={onClose}
+          className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 lg:mb-[30px] lg:leading-[140%] gap-[4px] bg-none border-none cursor-pointer hover:text-[#0a1a2f] transition"
         >
           <img src="/icon/right.svg" alt="" /> Back to Doctor's Page
-        </a>
+        </button>
 
         <div className="bg-white rounded-xl border border-[#B9B9B9] overflow-hidden">
           <div className="px-6 lg:px-[30px] py-5 lg:py-[20px] border-b border-[#0000001A]">

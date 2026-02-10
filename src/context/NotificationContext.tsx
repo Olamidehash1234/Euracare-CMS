@@ -149,7 +149,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
           console.log('🔌 [NotificationProvider] Auto-connecting with stored token...');
           setWsStatus('CONNECTING');
           await websocketService.connect(token);
-          console.log('✅ [NotificationProvider] Auto-connect successful');
+          console.log('  [NotificationProvider] Auto-connect successful');
         }
       } catch (err) {
         console.error('❌ [NotificationProvider] Auto-connect failed:', err);
@@ -182,7 +182,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       setError(null);
       
       const apiNotifications = await notificationService.getNotifications();
-      console.log('✅ [NotificationProvider] Loaded', apiNotifications.length, 'notifications from API');
+      console.log('  [NotificationProvider] Loaded', apiNotifications.length, 'notifications from API');
       
       const mappedNotifications = apiNotifications.map(n => mapBackendRestNotification(n));
       setNotifications(mappedNotifications);
@@ -213,7 +213,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       try {
         const notification = mapBackendMessageToNotification(message);
-        console.log('✅ [NotificationContext] Mapped notification:', notification);
+        console.log('  [NotificationContext] Mapped notification:', notification);
         
         setNotifications(prev => {
           // Check if notification already exists to avoid duplicates
@@ -221,7 +221,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
             console.warn('⚠️ [NotificationContext] Duplicate notification ignored');
             return prev;
           }
-          console.log('✅ [NotificationContext] Adding notification to state');
+          console.log('  [NotificationContext] Adding notification to state');
           return [notification, ...prev];
         });
       } catch (err) {
@@ -258,7 +258,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       setWsStatus('CONNECTING');
       console.log('🔌 [NotificationContext.connect] Status set to CONNECTING');
       await websocketService.connect(token);
-      console.log('✅ [NotificationContext.connect] Connection successful');
+      console.log('  [NotificationContext.connect] Connection successful');
     } catch (err) {
       console.error('❌ [NotificationContext.connect] Failed to connect WebSocket:', err);
       setWsStatus('DISCONNECTED');
@@ -271,7 +271,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     websocketService.disconnect();
     setIsConnected(false);
     setWsStatus('DISCONNECTED');
-    console.log('✅ [NotificationContext.disconnect] Disconnection complete');
+    console.log('  [NotificationContext.disconnect] Disconnection complete');
   };
 
   const addNotification = (notification: NotificationRow) => {
@@ -311,7 +311,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       setNotifications(prev =>
         prev.map(n => (n.id === id ? { ...n, read: true } : n))
       );
-      console.log('✅ [NotificationContext] Notification marked as read');
+      console.log('  [NotificationContext] Notification marked as read');
     } catch (err) {
       console.error('❌ [NotificationContext] Error marking notification as read:', err);
       throw err;
@@ -326,7 +326,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       // Update local state
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-      console.log('✅ [NotificationContext] All notifications marked as read');
+      console.log('  [NotificationContext] All notifications marked as read');
     } catch (err) {
       console.error('❌ [NotificationContext] Error marking all notifications as read:', err);
       throw err;
@@ -341,7 +341,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       
       // Update local state - remove deleted notifications
       setNotifications(prev => prev.filter(n => !ids.includes(n.id)));
-      console.log('✅ [NotificationContext] Notifications deleted');
+      console.log('  [NotificationContext] Notifications deleted');
     } catch (err) {
       console.error('❌ [NotificationContext] Error bulk deleting notifications:', err);
       throw err;

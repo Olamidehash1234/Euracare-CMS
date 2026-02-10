@@ -159,7 +159,7 @@ const DoctorsPage = () => {
             setDoctors(doctors.filter(d => d.id !== doctor.id));
             
             // Show success toast
-            setToastMessage('Doctor deleted successfully! ✅');
+            setToastMessage('Doctor deleted successfully!  ');
             setToastType('success');
             setShowToast(true);
         } catch (err: any) {

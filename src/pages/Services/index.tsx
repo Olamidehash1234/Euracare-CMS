@@ -98,7 +98,7 @@ const ServicesPage = () => {
       showToast('Deleting service...', 'loading');
       await serviceService.deleteService(String(s.id));
       setServices(prev => prev.filter(x => x.id !== s.id));
-      showToast('Service deleted successfully! ✅', 'success');
+      showToast('Service deleted successfully!  ', 'success');
     } catch (err) {
       showToast('Failed to delete service', 'error');
     }

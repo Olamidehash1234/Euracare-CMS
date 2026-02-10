@@ -134,7 +134,7 @@ const DepartmentPage = () => {
     setOpenMembersFor(roleId);
     setIsLoadingMembers(true);
     
-    console.log('👥 [RolesPage] Manage Members clicked for roleId:', roleId);
+    // console.log('👥 [RolesPage] Manage Members clicked for roleId:', roleId);
     // showToast('Loading members...', 'loading');
 
     try {
@@ -144,11 +144,11 @@ const DepartmentPage = () => {
         limit: 100 // Get all users for this role
       };
       
-      console.log('📋 [RolesPage] Fetching members with params:', params);
+      // console.log('📋 [RolesPage] Fetching members with params:', params);
       const response = await adminService.getAllAdmins(params);
       
-      console.log('📨 [RolesPage] Backend response:', response.data);
-      console.log('📨 [RolesPage] Members data:', response?.data?.data?.users);
+      // console.log('📨 [RolesPage] Backend response:', response.data);
+      // console.log('📨 [RolesPage] Members data:', response?.data?.data?.users);
       
       const usersData = response?.data?.data?.users || [];
 
@@ -172,7 +172,7 @@ const DepartmentPage = () => {
           };
         });
 
-        console.log('✅ [RolesPage] Members loaded successfully:', transformedMembers.length, 'members found');
+        console.log('  [RolesPage] Members loaded successfully:', transformedMembers.length, 'members found');
         console.log('📄 [RolesPage] Transformed members:', transformedMembers);
         setMembersData(transformedMembers);
         // showToast(`${transformedMembers.length} member(s) loaded`, 'success');
@@ -212,7 +212,7 @@ const DepartmentPage = () => {
 
   const handleDeleteRole = async (roleId: string) => {
     try {
-      console.log('[RolesPage] Deleting role:', roleId);
+      // console.log('[RolesPage] Deleting role:', roleId);
       showToast('Deleting role...', 'loading');
       await roleService.deleteRole(roleId);
       showToast('Role deleted successfully!', 'success');
@@ -363,9 +363,9 @@ const DepartmentPage = () => {
         <Header title="Roles & Permission" />
         <div className="p-[16px] lg:p-[40px]">
           {openMembersFor && (
-            <a href="/roles&permission" className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px]">
+            <button onClick={() => { setOpenMembersFor(null); fetchRoles(); }} className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px] bg-none border-none cursor-pointer hover:text-[#0a1a2f] transition">
               <img src="/icon/right.svg" alt="" /> Back to Roles and Permissions Page
-            </a>
+            </button>
           )}
           <div className="bg-white rounded-[14px] p-6 lg:px-[20px] lg:py-[23px] shadow-sm border border-gray-200">
             <div className="flex items-center flex-col lg:flex-row gap-[20px] justify-between mb-[22px]">
@@ -397,6 +397,7 @@ const DepartmentPage = () => {
                         onClose={() => {
                           setOpenMembersFor(null);
                           setMembersData([]);
+                          fetchRoles();
                         }}
                         onEdit={() => {}}
                       />

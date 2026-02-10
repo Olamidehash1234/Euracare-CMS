@@ -27,15 +27,15 @@ const LogsPage = () => {
       try {
         setLoading(true);
         setError(null);
-        console.log('📋 Starting to fetch audit logs...');
+        // console.log('📋 Starting to fetch audit logs...');
         
         const response = await auditService.getAudits({ page: 1, limit: 50 });
         
-        console.log('📨 Raw audit response:', response);
+        // console.log('📨 Raw audit response:', response);
         
         // Transform audit data to ActivityRow format
         const audits = response.data.data?.audits || [];
-        console.log('📊 Audit logs count:', audits.length);
+        // console.log('📊 Audit logs count:', audits.length);
         
         const transformedActivities: ActivityRow[] = audits.map((audit: AuditResponse) => {
           const transformed = {
@@ -47,15 +47,15 @@ const LogsPage = () => {
             details: audit.details || audit.item_affected || 'N/A',
             ip: audit.ip_address || 'N/A',
           };
-          console.log('🔄 Transformed audit:', { from: audit, to: transformed });
+          // console.log('🔄 Transformed audit:', { from: audit, to: transformed });
           return transformed;
         });
         
         setActivities(transformedActivities);
-        console.log('✅ Successfully loaded', transformedActivities.length, 'audit logs');
+        // console.log('  Successfully loaded', transformedActivities.length, 'audit logs');
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to load audit logs';
-        console.error('❌ Error loading audit logs:', errorMessage);
+        // console.error('❌ Error loading audit logs:', errorMessage);
         setError(errorMessage);
         setToastType('error');
         setToastMessage('Unable to load audit logs. Please try again.');
@@ -106,7 +106,7 @@ const LogsPage = () => {
       setToastType('success');
       setToastMessage('Audit logs loaded successfully');
       setShowToast(true);
-      console.log('✅ Successfully loaded', transformedActivities.length, 'audit logs');
+      console.log('  Successfully loaded', transformedActivities.length, 'audit logs');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load audit logs';
       console.error('❌ Error loading audit logs:', errorMessage);
@@ -121,17 +121,17 @@ const LogsPage = () => {
   };
 
   // Footer action handlers (local no-op / logging for now)
-  const handleSelectAll = () => {
-    console.log('📌 Select all clicked');
-  };
+  // const handleSelectAll = () => {
+  //   console.log('📌 Select all clicked');
+  // };
 
-  const handleMarkAllRead = () => {
-    console.log('📖 Mark all read clicked');
-  };
+  // const handleMarkAllRead = () => {
+  //   console.log('📖 Mark all read clicked');
+  // };
 
-  const handleDeleteSelected = () => {
-    console.log('🗑️ Delete selected clicked');
-  };
+  // const handleDeleteSelected = () => {
+  //   console.log('🗑️ Delete selected clicked');
+  // };
 
   return (
     <section>
@@ -195,7 +195,7 @@ const LogsPage = () => {
           <div className="mt-[30px] flex items-center justify-between text-sm text-[#202224]">
             <div>Showing 1-{activities.length} of {activities.length}</div>
 
-            <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
+            {/* <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
               <button onClick={handleSelectAll} className="px-[14px] py-[12px] text-[#0C2141]" title="Select All">
                   <img src="/icon/download.svg" alt="" />
               </button>
@@ -207,7 +207,7 @@ const LogsPage = () => {
               <button onClick={handleDeleteSelected} className="px-[14px] py-[12px] text-[#EF4444]" title="Delete">
                   <img src="/icon/delete-black.svg" alt="" />
               </button>
-            </div>
+            </div> */}
 
             <div className="flex items-center border border-[#E6E8EE] divide-x divide-[#E6E8EE] rounded-[8px]">
               <button className="px-[20px] py-[13px]">

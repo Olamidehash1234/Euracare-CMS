@@ -5,6 +5,7 @@ export interface TestimonialPayload {
   patient_name: string;
   service: string;
   video_url: string;
+  thumbnail_url?: string;
 }
 
 export interface TestimonialResponse {
@@ -13,6 +14,7 @@ export interface TestimonialResponse {
   patient_name: string;
   service: string;
   video_url: string;
+  thumbnail_url?: string;
   createdAt?: string;
   updatedAt?: string;
 }

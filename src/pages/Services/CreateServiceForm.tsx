@@ -209,7 +209,7 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
         await serviceService.createService(payload);
       }
 
-      showToast(mode === 'edit' ? 'Service updated successfully! ✅' : 'Service created successfully! ✅', 'success');
+      showToast(mode === 'edit' ? 'Service updated successfully!  ' : 'Service created successfully!  ', 'success');
 
       // Keep toast visible during timeout
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -233,9 +233,9 @@ export default function CreateServiceForm({ mode = 'create', initialData, onSave
   return (
     <div className="min-h-screen">
       <div className="">
-        <a href="/services" className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px]">
+        <button onClick={onClose} className="inline-flex items-center text-[#0C2141] text-sm lg:text-[16px] font-medium mb-4 gap-[4px] bg-none border-none cursor-pointer hover:text-[#0a1a2f] transition">
           <img src="/icon/right.svg" alt="" /> Back to Services Page
-        </a>
+        </button>
 
         <div className="bg-white rounded-xl border border-[#B9B9B9] overflow-hidden">
           <div className="px-[16px] lg:px-[30px] py-[14px] lg:py-[20px] border-b border-[#0000001A]">
