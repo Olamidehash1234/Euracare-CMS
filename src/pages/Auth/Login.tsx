@@ -48,14 +48,9 @@ export default function LoginPage(): JSX.Element {
   // Connect WebSocket after successful login
   useEffect(() => {
     if (isAuthenticated && user && !isLoading) {
-      console.log('🔌 [Login] User authenticated, connecting to WebSocket...');
       connectWebSocket()
-        .then(() => {
-          console.log('  [Login] WebSocket connected successfully');
-        })
-        .catch((err) => {
-          console.error('❌ [Login] Failed to connect WebSocket:', err);
-          // Don't fail the entire login, just log the error
+        .catch(() => {
+          // WebSocket connection failed, but continue with login
         });
     }
   }, [isAuthenticated, user, isLoading, connectWebSocket]);

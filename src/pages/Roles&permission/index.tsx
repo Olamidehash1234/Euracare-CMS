@@ -159,7 +159,6 @@ const DepartmentPage = () => {
 
         // Transform the users data to AdminType format
         const transformedMembers = usersData.map((user: any) => {
-          console.log('🔄 [RolesPage] Transforming user:', { id: user.id, name: user.full_name, status: user.status });
           return {
             id: user.id || user._id,
             name: user.full_name || user.fullName || '',
@@ -172,12 +171,9 @@ const DepartmentPage = () => {
           };
         });
 
-        console.log('  [RolesPage] Members loaded successfully:', transformedMembers.length, 'members found');
-        console.log('📄 [RolesPage] Transformed members:', transformedMembers);
         setMembersData(transformedMembers);
         // showToast(`${transformedMembers.length} member(s) loaded`, 'success');
       } else {
-        console.warn('⚠️ [RolesPage] No members found for this role');
         showToast('No members found for this role', 'error');
       }
     } catch (error: any) {
@@ -189,7 +185,7 @@ const DepartmentPage = () => {
         errorMessage = 'You do not have permission to view members.';
       }
 
-      console.error('❌ [RolesPage] Error loading members:', error);
+      
       showToast(errorMessage, 'error');
     } finally {
       setIsLoadingMembers(false);

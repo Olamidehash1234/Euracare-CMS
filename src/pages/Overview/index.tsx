@@ -133,7 +133,6 @@ const OverviewPage = () => {
         });
       }
     } catch (err) {
-      console.error('Error loading doctor for edit:', err);
       setToast({
         show: true,
         type: 'error',
@@ -187,7 +186,6 @@ const OverviewPage = () => {
         });
       }
     } catch (err) {
-      console.error('Error loading service for edit:', err);
       setToast({
         show: true,
         type: 'error',
@@ -246,7 +244,6 @@ const OverviewPage = () => {
         });
       }
     } catch (err) {
-      console.error('Error loading blog for edit:', err);
       setToast({
         show: true,
         type: 'error',

@@ -63,7 +63,7 @@ const mapBackendRestNotification = (notif: any): NotificationRow => {
 
 // Helper function to convert WebSocket message to NotificationRow
 const mapBackendMessageToNotification = (message: WebSocketMessage): NotificationRow => {
-  console.log('🔄 [mapBackendMessageToNotification] Converting message:', message);
+  // console.log('🔄 [mapBackendMessageToNotification] Converting message:', message);
   
   // First, try to use the real ID from the backend if available
   let id = '';
@@ -71,12 +71,12 @@ const mapBackendMessageToNotification = (message: WebSocketMessage): Notificatio
   // Check if payload has an id (MongoDB ObjectId from backend)
   if (message.payload?.id) {
     id = message.payload.id;
-    console.log('🔄 [mapBackendMessageToNotification] Using real ID from payload:', id);
+    // console.log('🔄 [mapBackendMessageToNotification] Using real ID from payload:', id);
   } 
   // Check if data has an id (MongoDB ObjectId from backend)
   else if (message.data?.id) {
     id = message.data.id;
-    console.log('🔄 [mapBackendMessageToNotification] Using real ID from data:', id);
+    // console.log('🔄 [mapBackendMessageToNotification] Using real ID from data:', id);
   }
   // Otherwise create a synthetic ID (fallback for older messages without ID)
   else {
@@ -87,7 +87,7 @@ const mapBackendMessageToNotification = (message: WebSocketMessage): Notificatio
     } else {
       id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     }
-    console.log('🔄 [mapBackendMessageToNotification] Using synthetic ID:', id);
+    // console.log('🔄 [mapBackendMessageToNotification] Using synthetic ID:', id);
   }
   
   // Handle the backend's event/payload format with module/action
@@ -136,7 +136,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const connectionAttemptedRef = useRef(false);
   const loadInProgressRef = useRef(false);
 
-  console.log('🔌 [NotificationProvider] Rendering, wsStatus:', wsStatus, 'isConnected:', isConnected, 'isLoading:', isLoading);
+  // console.log('🔌 [NotificationProvider] Rendering, wsStatus:', wsStatus, 'isConnected:', isConnected, 'isLoading:', isLoading);
 
   // Auto-connect on mount if user has a token
   useEffect(() => {
@@ -146,13 +146,13 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         // Use ref to ensure we only attempt connection once
         if (token && !connectionAttemptedRef.current) {
           connectionAttemptedRef.current = true;
-          console.log('🔌 [NotificationProvider] Auto-connecting with stored token...');
+          // console.log('🔌 [NotificationProvider] Auto-connecting with stored token...');
           setWsStatus('CONNECTING');
           await websocketService.connect(token);
-          console.log('  [NotificationProvider] Auto-connect successful');
+          // console.log('  [NotificationProvider] Auto-connect successful');
         }
       } catch (err) {
-        console.error('❌ [NotificationProvider] Auto-connect failed:', err);
+        // console.error('❌ [NotificationProvider] Auto-connect failed:', err);
         setWsStatus('DISCONNECTED');
       }
     };
@@ -164,38 +164,38 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     try {
       // Prevent concurrent requests and retries while loading
       if (loadInProgressRef.current) {
-        console.log('⏳ [NotificationProvider] Load already in progress, skipping...');
+        // console.log('⏳ [NotificationProvider] Load already in progress, skipping...');
         return;
       }
 
       const token = localStorage.getItem('authToken');
       if (!token) {
-        console.log('⚠️ [NotificationProvider] No auth token found, cannot load notifications');
+        // console.log('⚠️ [NotificationProvider] No auth token found, cannot load notifications');
         setError('Not authenticated');
         setIsLoading(false);
         return;
       }
       
       loadInProgressRef.current = true;
-      console.log('📋 [NotificationProvider] Loading notifications from REST API...');
+      // console.log('📋 [NotificationProvider] Loading notifications from REST API...');
       setIsLoading(true);
       setError(null);
       
       const apiNotifications = await notificationService.getNotifications();
-      console.log('  [NotificationProvider] Loaded', apiNotifications.length, 'notifications from API');
+      // console.log('  [NotificationProvider] Loaded', apiNotifications.length, 'notifications from API');
       
       const mappedNotifications = apiNotifications.map(n => mapBackendRestNotification(n));
       setNotifications(mappedNotifications);
       setIsLoading(false);
     } catch (err: any) {
-      console.error('❌ [NotificationProvider] Failed to load notifications:', err);
+      // console.error('❌ [NotificationProvider] Failed to load notifications:', err);
       
       // Log detailed error information
-      if (err.response) {
-        console.error('❌ [NotificationProvider] Error Status:', err.response.status);
-        console.error('❌ [NotificationProvider] Error Message:', err.response.statusText);
-        console.error('❌ [NotificationProvider] Error Data:', err.response.data);
-      }
+      // if (err.response) {
+      //   console.error('❌ [NotificationProvider] Error Status:', err.response.status);
+      //   console.error('❌ [NotificationProvider] Error Message:', err.response.statusText);
+      //   console.error('❌ [NotificationProvider] Error Data:', err.response.data);
+      // }
       
       const errorMessage = err.response?.data?.message || (err as Error).message || 'Failed to load notifications';
       setError(errorMessage);
@@ -207,78 +207,78 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   // Handle incoming WebSocket messages
   useEffect(() => {
-    console.log('🔌 [NotificationContext] Setting up message listener');
+    // console.log('🔌 [NotificationContext] Setting up message listener');
     const unsubscribe = websocketService.onMessage((message: WebSocketMessage) => {
-      console.log('📬 [NotificationContext] Raw notification received:', message);
+      // console.log('📬 [NotificationContext] Raw notification received:', message);
 
       try {
         const notification = mapBackendMessageToNotification(message);
-        console.log('  [NotificationContext] Mapped notification:', notification);
+        // console.log('  [NotificationContext] Mapped notification:', notification);
         
         setNotifications(prev => {
           // Check if notification already exists to avoid duplicates
           if (prev.some(n => n.id === notification.id)) {
-            console.warn('⚠️ [NotificationContext] Duplicate notification ignored');
+            // console.warn('⚠️ [NotificationContext] Duplicate notification ignored');
             return prev;
           }
-          console.log('  [NotificationContext] Adding notification to state');
+          // console.log('  [NotificationContext] Adding notification to state');
           return [notification, ...prev];
         });
       } catch (err) {
-        console.error('❌ [NotificationContext] Error processing notification:', err);
+        // console.error('❌ [NotificationContext] Error processing notification:', err);
       }
     });
 
-    console.log('🔌 [NotificationContext] Message listener mounted');
+    // console.log('🔌 [NotificationContext] Message listener mounted');
     return () => {
-      console.log('🔌 [NotificationContext] Message listener unmounting (may be React StrictMode)');
+      // console.log('🔌 [NotificationContext] Message listener unmounting (may be React StrictMode)');
       unsubscribe();
     };
   }, []);
 
   // Handle connection changes
   useEffect(() => {
-    console.log('🔌 [NotificationContext] MOUNTING: Setting up connection listener');
+    // console.log('🔌 [NotificationContext] MOUNTING: Setting up connection listener');
     const unsubscribe = websocketService.onConnectionChange((connected: boolean) => {
-      console.log('🔗 [NotificationContext] WebSocket connection changed:', connected);
+      // console.log('🔗 [NotificationContext] WebSocket connection changed:', connected);
       setIsConnected(connected);
       setWsStatus(connected ? 'CONNECTED' : 'DISCONNECTED');
     });
 
-    console.log('🔌 [NotificationContext] MOUNTED: Connection listener registered');
+    // console.log('🔌 [NotificationContext] MOUNTED: Connection listener registered');
     return () => {
-      console.log('🔌 [NotificationContext] UNMOUNTING: Connection listener unsubscribed');
+      // console.log('🔌 [NotificationContext] UNMOUNTING: Connection listener unsubscribed');
       unsubscribe();
     };
   }, []);
 
   const connect = async (token?: string) => {
     try {
-      console.log('🔌 [NotificationContext.connect] Starting connection with token:', token ? 'provided' : 'will use localStorage');
+      // console.log('🔌 [NotificationContext.connect] Starting connection with token:', token ? 'provided' : 'will use localStorage');
       setWsStatus('CONNECTING');
-      console.log('🔌 [NotificationContext.connect] Status set to CONNECTING');
+      // console.log('🔌 [NotificationContext.connect] Status set to CONNECTING');
       await websocketService.connect(token);
-      console.log('  [NotificationContext.connect] Connection successful');
+      // console.log('  [NotificationContext.connect] Connection successful');
     } catch (err) {
-      console.error('❌ [NotificationContext.connect] Failed to connect WebSocket:', err);
+      // console.error('❌ [NotificationContext.connect] Failed to connect WebSocket:', err);
       setWsStatus('DISCONNECTED');
       throw err;
     }
   };
 
   const disconnect = () => {
-    console.log('🔌 [NotificationContext.disconnect] Disconnecting WebSocket');
+    // console.log('🔌 [NotificationContext.disconnect] Disconnecting WebSocket');
     websocketService.disconnect();
     setIsConnected(false);
     setWsStatus('DISCONNECTED');
-    console.log('  [NotificationContext.disconnect] Disconnection complete');
+    // console.log('  [NotificationContext.disconnect] Disconnection complete');
   };
 
   const addNotification = (notification: NotificationRow) => {
-    console.log('📝 [NotificationContext] Adding notification:', notification);
+    // console.log('📝 [NotificationContext] Adding notification:', notification);
     setNotifications(prev => {
       if (prev.some(n => n.id === notification.id)) {
-        console.warn('⚠️ [NotificationContext] Duplicate notification ignored');
+        // console.warn('⚠️ [NotificationContext] Duplicate notification ignored');
         return prev;
       }
       return [notification, ...prev];
@@ -295,13 +295,13 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const markAsRead = async (id: string) => {
     try {
-      console.log('📖 [NotificationContext] Marking notification as read:', id);
+      // console.log('📖 [NotificationContext] Marking notification as read:', id);
       // Find the notification to log details
       const notif = notifications.find(n => n.id === id);
       if (notif) {
-        console.log('📖 [NotificationContext] Found notification:', notif.title, notif.message);
+        // console.log('📖 [NotificationContext] Found notification:', notif.title, notif.message);
       } else {
-        console.warn('⚠️ [NotificationContext] Notification not found in state:', id);
+        // console.warn('⚠️ [NotificationContext] Notification not found in state:', id);
       }
       
       // Call backend API to mark as read
@@ -311,39 +311,39 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       setNotifications(prev =>
         prev.map(n => (n.id === id ? { ...n, read: true } : n))
       );
-      console.log('  [NotificationContext] Notification marked as read');
+      // console.log('  [NotificationContext] Notification marked as read');
     } catch (err) {
-      console.error('❌ [NotificationContext] Error marking notification as read:', err);
+      // console.error('❌ [NotificationContext] Error marking notification as read:', err);
       throw err;
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      console.log('📖 [NotificationContext] Marking all notifications as read...');
+      // console.log('📖 [NotificationContext] Marking all notifications as read...');
       // Call backend API to mark all as read
       await notificationService.markAllAsRead();
       
       // Update local state
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-      console.log('  [NotificationContext] All notifications marked as read');
+      // console.log('  [NotificationContext] All notifications marked as read');
     } catch (err) {
-      console.error('❌ [NotificationContext] Error marking all notifications as read:', err);
+      // console.error('❌ [NotificationContext] Error marking all notifications as read:', err);
       throw err;
     }
   };
 
   const bulkDeleteNotifications = async (ids: string[]) => {
     try {
-      console.log('🗑️ [NotificationContext] Bulk deleting notifications:', ids);
+      // console.log('🗑️ [NotificationContext] Bulk deleting notifications:', ids);
       // Call backend API to bulk delete
       await notificationService.bulkDeleteNotifications(ids);
       
       // Update local state - remove deleted notifications
       setNotifications(prev => prev.filter(n => !ids.includes(n.id)));
-      console.log('  [NotificationContext] Notifications deleted');
+      // console.log('  [NotificationContext] Notifications deleted');
     } catch (err) {
-      console.error('❌ [NotificationContext] Error bulk deleting notifications:', err);
+      // console.error('❌ [NotificationContext] Error bulk deleting notifications:', err);
       throw err;
     }
   };
@@ -351,7 +351,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   // Calculate unread count efficiently using useMemo - best practice for expensive calculations
   const unreadCount = useMemo(() => {
     const count = notifications.filter(n => !n.read).length;
-    console.log('📊 [NotificationContext] Unread count recalculated:', count);
+    // console.log('📊 [NotificationContext] Unread count recalculated:', count);
     return count;
   }, [notifications]);
 

@@ -32,9 +32,9 @@ export default function NotificationsPage() {
   useEffect(() => {
     if (!loadAttemptedRef.current) {
       loadAttemptedRef.current = true;
-      console.log('📋 [NotificationsPage] Component mounted, loading notifications...');
+      // console.log('📋 [NotificationsPage] Component mounted, loading notifications...');
       loadNotifications().catch(err => {
-        console.error('❌ [NotificationsPage] Error loading notifications:', err);
+        // console.error('❌ [NotificationsPage] Error loading notifications:', err);
       });
     }
   }, [loadNotifications]);
@@ -45,11 +45,11 @@ export default function NotificationsPage() {
       showToast('Marking all as read...', 'loading');
       await markAllAsRead();
       showToast('All notifications marked as read  ', 'success');
-      console.log('  [NotificationsPage] All notifications marked as read');
+      // console.log('  [NotificationsPage] All notifications marked as read');
     } catch (err: any) {
       const message = err?.response?.data?.message || 'Failed to mark all as read';
       showToast(message, 'error');
-      console.error('❌ [NotificationsPage] Error marking all as read:', err);
+      // console.error('❌ [NotificationsPage] Error marking all as read:', err);
     } finally {
       setIsProcessing(false);
     }
@@ -68,11 +68,11 @@ export default function NotificationsPage() {
       showToast(`${selectedIds.length} notification(s) deleted  `, 'success');
       setSelectedIds([]);
       setSelectedAll(false);
-      console.log(`  [NotificationsPage] ${selectedIds.length} notification(s) deleted`);
+      // console.log(`  [NotificationsPage] ${selectedIds.length} notification(s) deleted`);
     } catch (err: any) {
       const message = err?.message || err?.response?.data?.message || 'Failed to delete notifications';
       showToast(message, 'error');
-      console.error('❌ [NotificationsPage] Error deleting notifications:', err);
+      // console.error('❌ [NotificationsPage] Error deleting notifications:', err);
     } finally {
       setIsProcessing(false);
     }
@@ -80,27 +80,27 @@ export default function NotificationsPage() {
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      console.log('📖 [NotificationsPage] Marking notification as read:', id);
+      // console.log('📖 [NotificationsPage] Marking notification as read:', id);
       await markAsRead(id);
-      console.log('  [NotificationsPage] Notification marked as read');
+      // console.log('  [NotificationsPage] Notification marked as read');
     } catch (err: any) {
       const message = err?.message || 'Failed to mark as read';
       showToast(message, 'error');
-      console.error('❌ [NotificationsPage] Error marking as read:', err);
+      // console.error('❌ [NotificationsPage] Error marking as read:', err);
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      console.log('🗑️ [NotificationsPage] Deleting notification:', id);
+      // console.log('🗑️ [NotificationsPage] Deleting notification:', id);
       // Use bulkDeleteNotifications with a single id
       await bulkDeleteNotifications([id]);
       showToast('Notification deleted  ', 'success');
-      console.log('  [NotificationsPage] Notification deleted');
+      // console.log('  [NotificationsPage] Notification deleted');
     } catch (err: any) {
       const message = err?.message || err?.response?.data?.message || 'Failed to delete notification';
       showToast(message, 'error');
-      console.error('❌ [NotificationsPage] Error deleting notification:', err);
+      // console.error('❌ [NotificationsPage] Error deleting notification:', err);
     }
   };
 

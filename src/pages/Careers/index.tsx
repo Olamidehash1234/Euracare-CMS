@@ -336,7 +336,6 @@ export default function CareersPage() {
 
       setApplicants(mapped);
     } catch (err: any) {
-      console.error('Error fetching applicants:', err, err?.response?.data);
       setApplicantsError('error');
       // show user-friendly toast
       setToastType('error');

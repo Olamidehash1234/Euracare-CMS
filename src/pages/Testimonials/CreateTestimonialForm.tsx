@@ -106,7 +106,6 @@ export default function CreateTestimonialForm({
       setToastMessage('Thumbnail uploaded successfully!');
       setShowToast(true);
     } catch (error) {
-      console.error('Thumbnail upload failed:', error);
       setThumbnailPreview(null);
       setToastType('error');
       setToastMessage(`Failed to upload thumbnail: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -137,7 +136,7 @@ export default function CreateTestimonialForm({
         thumbnail_url: thumbnailPreview || undefined,
       };
 
-      console.log('📤 [Testimonials Form] Sending API Payload:', apiPayload);
+
 
       if (mode === 'create') {
         await testimonialService.createTestimonial(apiPayload);

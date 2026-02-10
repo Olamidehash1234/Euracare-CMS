@@ -57,7 +57,6 @@ export function formatNotificationTime(dateString: string): string {
     
     return monthDayFormatter.format(date);
   } catch (error) {
-    console.error('Error formatting date:', error);
     return 'Recently';
   }
 }
@@ -97,7 +96,6 @@ export function formatNotificationDate(dateString: string): string {
     
     return formatter.format(date);
   } catch (error) {
-    console.error('Error formatting date:', error);
     return 'Recently';
   }
 }
@@ -110,21 +108,18 @@ export function formatTableDateTime(dateString: string): string {
   try {
     if (!dateString) return '-';
     
-    console.log('📅 [formatTableDateTime] Input dateString:', dateString);
+    
     
     // If the date string doesn't have a timezone indicator (no Z, +, - at the end),
     // treat it as UTC by appending 'Z'
     let correctedDateString = dateString;
     if (!dateString.includes('Z') && !dateString.includes('+') && !dateString.includes('-', dateString.length - 6)) {
       correctedDateString = dateString + 'Z';
-      console.log('📅 [formatTableDateTime] Added Z suffix. Corrected dateString:', correctedDateString);
     }
     
     const date = new Date(correctedDateString);
     
-    console.log('📅 [formatTableDateTime] Parsed Date object:', date);
-    console.log('📅 [formatTableDateTime] Date.getTime():', date.getTime());
-    console.log('📅 [formatTableDateTime] Date.toISOString():', date.toISOString());
+    
     
     // Format without forcing timezone - let the system's local interpretation handle it
     // This respects the user's system timezone settings
@@ -138,11 +133,10 @@ export function formatTableDateTime(dateString: string): string {
     });
     
     const formatted = formatter.format(date);
-    console.log('📅 [formatTableDateTime] Formatted result (System local time):', formatted);
+    
     
     return formatted;
   } catch (error) {
-    console.error('❌ [formatTableDateTime] Error formatting date:', error, 'Input:', dateString);
     return dateString || '-';
   }
 }

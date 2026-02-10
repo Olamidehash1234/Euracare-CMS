@@ -79,14 +79,10 @@ const LogsPage = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔄 Retrying to fetch audit logs...');
       
       const response = await auditService.getAudits({ page: 1, limit: 50 });
       
-      console.log('📨 Raw audit response:', response);
-      
       const audits = response.data.data?.audits || [];
-      console.log('📊 Audit logs count:', audits.length);
       
       const transformedActivities: ActivityRow[] = audits.map((audit: AuditResponse) => {
         const transformed = {
@@ -98,7 +94,6 @@ const LogsPage = () => {
           details: audit.details || audit.item_affected || 'N/A',
           ip: audit.ip_address || 'N/A',
         };
-        console.log('🔄 Transformed audit:', { from: audit, to: transformed });
         return transformed;
       });
       
@@ -106,10 +101,8 @@ const LogsPage = () => {
       setToastType('success');
       setToastMessage('Audit logs loaded successfully');
       setShowToast(true);
-      console.log('  Successfully loaded', transformedActivities.length, 'audit logs');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load audit logs';
-      console.error('❌ Error loading audit logs:', errorMessage);
       setError(errorMessage);
       setToastType('error');
       setToastMessage('Failed to load audit logs. Please try again.');

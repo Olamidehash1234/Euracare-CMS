@@ -34,14 +34,9 @@ const authService = {
   login: (payload: LoginPayload) =>
     apiClient.post<LoginResponse>('/auth/login', payload)
       .then((response) => {
-        const accessToken = response.data.data?.access_token;
-        if (accessToken) {
-          console.log('🔐 Login successful. Access Token:', accessToken);
-        }
         return response;
       })
       .catch((error) => {
-        console.error('❌ Login failed:', error.message);
         throw error;
       }),
 
