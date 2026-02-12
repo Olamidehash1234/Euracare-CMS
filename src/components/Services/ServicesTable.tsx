@@ -22,6 +22,12 @@ interface ServicesTableProps {
 import { formatTableDateTime } from '../../utils/dateFormatter';
 
 export default function ServicesTable({ services, onView, onEdit, onDelete }: ServicesTableProps) {
+  // Sort services by publishedAt descending (newest first)
+  const sortedServices = [...services].sort((a, b) => {
+    const dateA = new Date(a.publishedAt).getTime();
+    const dateB = new Date(b.publishedAt).getTime();
+    return dateB - dateA;
+  });
   return (
     <div className="overflow-x-auto w-full border-[0.3px] px-[24px] border-[#B9B9B9] rounded-[14px]">
       <table className="w-full text-left table-auto">
@@ -35,7 +41,7 @@ export default function ServicesTable({ services, onView, onEdit, onDelete }: Se
           </tr>
         </thead>
         <tbody>
-          {services.map((s) => (
+          {sortedServices.map((s) => (
             <tr key={s.id} className="border-t border-[#01010133]">
               <td className="py-[19px] align-middle"><input type="checkbox" /></td>
               <td className="py-[19px] pl-4 pr-0 align-middle">

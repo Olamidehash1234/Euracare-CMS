@@ -23,6 +23,12 @@ const fmt = (iso?: string) => {
 };
 
 export default function AdminTable({ admins, onEdit, onDelete }: AdminTableProps) {
+  // Sort admins by dateCreated descending (newest first)
+  const sortedAdmins = [...admins].sort((a, b) => {
+    const dateA = new Date(a.dateCreated).getTime();
+    const dateB = new Date(b.dateCreated).getTime();
+    return dateB - dateA;
+  });
   return (
     <div className="overflow-x-auto w-full border-[0.3px] px-[24px] border-[#B9B9B9] rounded-[14px]">
       <table className="w-full text-left table-auto">
@@ -39,7 +45,7 @@ export default function AdminTable({ admins, onEdit, onDelete }: AdminTableProps
           </tr>
         </thead>
         <tbody>
-          {admins.map((admin) => (
+          {sortedAdmins.map((admin) => (
             <tr key={admin.id} className="border-t border-[#01010133]">
               <td className="w-[40px] py-[19px] align-middle"><input type="checkbox" /></td>
               <td className="w-[250px] py-[19px] pl-4 pr-0 align-middle">

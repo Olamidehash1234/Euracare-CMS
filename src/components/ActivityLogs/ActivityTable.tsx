@@ -32,16 +32,21 @@ export default function ActivityTable({ activities = [] }: Props) {
 
           {activities.length > 0 ? (
             <tbody className="divide-y divide-[#01010133]">
-              {activities.map((a) => (
-                <tr key={a.id ?? `${a.timestamp}-${a.actor}`} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-[19px] px-4 text-[14px] align-middle whitespace-nowrap">{a.timestamp ?? '-'}</td>
-                  <td className="py-[19px] px-4 text-[14px] align-middle">{a.actor ?? '-'}</td>
-                  <td className="py-[19px] px-4 text-[14px] align-middle">{a.role ?? '-'}</td>
-                  <td className="py-[19px] px-4 text-[14px] align-middle">{a.action ?? '-'}</td>
-                  <td className="py-[19px] px-4 text-[14px] align-middle min-w-[300px]">{a.details ?? '-'}</td>
-                  {/* <td className="py-[19px] px-4 text-[14px] align-middle">{a.ip ?? '-'}</td> */}
-                </tr>
-              ))}
+              {[...activities]
+                .sort((a, b) => {
+                  if (!a.timestamp || !b.timestamp) return 0;
+                  return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+                })
+                .map((a) => (
+                  <tr key={a.id ?? `${a.timestamp}-${a.actor}`} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-[19px] px-4 text-[14px] align-middle whitespace-nowrap">{a.timestamp ?? '-'}</td>
+                    <td className="py-[19px] px-4 text-[14px] align-middle">{a.actor ?? '-'}</td>
+                    <td className="py-[19px] px-4 text-[14px] align-middle">{a.role ?? '-'}</td>
+                    <td className="py-[19px] px-4 text-[14px] align-middle">{a.action ?? '-'}</td>
+                    <td className="py-[19px] px-4 text-[14px] align-middle min-w-[300px]">{a.details ?? '-'}</td>
+                    {/* <td className="py-[19px] px-4 text-[14px] align-middle">{a.ip ?? '-'}</td> */}
+                  </tr>
+                ))}
             </tbody>
           ) : (
             <tbody>

@@ -29,8 +29,14 @@ const formatDate = (iso?: string) => {
 };
 
 const DoctorsTable: React.FC<DoctorsTableProps> = ({ doctors, onEdit, onDelete }) => {
-   const [activeMoreOptions, setActiveMoreOptions] = useState<{id: string | number; rect?: DOMRect} | null>(null);
-   return (
+  // Sort doctors by createdAt descending (newest first)
+  const sortedDoctors = [...doctors].sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return dateB - dateA;
+  });
+  const [activeMoreOptions, setActiveMoreOptions] = useState<{id: string | number; rect?: DOMRect} | null>(null);
+  return (
     <div className="overflow-x-auto border-[0.3px] px-[24px] border-[#B9B9B9] rounded-[14px]">
       <table className="w-full text-left table-auto justify-between">
         <thead>
@@ -44,7 +50,7 @@ const DoctorsTable: React.FC<DoctorsTableProps> = ({ doctors, onEdit, onDelete }
           </tr>
         </thead>
         <tbody>
-          {doctors.map((d) => (
+          {sortedDoctors.map((d) => (
             <tr key={d.id} className="border-t border-[#01010133]">
               <td className="py-[29px] align-middle"><input type="checkbox" /></td>
               <td className="py-[29px] pl-4 pr-0 align-middle">

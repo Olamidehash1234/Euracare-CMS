@@ -17,6 +17,12 @@ interface TeamTableProps {
 import { formatTableDateTime } from '../../utils/dateFormatter';
 
 export default function TeamTable({ members, onView, onEdit, onDelete }: TeamTableProps) {
+  // Sort members by createdAt descending (newest first)
+  const sortedMembers = [...members].sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return dateB - dateA;
+  });
   return (
     <div className="overflow-x-auto w-full border-[0.3px] px-[24px] border-[#B9B9B9] rounded-[14px]">
       <table className="w-full text-left table-auto">
@@ -31,7 +37,7 @@ export default function TeamTable({ members, onView, onEdit, onDelete }: TeamTab
           </tr>
         </thead>
         <tbody>
-          {members.map((m) => (
+          {sortedMembers.map((m) => (
             <tr key={m.id} className="border-t border-[#01010133]">
               <td className="py-[29px] align-middle"><input type="checkbox" /></td>
               <td className="py-[29px] pl-4 pr-0 align-middle">

@@ -40,25 +40,25 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
   const handleSuspendUser = async (member: AdminType) => {
     try {
       setIsLoading(true);
-      console.log('⏸️ [ManageMembersTable] Suspending user:', member.id);
-      console.log('👤 [ManageMembersTable] Current member status:', member.status);
+      // console.log('⏸️ [ManageMembersTable] Suspending user:', member.id);
+      // console.log('👤 [ManageMembersTable] Current member status:', member.status);
       showToast('Suspending user...', 'loading');
 
       // Call the suspend user endpoint
       const response = await userService.suspendUser(member.id.toString());
-      console.log('📨 [ManageMembersTable] Suspend response received');
-      console.log('📊 [ManageMembersTable] Response success:', response.data.success);
-      console.log('📊 [ManageMembersTable] Backend user status:', response.data.data?.status);
+      // console.log('📨 [ManageMembersTable] Suspend response received');
+      // console.log('📊 [ManageMembersTable] Response success:', response.data.success);
+      // console.log('📊 [ManageMembersTable] Backend user status:', response.data.data?.status);
 
       // Update the member's status in local state with backend response status
       const newStatus = (response.data.data?.status || 'Suspended') as 'Active' | 'Suspended';
-      console.log('🔄 [ManageMembersTable] Updating local state with status:', newStatus);
+      // console.log('🔄 [ManageMembersTable] Updating local state with status:', newStatus);
       
       setUpdatedMembers((prev) => {
         const updated = prev.map((m) =>
           m.id === member.id ? { ...m, status: newStatus } : m
         );
-        console.log('✅ [ManageMembersTable] Local state updated, new members:', updated);
+        // console.log('✅ [ManageMembersTable] Local state updated, new members:', updated);
         return updated;
       });
 
@@ -75,7 +75,7 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error('❌ [ManageMembersTable] Error suspending user:', error);
+      // console.error('❌ [ManageMembersTable] Error suspending user:', error);
       showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
@@ -85,25 +85,25 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
   const handleReactivateUser = async (member: AdminType) => {
     try {
       setIsLoading(true);
-      console.log('♻️ [ManageMembersTable] Reactivating user:', member.id);
-      console.log('👤 [ManageMembersTable] Current member status:', member.status);
+      // console.log('♻️ [ManageMembersTable] Reactivating user:', member.id);
+      // console.log('👤 [ManageMembersTable] Current member status:', member.status);
       showToast('Reactivating user...', 'loading');
 
       // Call the reactivate user endpoint
       const response = await userService.reactivateUser(member.id.toString());
-      console.log('📨 [ManageMembersTable] Reactivate response received');
-      console.log('📊 [ManageMembersTable] Response success:', response.data.success);
-      console.log('📊 [ManageMembersTable] Backend user status:', response.data.data?.status);
+      // console.log('📨 [ManageMembersTable] Reactivate response received');
+      // console.log('📊 [ManageMembersTable] Response success:', response.data.success);
+      // console.log('📊 [ManageMembersTable] Backend user status:', response.data.data?.status);
 
       // Update the member's status in local state with backend response status
       const newStatus = (response.data.data?.status || 'Active') as 'Active' | 'Suspended';
-      console.log('🔄 [ManageMembersTable] Updating local state with status:', newStatus);
+      // console.log('🔄 [ManageMembersTable] Updating local state with status:', newStatus);
       
       setUpdatedMembers((prev) => {
         const updated = prev.map((m) =>
           m.id === member.id ? { ...m, status: newStatus } : m
         );
-        console.log('✅ [ManageMembersTable] Local state updated, new members:', updated);
+        // console.log('✅ [ManageMembersTable] Local state updated, new members:', updated);
         return updated;
       });
 
@@ -120,7 +120,7 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error('❌ [ManageMembersTable] Error reactivating user:', error);
+      // console.error('❌ [ManageMembersTable] Error reactivating user:', error);
       showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
@@ -130,12 +130,12 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
   const handleDeleteUser = async (member: AdminType) => {
     try {
       setIsLoading(true);
-      console.log('🗑️ [ManageMembersTable] Deleting user:', member.id);
+      // console.log('🗑️ [ManageMembersTable] Deleting user:', member.id);
       showToast('Deleting user...', 'loading');
 
       // Call the delete admin endpoint
-      const response = await adminService.deleteAdmin(member.id.toString());
-      console.log('📨 [ManageMembersTable] Delete response:', response);
+      await adminService.deleteAdmin(member.id.toString());
+      // console.log('📨 [ManageMembersTable] Delete response:', response);
 
       // Remove the member from local state
       setUpdatedMembers((prev) => prev.filter((m) => m.id !== member.id));
@@ -153,7 +153,7 @@ export default function ManageMembersTable({ members, onEdit }: Props) {
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error('❌ [ManageMembersTable] Error deleting user:', error);
+      // console.error('❌ [ManageMembersTable] Error deleting user:', error);
       showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);

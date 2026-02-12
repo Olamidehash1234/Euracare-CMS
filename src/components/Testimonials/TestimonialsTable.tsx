@@ -14,6 +14,14 @@ interface TestimonialsTableProps {
 }
 
 export default function TestimonialsTable({ testimonials, onEdit, onDelete }: TestimonialsTableProps) {
+  // Sort testimonials by id descending (as a proxy for recency, since no date field is present)
+  const sortedTestimonials = [...testimonials].sort((a, b) => {
+    // If id is a number, sort numerically; otherwise, sort as string
+    if (typeof a.id === 'number' && typeof b.id === 'number') {
+      return b.id - a.id;
+    }
+    return String(b.id).localeCompare(String(a.id));
+  });
   return (
     <div className="overflow-x-auto w-full border-[0.3px] px-[24px] border-[#B9B9B9] rounded-[14px]">
       <table className="w-full text-left table-auto">
@@ -30,7 +38,7 @@ export default function TestimonialsTable({ testimonials, onEdit, onDelete }: Te
           </tr>
         </thead>
         <tbody>
-          {testimonials.map((t) => (
+          {sortedTestimonials.map((t) => (
             <tr key={t.id} className="border-t border-[#01010133]">
               <td className="w-[40px] py-[19px] align-middle"><input type="checkbox" /></td>
               <td className="w-[100px] py-[19px] px-4 align-middle">
