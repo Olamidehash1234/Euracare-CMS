@@ -190,18 +190,13 @@ const TeamPage = () => {
       <section>
         <Header title="Team Members" />
         <div className="p-[16px] lg:p-[40px]">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold text-red-900 mb-2">Unable to Load Team Members</h3>
-            <p className="text-red-700 mb-4">{error}</p>
-            <button
-              onClick={() => {
-                fetchTeamMembers();
-              }}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-            >
-              Retry
-            </button>
-          </div>
+          <NotFound
+            title="Failed to Load Team Members"
+            description="We encountered an error while loading the team members. Please try again."
+            imageSrc="/not-found.png"
+            ctaText="Try Again"
+            onCta={fetchTeamMembers}
+          />
         </div>
       </section>
     );

@@ -6,6 +6,7 @@ interface NotFoundProps {
   imageSrc?: string;
   ctaText?: string;
   onCta?: () => void;
+  className?: string;
 }
 
 const NotFound: React.FC<NotFoundProps> = ({
@@ -14,9 +15,10 @@ const NotFound: React.FC<NotFoundProps> = ({
   imageSrc = '/not-found.png',
   ctaText = 'Add New',
   onCta,
+  className = '',
 }) => {
   return (
-    <div className="flex flex-col border-[1px] rounded-[14px] items-center gap-[20px] justify-center py-[40px] lg:py-[89px]">
+    <div className={`flex flex-col border-[1px] rounded-[14px] items-center gap-[20px] justify-center py-[40px] lg:py-[89px] ${className}`}>
       <img src={imageSrc} alt={title} />
       <div className="font-semibold text-center">{title}</div>
       <div className="text-center text-sm text-gray-500 max-w-[250px] lg:max-w-[340px]">{description}</div>

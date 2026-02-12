@@ -15,6 +15,7 @@ import CreateServiceForm from '../Services/CreateServiceForm';
 import type { ServicePayload } from '../Services/CreateServiceForm';
 import CreateBlogForm from '../Blogs/CreateBlogForm';
 import type { BlogPayload } from '../Blogs/CreateBlogForm';
+import NotFound from '@/components/commonComponents/NotFound';
 
 interface ToastState {
   show: boolean;
@@ -332,21 +333,48 @@ const OverviewPage = () => {
 
   // Show error state
   if (error && !isLoading) {
+    // Fetch overview data again and reset error/loading state
+    const handleRetry = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await overviewService.getOverviewData();
+        if (response.success && response.data.overview) {
+          const overview = response.data.overview;
+          setArticles(overview.articles || []);
+          setDoctors(overview.doctors || []);
+          setServices(overview.services || []);
+          const transformedActivities = (overview.audit || []).map((audit: any) => ({
+            id: audit.id,
+            title: audit.details || 'Activity',
+            subtitle: audit.action_type,
+            time: audit.created_at,
+          }));
+          setActivities(transformedActivities);
+          setError(null);
+        } else {
+          setError('Failed to fetch overview data - Invalid response structure');
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching data';
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     return (
       <div>
         <Header title="Overview" />
-        <div className="p-[16px] lg:px-[40px] lg:mx-[40px] lg:my-[40px] rounded-[20px] border border-red-200 lg:py-[50px] flex items-center justify-center min-h-[calc(100vh-200px)]">
-          <div className="rounded-lg p-6 text-center">
-            <img src="/not-found.png" alt="Error" className="mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-red-900 mb-2">Unable to Load Overview</h3>
-            <p className="text-red-700 mb-4">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-            >
-              Retry
-            </button>
-          </div>
+        <div className="p-[16px] lg:px-[40px] lg:mx-[0px] lg:my-[90px] rounded-[20px] flex items-center justify-center">
+          <NotFound
+            title="Failed to Load Overview"
+            description="We encountered an error while loading the overview. Please try again."
+            imageSrc="/not-found.png"
+            ctaText="Try Again"
+            onCta={handleRetry}
+            className="w-full"
+          />
         </div>
       </div>
     );

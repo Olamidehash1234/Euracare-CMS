@@ -13,7 +13,7 @@ interface UseSessionTimeoutProps {
 export const useSessionTimeout = ({ onSessionTimeout }: UseSessionTimeoutProps = {}) => {
   const navigate = useNavigate();
   const unsubscribeRef = useRef<(() => void) | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Subscribe to session timeout events

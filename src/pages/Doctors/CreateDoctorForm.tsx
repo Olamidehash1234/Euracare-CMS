@@ -151,9 +151,11 @@ export default function DoctorForm({
         resetForm();
       }
 
-      // Keep toast visible during timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      // Auto-hide toast after 5s (matches Toast component duration)
+      setTimeout(() => {
+        setShowToast(false);
+      }, 5000);
+
       // If onSave callback is provided (from Overview/parent component), call it
       // Convert API payload to form-shaped NewDoctorPayload for the callback
       if (onSave) {
