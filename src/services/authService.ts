@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient, { resetSessionTimeout } from './apiClient';
 
 export interface LoginPayload {
   email: string;
@@ -34,6 +34,8 @@ const authService = {
   login: (payload: LoginPayload) =>
     apiClient.post<LoginResponse>('/auth/login', payload)
       .then((response) => {
+        // Reset session timeout flag on successful login
+        resetSessionTimeout();
         return response;
       })
       .catch((error) => {

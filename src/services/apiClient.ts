@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import type {AxiosInstance, AxiosResponse} from 'axios';
+import { authEventEmitter } from '../utils/authEventEmitter';
 
 // let failedQueue: any[] = [];
 
@@ -27,9 +28,17 @@ const apiClient: AxiosInstance = axios.create({
 
 // let isRefreshing = false;
 
+// Flag to track if session has timed out
+let isSessionTimedOut = false;
+
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
+    // If session has timed out, reject all new requests
+    if (isSessionTimedOut) {
+      return Promise.reject(new Error('Session has expired'));
+    }
+
     // Get token from localStorage if it exists
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -48,83 +57,27 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    // const originalRequest = error.config as any;
+    // Handle 401 Unauthorized - Session timeout
+    if (error.response?.status === 401 && !isSessionTimedOut) {
+      isSessionTimedOut = true;
+      
+      // Clear auth data
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('currentUser');
 
-    // Handle 401 errors with token refresh attempt
-    // if (error.response?.status === 401) {
-    //   // Only redirect to login if it's NOT a login request itself
-    //   const isLoginRequest = originalRequest?.url?.includes('/auth/login');
-    //   const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh');
-    //   
-    //   if (isLoginRequest || isRefreshRequest) {
-    //     // Let login/refresh errors propagate
-    //     return Promise.reject(error);
-    //   }
-    //
-    //   // Check if refresh token exists
-    //   const refreshToken = localStorage.getItem('refreshToken');
-    //   if (!refreshToken) {
-    //     // No refresh token - must login
-    //     localStorage.removeItem('authToken');
-    //     localStorage.removeItem('refreshToken');
-    //     localStorage.removeItem('currentUser');
-    //     window.location.href = '/auth/login';
-    //     return Promise.reject(error);
-    //   }
-    //
-    //   // If not already refreshing, attempt to refresh token
-    //   if (!isRefreshing) {
-    //     isRefreshing = true;
-    //
-    //     return new Promise((resolve, reject) => {
-    //       axios
-    //         .post(
-    //           `${import.meta.env.VITE_API_BASE_URL || 'https://euracare-cms-backend-mco8l.ondigitalocean.app'}/api/${import.meta.env.VITE_API_VERSION || 'v1'}/auth/refresh`,
-    //           { refresh_token: refreshToken }
-    //         )
-    //         .then(({ data }) => {
-    //           const newAccessToken = data.data?.access_token;
-    //           if (newAccessToken) {
-    //             localStorage.setItem('authToken', newAccessToken);
-    //             apiClient.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-    //             originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-    //             processQueue(null, newAccessToken);
-    //             resolve(apiClient(originalRequest));
-    //           } else {
-    //             processQueue(error, null);
-    //             localStorage.removeItem('authToken');
-    //             localStorage.removeItem('refreshToken');
-    //             localStorage.removeItem('currentUser');
-    //             window.location.href = '/auth/login';
-    //             reject(error);
-    //           }
-    //         })
-    //         .catch((err) => {
-    //           processQueue(err, null);
-    //           localStorage.removeItem('authToken');
-    //           localStorage.removeItem('refreshToken');
-    //           localStorage.removeItem('currentUser');
-    //           window.location.href = '/auth/login';
-    //           reject(err);
-    //         });
-    //     });
-    //   } else {
-    //     // Already refreshing - queue the request
-    //     return new Promise((resolve, reject) => {
-    //       failedQueue.push({
-    //         resolve: (token: string) => {
-    //           originalRequest.headers.Authorization = `Bearer ${token}`;
-    //           resolve(apiClient(originalRequest));
-    //         },
-    //         reject: (err: any) => reject(err),
-    //       });
-    //     });
-    //   }
-    // }
+      // Emit session timeout event for component to handle toast + redirect
+      authEventEmitter.emit('sessionTimeout');
+    }
     
     // Silent error handling - no console output
     return Promise.reject(error);
   }
 );
+
+// Export a way to reset the session timeout status (for login)
+export const resetSessionTimeout = () => {
+  isSessionTimedOut = false;
+};
 
 export default apiClient;

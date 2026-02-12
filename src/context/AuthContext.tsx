@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { authService, getErrorMessage } from '../../src/services';
+import { authEventEmitter } from '../utils/authEventEmitter';
 
 export interface User {
   id: string;
@@ -81,6 +82,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       localStorage.setItem('currentUser', JSON.stringify(basicUser));
       setUser(basicUser);
+      
+      // Reset session timeout flags on successful login
+      authEventEmitter.reset();
     } catch (err) {
       // Clear user on login failure so isAuthenticated becomes false
       setUser(null);
