@@ -38,7 +38,7 @@ const testimonialService = {
 
   // Delete testimonial
   deleteTestimonial: (id: string) =>
-    apiClient.delete(`/testimonials/${id}/`),
+    apiClient.delete(`/testimonials/${id}`),
 
   // Bulk delete testimonials
   bulkDeleteTestimonials: (ids: string[]) =>
