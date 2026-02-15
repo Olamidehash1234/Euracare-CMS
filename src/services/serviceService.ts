@@ -52,7 +52,7 @@ const serviceService = {
 
   // Get single service
   getServiceById: (id: string) => {
-    const response = apiClient.get<GetServiceByIdResponse>(`/services/${id}/`);
+    const response = apiClient.get<GetServiceByIdResponse>(`/services/${id}`);
     return response;
   },
 
