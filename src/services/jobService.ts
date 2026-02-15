@@ -33,7 +33,7 @@ const createJob = async (payload: CreateJobPayload) => {
 };
 
 const getJobById = async (id: string) => {
-  const res = await apiClient.get(`/jobs/${id}/`);
+  const res = await apiClient.get(`/jobs/${id}`);
   return res.data;
 };
 
