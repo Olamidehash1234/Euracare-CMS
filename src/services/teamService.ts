@@ -45,7 +45,7 @@ const teamService = {
    * Get single team member by ID
    */
   getTeamMemberById: (id: string) => {
-    return apiClient.get<{ data: TeamMemberResponse }>(`/teams/${id}/`);
+    return apiClient.get<{ data: TeamMemberResponse }>(`/teams/${id}`);
   },
 
   /**
