@@ -18,11 +18,8 @@ import { authEventEmitter } from '../utils/authEventEmitter';
 // };
 
 // Create axios instance
-const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://euracare-cms-backend-mco8l.ondigitalocean.app';
-const apiVersion = import.meta.env.VITE_API_VERSION || 'v1';
-
 const apiClient: AxiosInstance = axios.create({
-  baseURL: `${apiBase}/api/${apiVersion}`,
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}`,
   headers: {
     'Content-Type': 'application/json',
   },

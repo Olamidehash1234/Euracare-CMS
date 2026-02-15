@@ -3,13 +3,10 @@
  * Handles environment variables and API configuration
  */
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://euracare-cms-backend-mco8l.ondigitalocean.app';
-const API_VERSION = import.meta.env.VITE_API_VERSION || 'v1';
-
 export const API_CONFIG = {
-  BASE_URL,
-  API_VERSION,
-  FULL_API_URL: `${BASE_URL}/api/${API_VERSION}`,
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://euracare-cms-backend-mco8l.ondigitalocean.app',
+  API_VERSION: import.meta.env.VITE_API_VERSION || 'v1',
+  FULL_API_URL: `${import.meta.env.VITE_API_BASE_URL || 'https://euracare-cms-backend-mco8l.ondigitalocean.app'}/api/${import.meta.env.VITE_API_VERSION || 'v1'}`,
   
   // Request timeout in milliseconds
   TIMEOUT: 30000,
