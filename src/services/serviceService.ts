@@ -48,7 +48,7 @@ export interface GetServiceByIdResponse {
 const serviceService = {
   // Get all services
   getAllServices: (params?: { page?: number; limit?: number; search?: string }) =>
-    apiClient.get<{ data: { services: ServiceResponse[] }; total: number }>('/services', { params }),
+    apiClient.get<{ data: { services: ServiceResponse[] }; total: number }>('/services/', { params }),
 
   // Get single service
   getServiceById: (id: string) => {

@@ -32,11 +32,7 @@ class WebSocketService {
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
-    this.url = import.meta.env.VITE_WS_URL;
-    
-    if (!this.url) {
-      
-    }
+    this.url = import.meta.env.VITE_WS_URL || 'wss://euracare-cms-backend-mco8l.ondigitalocean.app/api/v1/notification/ws';
   }
 
   public connect(token?: string): Promise<void> {
