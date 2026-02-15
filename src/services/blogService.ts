@@ -37,7 +37,7 @@ const blogService = {
 
   // Get single blog
   getBlogById: (id: string) =>
-    apiClient.get<{ data: BlogResponse }>(`/articles/${id}/`),
+    apiClient.get<{ data: BlogResponse }>(`/articles/${id}`),
 
   // Create blog
   createBlog: (payload: BlogPayload) =>
