@@ -23,7 +23,7 @@ export interface JobResponse {
 }
 
 const listJobs = async () => {
-  const res = await apiClient.get('/jobs');
+  const res = await apiClient.get('/jobs/');
   return res.data;
 };
 
