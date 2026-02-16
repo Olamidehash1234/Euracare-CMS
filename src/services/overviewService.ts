@@ -70,7 +70,7 @@ const overviewService = {
   getOverviewData: async () => {
     try {
       // console.log('📊 [overviewService] Fetching overview data from /overview/');
-      const response = await apiClient.get<OverviewResponse>('/overview/');
+      const response = await apiClient.get<OverviewResponse>('/overview');
       
       // console.log('📊 [overviewService] Full response:', response);
       // console.log('📊 [overviewService] Response data:', response.data);
