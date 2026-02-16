@@ -107,7 +107,7 @@ const notificationService = {
       // Resolve synthetic IDs to real MongoDB ObjectIds if needed
       const realId = await resolveSyntheticId(id);
       const response = await apiClient.patch<{ success: boolean; data: BackendNotification }>(
-        `/notification${realId}/mark-as-read`
+        `/notification/${realId}/mark-as-read`
       );
       return response;
     } catch (error: any) {
