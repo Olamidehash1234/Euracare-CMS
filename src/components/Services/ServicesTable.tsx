@@ -21,7 +21,7 @@ interface ServicesTableProps {
 
 import { formatTableDateTime } from '../../utils/dateFormatter';
 
-export default function ServicesTable({ services, onView, onEdit, onDelete }: ServicesTableProps) {
+export default function ServicesTable({ services, onEdit, onDelete }: ServicesTableProps) {
   // Sort services by publishedAt descending (newest first)
   const sortedServices = [...services].sort((a, b) => {
     const dateA = new Date(a.publishedAt).getTime();

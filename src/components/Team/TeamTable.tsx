@@ -16,7 +16,7 @@ interface TeamTableProps {
 
 import { formatTableDateTime } from '../../utils/dateFormatter';
 
-export default function TeamTable({ members, onView, onEdit, onDelete }: TeamTableProps) {
+export default function TeamTable({ members, onEdit, onDelete }: TeamTableProps) {
   // Sort members by createdAt descending (newest first)
   const sortedMembers = [...members].sort((a, b) => {
     const dateA = new Date(a.createdAt).getTime();
