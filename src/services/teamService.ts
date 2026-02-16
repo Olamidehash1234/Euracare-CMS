@@ -34,7 +34,7 @@ const teamService = {
    */
   getAllTeamMembers: async (params?: { page?: number; limit?: number; search?: string }) => {
     try {
-      const response = await apiClient.get<{ data: { team_members: TeamMemberResponse[]; meta?: any } }>('/teams/', { params });
+      const response = await apiClient.get<{ data: { team_members: TeamMemberResponse[]; meta?: any } }>('/teams', { params });
       return response;
     } catch (error) {
       throw error;
@@ -75,7 +75,7 @@ const teamService = {
         profile_picture_url: profilePictureUrl,
       };
 
-      const response = await apiClient.post<{ data: TeamMemberResponse }>('/teams/', teamMemberPayload);
+      const response = await apiClient.post<{ data: TeamMemberResponse }>('/teams', teamMemberPayload);
       return response.data;
     } catch (error) {
       throw error;

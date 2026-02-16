@@ -33,7 +33,7 @@ export interface BlogResponse {
 const blogService = {
   // Get all blogs
   getAllBlogs: (params?: { page?: number; limit?: number; search?: string; status?: string }) =>
-    apiClient.get<{ data: { articles: { articles: BlogResponse[]; meta: any } } }>('/articles/', { params }),
+    apiClient.get<{ data: { articles: { articles: BlogResponse[]; meta: any } } }>('/articles', { params }),
 
   // Get single blog
   getBlogById: (id: string) =>
@@ -41,7 +41,7 @@ const blogService = {
 
   // Create blog
   createBlog: (payload: BlogPayload) =>
-    apiClient.post<{ data: BlogResponse }>('/articles/', payload),
+    apiClient.post<{ data: BlogResponse }>('/articles', payload),
 
   // Update blog
   updateBlog: (id: string, payload: Partial<BlogPayload>) =>

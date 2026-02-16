@@ -41,7 +41,7 @@ export interface DoctorResponse {
 const doctorService = {
   // Get all doctors
   getAllDoctors: (params?: { page?: number; limit?: number; search?: string }) =>
-    apiClient.get<{ data: { doctor: DoctorResponse[]; meta?: any } }>('/doctors/', { params }),
+    apiClient.get<{ data: { doctor: DoctorResponse[]; meta?: any } }>('/doctors', { params }),
 
   // Get single doctor
   getDoctorById: (id: string) =>
@@ -49,7 +49,7 @@ const doctorService = {
 
   // Create doctor
   createDoctor: (payload: CreateDoctorPayload) =>
-    apiClient.post<{ data: DoctorResponse }>('/doctors/', payload),
+    apiClient.post<{ data: DoctorResponse }>('/doctors', payload),
 
   // Update doctor
   updateDoctor: async (id: string, payload: Partial<CreateDoctorPayload>) => {

@@ -22,7 +22,7 @@ export interface TestimonialResponse {
 const testimonialService = {
   // Get all testimonials
   getAllTestimonials: (params?: { page?: number; limit?: number; search?: string }) =>
-    apiClient.get<{ data: { testimonials: TestimonialResponse[]; meta?: any } }>('/testimonials/', { params }),
+    apiClient.get<{ data: { testimonials: TestimonialResponse[]; meta?: any } }>('/testimonials', { params }),
 
   // Get single testimonial by ID
   getTestimonialById: (id: string) =>
@@ -30,7 +30,7 @@ const testimonialService = {
 
   // Create testimonial
   createTestimonial: (payload: TestimonialPayload) =>
-    apiClient.post<{ data: TestimonialResponse }>('/testimonials/', payload),
+    apiClient.post<{ data: TestimonialResponse }>('/testimonials', payload),
 
   // Update testimonial
   updateTestimonial: (id: string, payload: Partial<TestimonialPayload>) =>

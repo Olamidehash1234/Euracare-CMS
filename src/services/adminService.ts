@@ -25,7 +25,7 @@ export interface AdminResponse {
 const adminService = {
   // Get all admins
   getAllAdmins: (params?: { page?: number; limit?: number; search?: string; roleId?: string }) =>
-    apiClient.get<{ data: { users: AdminResponse[]; meta?: any } }>('/users/', { params }),
+    apiClient.get<{ data: { users: AdminResponse[]; meta?: any } }>('/users', { params }),
 
   // Get single admin
   getAdminById: (id: string) =>
@@ -33,7 +33,7 @@ const adminService = {
 
   // Create user (admin)
   createUser: (payload: CreateUserPayload) =>
-    apiClient.post<{ data: AdminResponse }>('/users/', payload),
+    apiClient.post<{ data: AdminResponse }>('/users', payload),
 
   // Update admin
   updateAdmin: (id: string, payload: Partial<CreateUserPayload>) =>

@@ -48,7 +48,7 @@ export interface GetServiceByIdResponse {
 const serviceService = {
   // Get all services
   getAllServices: (params?: { page?: number; limit?: number; search?: string }) =>
-    apiClient.get<{ data: { services: ServiceResponse[] }; total: number }>('/services/', { params }),
+    apiClient.get<{ data: { services: ServiceResponse[] }; total: number }>('/services', { params }),
 
   // Get single service
   getServiceById: (id: string) => {
@@ -58,7 +58,7 @@ const serviceService = {
 
   // Create service
   createService: (payload: ServicePayload) =>
-    apiClient.post<{ data: ServiceResponse }>('/services/', payload),
+    apiClient.post<{ data: ServiceResponse }>('/services', payload),
 
   // Update service
   updateService: (id: string, payload: Partial<ServicePayload>) =>

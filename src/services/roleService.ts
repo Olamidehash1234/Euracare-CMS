@@ -29,23 +29,23 @@ export interface PermissionResponse {
 const roleService = {
   // Get all roles
   getAllRoles: (params?: { page?: number; limit?: number }) =>
-    apiClient.get<{ data: { roles: RoleResponse[]; meta?: any } }>('/roles/', { params }),
+    apiClient.get<{ data: { roles: RoleResponse[]; meta?: any } }>('/roles', { params }),
 
   // Get single role
   getRoleById: (id: string) =>
-    apiClient.get<{ data: RoleResponse }>(`/roles/${id}/`),
+    apiClient.get<{ data: RoleResponse }>(`/roles/${id}`),
 
   // Create role
   createRole: (payload: RolePayload) =>
-    apiClient.post<{ data: RoleResponse }>('/roles/', payload),
+    apiClient.post<{ data: RoleResponse }>('/roles', payload),
 
   // Update role
   updateRole: (id: string, payload: Partial<RolePayload>) =>
-    apiClient.put<{ data: RoleResponse }>(`/roles/${id}/`, payload),
+    apiClient.put<{ data: RoleResponse }>(`/roles/${id}`, payload),
 
   // Delete role
   deleteRole: (id: string) =>
-    apiClient.delete(`/roles/${id}/`),
+    apiClient.delete(`/roles/${id}`),
 
   // Get all permissions
   getAllPermissions: () =>

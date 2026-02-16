@@ -31,7 +31,7 @@ const auditService = {
    * Get all audit logs with optional pagination
    */
   getAudits: (params?: { page?: number; limit?: number; search?: string }) => {
-    return apiClient.get<{ success: boolean; data: { audits: AuditResponse[] }; meta?: any }>('/audits/', { params })
+    return apiClient.get<{ success: boolean; data: { audits: AuditResponse[] }; meta?: any }>('/audits', { params })
       .then((response) => {
         return response;
       })
@@ -44,7 +44,7 @@ const auditService = {
    * Get audit logs for a specific user
    */
   getUserAudits: (userId: string, params?: { page?: number; limit?: number }) => {
-    return apiClient.get<{ success: boolean; data: { audits: AuditResponse[] } }>(`/audits/user/${userId}/`, { params })
+    return apiClient.get<{ success: boolean; data: { audits: AuditResponse[] } }>(`/audits/user/${userId}`, { params })
       .then((response) => {
         return response;
       })
@@ -57,7 +57,7 @@ const auditService = {
    * Get audit log by ID
    */
   getAuditById: (id: string) => {
-    return apiClient.get<{ success: boolean; data: AuditResponse }>(`/audits/${id}/`)
+    return apiClient.get<{ success: boolean; data: AuditResponse }>(`/audits/${id}`)
       .then((response) => {
         return response;
       })
