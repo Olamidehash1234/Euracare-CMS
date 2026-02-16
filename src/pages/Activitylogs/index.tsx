@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from '../../components/commonComponents/Header';
 import SearchBar from '../../components/commonComponents/SearchBar';
 import ActivityTable from '../../components/ActivityLogs/ActivityTable';
-import InlineRoleDropdown from '../../components/commonComponents/InlineRoleDropdown';
+import CustomDropdown from '../../components/commonComponents/CustomDropdown';
 import Toast from '../../components/GlobalComponents/Toast';
 import LoadingSpinner from '../../components/commonComponents/LoadingSpinner';
 import NotFound from '../../components/commonComponents/NotFound';
@@ -10,18 +10,18 @@ import { auditService } from '../../services';
 import type { ActivityRow } from '../../components/ActivityLogs/ActivityTable';
 import type { AuditResponse } from '../../services/auditService';
 
-const roleOptions = ['Super Admin', 'Admin', 'System', 'marketing'];
-
 const LogsPage = () => {
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [selectedRole, setSelectedRole] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [activities, setActivities] = useState<ActivityRow[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<ActivityRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'loading'>('success');
 
-  // Fetch audit logs from backend
+  // Fetch audit logs from backend (without pagination)
   useEffect(() => {
     const fetchAudits = async () => {
       try {
@@ -29,7 +29,7 @@ const LogsPage = () => {
         setError(null);
         // console.log('📋 Starting to fetch audit logs...');
         
-        const response = await auditService.getAudits({ page: 1, limit: 50 });
+        const response = await auditService.getAudits();
         
         // console.log('📨 Raw audit response:', response);
         
@@ -61,6 +61,7 @@ const LogsPage = () => {
         setToastMessage('Unable to load audit logs. Please try again.');
         setShowToast(true);
         setActivities([]);
+        setFilteredActivities([]);
       } finally {
         setLoading(false);
       }
@@ -69,9 +70,34 @@ const LogsPage = () => {
     fetchAudits();
   }, []);
 
-  // resetFilters clears parent's selection (dropdown reads value prop)
+  // Filter activities based on search query and selected role
+  useEffect(() => {
+    let filtered = activities;
+
+    // Filter by search query (searches in actor, action, details)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(activity =>
+        (activity.actor?.toLowerCase().includes(query)) ||
+        (activity.action?.toLowerCase().includes(query)) ||
+        (activity.details?.toLowerCase().includes(query))
+      );
+    }
+
+    // Filter by selected role
+    if (selectedRole) {
+      filtered = filtered.filter(activity =>
+        activity.role === selectedRole
+      );
+    }
+
+    setFilteredActivities(filtered);
+  }, [activities, searchQuery, selectedRole]);
+
+  // resetFilters clears the selection
   const resetFilters = () => {
-    setSelectedRoles([]);
+    setSelectedRole('');
+    setSearchQuery('');
   };
 
   // Retry fetching audits
@@ -80,7 +106,7 @@ const LogsPage = () => {
       setLoading(true);
       setError(null);
       
-      const response = await auditService.getAudits({ page: 1, limit: 50 });
+      const response = await auditService.getAudits();
       
       const audits = response.data.data?.audits || [];
       
@@ -133,32 +159,35 @@ const LogsPage = () => {
       <div className="p-[16px] lg:p-[40px]">
         <div className="flex items-center flex-col lg:flex-row gap-[10px] lg:gap-[20px] justify-between mb-[22px]">
           <div className="flex items-center w-full lg:w-1/2">
-            <SearchBar placeholder="Search Activity Log" />
+            <SearchBar 
+              placeholder="Search Activity Log" 
+              value={searchQuery}
+              onSearch={setSearchQuery}
+            />
           </div>
 
           {/* FILTER CONTROLS */}
-          <div className="flex items-center border border-[#01010133] divide-x rounded-[10px] overflow-hidden">
-            <div className="inline-flex items-center">
-              <button className="flex items-center gap-2 px-[20px] py-[12px]">
-                <img src="/icon/filter.svg" alt="filter" className="" />
-                <span className=" text-[#202224] text-[15px]">Filter By:</span>
-              </button>
+          <div className="flex items-center flex-col lg:flex-row gap-[10px] lg:gap-[20px]">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Role:</span>
+              <CustomDropdown
+                options={Array.from(new Set(activities.map(a => a.role)))
+                  .filter(Boolean)
+                  .map(role => ({ label: role || 'Unknown', value: role || '' }))}
+                value={selectedRole}
+                onChange={setSelectedRole}
+                placeholder="Select Role"
+                className="w-[150px]"
+              />
             </div>
-
-            {/* Role dropdown trigger */}
-            <InlineRoleDropdown
-              options={roleOptions}
-              value={selectedRoles}
-              onChange={(vals) => setSelectedRoles(vals)}
-            />
 
             {/* Reset filter */}
             <button
               onClick={resetFilters}
-              className="flex items-center gap-2 px-3 py-[12px] text-[15px] text-[#FF453A]"
+              className="flex items-center gap-2 px-3 py-[8px] text-[15px] text-[#FF453A] hover:text-red-700 transition"
             >
-              <img src="/icon/reset.svg" alt="reset" className="" />
-              Reset Filter
+              <img src="/icon/reset.svg" alt="reset" className="w-[16px]" />
+              Reset
             </button>
           </div>
         </div>
@@ -182,36 +211,7 @@ const LogsPage = () => {
         )}
 
         {/* Activity table component - show only when not loading and no error */}
-        {!loading && !error && <ActivityTable activities={activities} />}
-
-        {!loading && !error && (
-          <div className="mt-[30px] flex items-center justify-between text-sm text-[#202224]">
-            <div>Showing 1-{activities.length} of {activities.length}</div>
-
-            {/* <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
-              <button onClick={handleSelectAll} className="px-[14px] py-[12px] text-[#0C2141]" title="Select All">
-                  <img src="/icon/download.svg" alt="" />
-              </button>
-
-              <button onClick={handleMarkAllRead} className="px-[14px] py-[12px] text-[#0C2141]" title="Mark All Read">
-                  <img src="/icon/info.svg" alt="" />
-              </button>
-
-              <button onClick={handleDeleteSelected} className="px-[14px] py-[12px] text-[#EF4444]" title="Delete">
-                  <img src="/icon/delete-black.svg" alt="" />
-              </button>
-            </div> */}
-
-            <div className="flex items-center border border-[#E6E8EE] divide-x divide-[#E6E8EE] rounded-[8px]">
-              <button className="px-[20px] py-[13px]">
-                <img src="/icon/arrow-left.svg" alt="" />
-              </button>
-              <button className="px-[20px] py-[13px]">
-                <img src="/icon/arrow-right.svg" alt="" />
-              </button>
-            </div>
-          </div>
-        )}
+        {!loading && !error && <ActivityTable activities={filteredActivities} />}
       </div>
 
       {/* Toast notification */}
