@@ -83,7 +83,7 @@ const notificationService = {
       if (!token) {
         return [];
       }
-      const response = await apiClient.get<{ success: boolean; data: { notifications: BackendNotification[] } }>('/notification/', { params });
+      const response = await apiClient.get<{ success: boolean; data: { notifications: BackendNotification[] } }>('/notification', { params });
       return response.data?.data?.notifications || [];
     } catch (err: any) {
       throw err;
@@ -92,7 +92,7 @@ const notificationService = {
 
   // Get unread notifications count
   getUnreadCount: () => {
-    return apiClient.get<{ success: boolean; data: { count: number } }>('/notification/unread-count/')
+    return apiClient.get<{ success: boolean; data: { count: number } }>('/notification/unread-count')
       .then((response) => {
         return response;
       })
