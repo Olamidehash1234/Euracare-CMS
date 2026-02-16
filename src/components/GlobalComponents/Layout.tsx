@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SideBar from "./SideBar";
 // import Header from "./Header";
@@ -9,17 +9,18 @@ import { useSessionTimeout } from "../../hooks/useSessionTimeout";
 
 const Layout = () => {
   const [showSessionTimeoutToast, setShowSessionTimeoutToast] = useState(false);
+  const navigate = useNavigate();
 
-  // Handle session timeout events - show toast
-  // AuthContext handles the actual logout and redirect
+  // Handle session timeout events - show toast and redirect
+  // (Layout is inside Router, so useNavigate is safe here)
   useSessionTimeout({
     onSessionTimeout: () => {
       setShowSessionTimeoutToast(true);
       
-      // Auto-hide toast after 3 seconds
+      // Redirect after a brief delay to allow toast to display
       setTimeout(() => {
-        setShowSessionTimeoutToast(false);
-      }, 3000);
+        navigate('/auth/login', { replace: true });
+      }, 2000);
     },
   });
 

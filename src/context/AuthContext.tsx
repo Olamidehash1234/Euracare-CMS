@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { authService, getErrorMessage } from '../../src/services';
 import { authEventEmitter } from '../utils/authEventEmitter';
 
@@ -27,7 +26,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   // Initialize auth state on mount
   useEffect(() => {
@@ -55,15 +53,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     initializeAuth();
   }, []);
 
-  // Listen for session timeout events and logout
+  // Listen for session timeout events and clear auth state
   useEffect(() => {
     const unsubscribe = authEventEmitter.on('sessionTimeout', () => {
       // Clear auth state when session times out
       setUser(null);
       setError(null);
-      
-      // Redirect to login page
-      navigate('/auth/login', { replace: true });
     });
 
     return () => {
@@ -71,7 +66,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         unsubscribe();
       }
     };
-  }, [navigate]);
+  }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
