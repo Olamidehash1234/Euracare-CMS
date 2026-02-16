@@ -53,9 +53,9 @@ export default function TeamTable({ members, onView, onEdit, onDelete }: TeamTab
               <td className="py-[29px] px-4 text-[14px] align-middle">{m.category ?? '-'}</td>
               <td className="py-[29px] px-4 align-middle text-center">
                 <div className="flex items-center gap-2 lg:gap-[0px] border border-[#D5D5D5] bg-[#FAFBFD] w-max rounded-[12px] divide-x">
-                  <button onClick={() => onView?.(m)} className="px-[12px] py-[10px] text-[#0C2141]" title="View">
+                  {/* <button onClick={() => onView?.(m)} className="px-[12px] py-[10px] text-[#0C2141]" title="View">
                     <img src="/icon/eye.svg" alt="" />
-                  </button>
+                  </button> */}
 
                   <button onClick={() => onEdit?.(m)} className="px-[12px] py-[10px] text-[#0C2141]" title="Edit">
                     <img src="/icon/edit.svg" alt="" />
