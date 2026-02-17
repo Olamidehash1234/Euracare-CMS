@@ -230,7 +230,16 @@ export default function CreateAdminForm({ mode = 'create', initialData, isLoadin
         notifyByEmail: form.notifyByEmail,
         countryCode: form.countryCode,
       });
-    } catch (err) {
+    } catch (err: any) {
+      // Log detailed error information for debugging
+      // console.error('=== Admin Creation/Update Error ===');
+      // console.error('Status Code:', err?.response?.status);
+      // console.error('Backend Response:', err?.response?.data);
+      // console.error('Error Message:', err?.message);
+      // console.error('Full Error:', err);
+      // console.error('Payload Sent:', payload);
+      // console.error('=====================================');
+
       const errorMessage = getErrorMessage(err);
       setToastType('error');
       setToastMessage(errorMessage);
